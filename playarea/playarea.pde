@@ -1,5 +1,12 @@
+
+Ball b1;
+
 void setup(){
   size(640, 360);
+  noLoop();
+  //create the initial ball object
+  b1 = new Ball();
+  
 }
 
 void draw(){
@@ -9,7 +16,6 @@ void draw(){
   //green floor at the bottom
   fill(129, 206, 15);
   rect(0, 340, width, 20);
-  //create the ball and fill with white color
-  fill(255);
-  ellipse(252, 144, 32, 32);
+  //create ball
+  b1.display();
 }
