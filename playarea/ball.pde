@@ -25,6 +25,17 @@ class Ball {
     x += xstep;
     y += ystep;
     redraw();
-     
+  }
+  
+  float getBallXPos(){
+    return x;
+  }
+  float getBallYPos(float yStep){
+    return y;
+  }
+  
+  void resetBallXPosition(float newXPosition){
+      x = newXPosition;
   }
 } 
+
