@@ -2,9 +2,11 @@ class Ball {
   float x, y, radius;
   
   //initial version of ball 
-  Ball() {
+  /*Ball() {
     radius = 16;
-  }
+    x = width*0.25;
+    y = height*0.5;
+  }*/
   
   //creation of ball w.r.t parameters
   Ball(float xpos, float ypos, float r){
@@ -15,7 +17,7 @@ class Ball {
   
   void display(){
     fill(255);
-    ellipse(252, 144, 32, 32);
+    ellipse(x, y, radius*2, radius*2);
     redraw();
   }
   
