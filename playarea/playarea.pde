@@ -49,24 +49,74 @@ void draw(){
   // Draw the ball
   ball.display();
 }
+boolean keyUp = false;
+boolean keyDown = false;
+boolean keyRight = false;
+boolean keyLeft = false;
 
 void keyPressed() {
   if (key == CODED) {
     if (keyCode == UP) {
-      ball.step(0,10);
+      keyUp = true;
+      //ball.step(0,10);
     } 
     if (keyCode == DOWN) {
-      ball.step(0,-100);
+      keyDown = true;
+      //ball.step(0,-30);
     } 
     if (keyCode == RIGHT) {
-      ball.step(10,-2);
+      keyRight = true;
+      //ball.step(30,-2);
       //redraw();
     }
     if (keyCode == LEFT) {
-      ball.step(-10,-2);
+      keyLeft = true;
+      //ball.step(-30,-2);
       //redraw();
+    }
+    if(keyUp == true && keyRight == true) {
+      ball.step(5,10); 
+    }
+    else if(keyUp == true && keyLeft == true) {
+      ball.step(-5,10);
+    }
+    else if(keyUp == true) {
+      ball.step(0,10);
+    }
+    else if(keyDown == true && keyRight == true) {
+      ball.step(5, -15); 
+    }
+    else if(keyDown == true && keyLeft == true) {
+      ball.step(-5, -15);
+    }
+    else if(keyDown == true) {
+      ball.step(0, -30);
+    }
+    else if(keyRight == true) {
+      ball.step(10, 0);
+    }
+    else if(keyLeft == true) {
+      ball.step(-10, 0);
     }
   }
 }
+  
+  void keyReleased(){
+    if(key == CODED) {
+      if(keyCode == UP){
+         keyUp = false; 
+      }
+      if(keyCode == DOWN) {
+        keyDown = false;
+      }
+      if(keyCode == RIGHT) {
+        keyRight = false;
+      }
+      if(keyCode == LEFT) {
+        keyLeft = false;
+      }
+      
+    }
+  }
 
 
