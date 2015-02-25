@@ -53,8 +53,8 @@ void draw(){
 boolean keyUp = false;
 boolean keyDown = false;
 boolean keyRight = false;
-//float moveRight = 0;
-//float moveLeft = 0;
+float moveRight = 0;
+float moveLeft = 0;
 boolean keyLeft = false;
 
 void keyPressed() {
@@ -85,8 +85,8 @@ void keyPressed() {
     }
     else if(keyUp == true) {
       ball.step(0,10);
-      //moveLeft = 0;
-      //moveRight = 0;
+      moveLeft = 0;
+      moveRight = 0;
     }
     /*else if(keyDown == true && keyRight == true) {
       ball.step(5, -15); 
@@ -96,18 +96,18 @@ void keyPressed() {
     }*/
     else if(keyDown == true) {
       //ball.step(0, -30);
-      //moveLeft = 0;
-      //moveRight = 0;
+      moveLeft = 0;
+      moveRight = 0;
     }
     else if(keyRight == true) {
-      ball.step(10, -10);
-      //moveRight += 5;
-      //moveLeft = 0;
+      ball.step(10 + moveRight, -10);
+      moveRight += 5;
+      moveLeft = 0;
     }
     else if(keyLeft == true) {
-      ball.step(- 10, -10);
-      //moveLeft -= 5;
-      //moveRight = 0;
+      ball.step(- 10 + moveLeft, -10);
+      moveLeft -= 5;
+      moveRight = 0;
     }
   }
 }
