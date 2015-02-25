@@ -56,9 +56,15 @@ boolean keyRight = false;
 float moveRight = 0;
 float moveLeft = 0;
 boolean keyLeft = false;
+boolean keyCtrl = false;
+boolean keyR = false;
 
 void keyPressed() {
+  
   if (key == CODED) {
+    if(keyCode == CONTROL) {
+    keyCtrl = true; 
+  }
     if (keyCode == UP) {
       keyUp = true;
       //ball.step(0,10);
@@ -82,6 +88,14 @@ void keyPressed() {
     }
     else if(keyUp == true && keyLeft == true) {
       ball.step(-10,10);
+    }
+    else if(keyCtrl == true && keyUp == true){
+      box2d.setGravity(0, 5); 
+      keyCtrl = false;
+    }
+    else if(keyCtrl == true && keyDown == true){
+      box2d.setGravity(0, -20);
+      keyCtrl = false; 
     }
     else if(keyUp == true) {
       ball.step(0,10);
@@ -109,7 +123,9 @@ void keyPressed() {
       moveLeft -= 5;
       moveRight = 0;
     }
+    
   }
+  
 }
   
   void keyReleased(){
