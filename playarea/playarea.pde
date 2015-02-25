@@ -75,15 +75,15 @@ void keyPressed() {
       //redraw();
     }
     if(keyUp == true && keyRight == true) {
-      ball.step(5,10); 
+      ball.step(10,10); 
     }
     else if(keyUp == true && keyLeft == true) {
-      ball.step(-5,10);
+      ball.step(-10,10);
     }
     else if(keyUp == true) {
       ball.step(0,10);
     }
-    else if(keyDown == true && keyRight == true) {
+    /*else if(keyDown == true && keyRight == true) {
       ball.step(5, -15); 
     }
     else if(keyDown == true && keyLeft == true) {
@@ -91,12 +91,12 @@ void keyPressed() {
     }
     else if(keyDown == true) {
       ball.step(0, -30);
-    }
+    }*/
     else if(keyRight == true) {
-      ball.step(10, 0);
+      ball.step(10, -5);
     }
     else if(keyLeft == true) {
-      ball.step(-10, 0);
+      ball.step(-10, -5);
     }
   }
 }
