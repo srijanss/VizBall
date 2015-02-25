@@ -19,11 +19,19 @@ class Surface {
 
     // This has to go backwards so that the objects  bounce off the top of the surface
     // This "edgechain" will only work in one direction!
-    for (float x = surface_width+10; x > start_pos; x -= 5) {
-      float y;
-      y = surface_height;
-      // Store the vertex in screen coordinates
-      surface.add(new Vec2(x,y));
+    if(surface_width != 0) {
+      for (float x = surface_width+10; x > start_pos; x -= 5) {
+        float y;
+        y = surface_height;
+        // Store the vertex in screen coordinates
+        surface.add(new Vec2(x,y));
+      }
+    }
+    else {
+      for(float y = surface_height; y > start_pos; y -= 5) {
+        float x = 0;
+        surface.add(new Vec2(x,y));
+      }
     }
     
     // Build an array of vertices in Box2D coordinates

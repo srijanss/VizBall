@@ -14,7 +14,7 @@ Box2DProcessing box2d;
 Ball ball;
 
 // An objects to store information about the surfaces
-Surface surface, surface2, surface3;
+Surface surface, surface2, surface3, verticalSurface;
 
 
 void setup(){
@@ -32,6 +32,7 @@ void setup(){
   surface = new Surface(width, height - 20, -10);
   surface2 = new Surface(width, height - 250, 320);
   surface3 = new Surface(width, height - 230, 320); 
+  verticalSurface = new Surface(0, 640, -10);
   
 }
 
@@ -52,6 +53,8 @@ void draw(){
 boolean keyUp = false;
 boolean keyDown = false;
 boolean keyRight = false;
+//float moveRight = 0;
+//float moveLeft = 0;
 boolean keyLeft = false;
 
 void keyPressed() {
@@ -82,21 +85,29 @@ void keyPressed() {
     }
     else if(keyUp == true) {
       ball.step(0,10);
+      //moveLeft = 0;
+      //moveRight = 0;
     }
     /*else if(keyDown == true && keyRight == true) {
       ball.step(5, -15); 
     }
     else if(keyDown == true && keyLeft == true) {
       ball.step(-5, -15);
-    }
-    else if(keyDown == true) {
-      ball.step(0, -30);
     }*/
+    else if(keyDown == true) {
+      //ball.step(0, -30);
+      //moveLeft = 0;
+      //moveRight = 0;
+    }
     else if(keyRight == true) {
-      ball.step(10, -5);
+      ball.step(10, -10);
+      //moveRight += 5;
+      //moveLeft = 0;
     }
     else if(keyLeft == true) {
-      ball.step(-10, -5);
+      ball.step(- 10, -10);
+      //moveLeft -= 5;
+      //moveRight = 0;
     }
   }
 }
@@ -111,9 +122,11 @@ void keyPressed() {
       }
       if(keyCode == RIGHT) {
         keyRight = false;
+        //moveRight = 0;
       }
       if(keyCode == LEFT) {
         keyLeft = false;
+        //moveLeft = 0;
       }
       
     }
