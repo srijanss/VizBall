@@ -1,67 +1,72 @@
+//VVizball Game Playarea
 
-Ball b1;
-float r = 48;
-float g = 139;
-float b = 206;
-float ballXRPos = 0;
-float ballXLPos = 0;
-float ballYTPos = 0;
-float ballYBPos = 0;
+//imports from box2d library
+import shiffman.box2d.*;
+import org.jbox2d.collision.shapes.*;
+import org.jbox2d.common.*;
+import org.jbox2d.dynamics.*;
+import org.jbox2d.dynamics.*;
+
+// A reference to our box2d world
+Box2DProcessing box2d;
+
+//Ball in the playarea
+Ball ball;
+
+// An objects to store information about the surfaces
+Surface surface, surface2, surface3;
 
 
 void setup(){
   size(640, 360);
-  noLoop();
-  //b1 = new Ball();
-  //create the ball object with parameters
-  b1 = new Ball(width*0.5, height*0.4, 16);
+  smooth();
+  
+  // Initialize box2d physics and create the world
+  box2d = new Box2DProcessing(this);
+  box2d.createWorld();
+  // We are setting a custom gravity
+  box2d.setGravity(0, -20);
+  //create a Ball with specified size and at given coordinates in screen
+  ball = new Ball(width*0.5, height*0.4, 16);
+  // Create the surface
+  surface = new Surface(width, height - 20, -10);
+  surface2 = new Surface(width, height - 250, 320);
+  surface3 = new Surface(width, height - 230, 320); 
   
 }
 
 void draw(){
-  background(r, g, b);
-  noFill();
-  stroke(255);
-  //green floor at the bottom
-  fill(129, 206, 15);
-  rect(0, 340, width, 20);
-  //create ball
-  b1.display();
+  // We must always step through time!
+  box2d.step();
+
+  background(255);
+
+  // Draw the surface
+  surface.display();
+  surface2.display();
+  //surface3.display();
+
+  // Draw the ball
+  ball.display();
 }
 
 void keyPressed() {
   if (key == CODED) {
     if (keyCode == UP) {
-      b1.step(0,-10);
+      ball.step(0,10);
     } 
     if (keyCode == DOWN) {
-      b1.step(0,10);
+      ball.step(0,-100);
     } 
     if (keyCode == RIGHT) {
-      b1.step(10,0);
-      ballXRPos = b1.getBallXPos();
-        if(ballXRPos>650){
-          changeBackground();
-          b1.resetBallXPosition(10);
-          redraw();
-        }
+      ball.step(10,-2);
+      //redraw();
     }
     if (keyCode == LEFT) {
-      b1.step(-10,0);
-        ballXLPos = b1.getBallXPos();
-        if(ballXLPos<0){
-          b1.resetBallXPosition(640);
-          changeBackground();
-          redraw();
-        }
+      ball.step(-10,-2);
+      //redraw();
     }
   }
 }
 
-void changeBackground(){
-    r = 41;
-    g = 5;
-    b = 106; 
-    redraw();   
-}
 
