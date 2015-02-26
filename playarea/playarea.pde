@@ -9,6 +9,7 @@ import org.jbox2d.dynamics.*;
 
 // A reference to our box2d world
 Box2DProcessing box2d;
+PImage bg;
 
 //Ball in the playarea
 Ball ball;
@@ -19,6 +20,7 @@ Surface surface, surface2, surface3, verticalSurface;
 
 void setup(){
   size(640, 360);
+  bg = loadImage("./images/mountain_trees.png");
   smooth();
   
   // Initialize box2d physics and create the world
@@ -41,6 +43,7 @@ void draw(){
   box2d.step();
 
   background(255);
+  background(bg);
 
   // Draw the surface
   surface.display();
