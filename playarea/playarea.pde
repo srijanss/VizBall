@@ -9,7 +9,7 @@ import org.jbox2d.dynamics.*;
 
 // A reference to our box2d world
 Box2DProcessing box2d;
-PImage bg;
+PImage sky, bg;
 
 //Ball in the playarea
 Ball ball;
@@ -20,6 +20,7 @@ Surface surface, surface2, surface3, verticalSurface;
 
 void setup(){
   size(640, 360);
+  sky = loadImage("./images/sky.png");
   bg = loadImage("./images/mountain_trees.png");
   smooth();
   
@@ -42,8 +43,10 @@ void draw(){
   // We must always step through time!
   box2d.step();
 
-  background(255);
-  background(bg);
+  background(255,204,153);
+  image(sky, 0, 0);
+  image(bg, 0, 0);
+  //background(bg);
 
   // Draw the surface
   surface.display();
@@ -94,11 +97,11 @@ void keyPressed() {
     }
     else if(keyCtrl == true && keyUp == true){
       box2d.setGravity(0, 5); 
-      keyCtrl = false;
+      //keyCtrl = false;
     }
     else if(keyCtrl == true && keyDown == true){
       box2d.setGravity(0, -20);
-      keyCtrl = false; 
+      //keyCtrl = false; 
     }
     else if(keyUp == true) {
       ball.step(0,10);
@@ -118,12 +121,16 @@ void keyPressed() {
     }
     else if(keyRight == true) {
       ball.step(10 + moveRight, -10);
-      moveRight += 5;
+      if(moveRight < 20){
+        moveRight += 5;
+      }
       moveLeft = 0;
     }
     else if(keyLeft == true) {
       ball.step(- 10 + moveLeft, -10);
-      moveLeft -= 5;
+      if(moveLeft > -20){
+        moveLeft -= 5;
+      }
       moveRight = 0;
     }
     
@@ -145,6 +152,10 @@ void keyPressed() {
       }
       if(keyCode == LEFT) {
         keyLeft = false;
+        //moveLeft = 0;
+      }
+      if(keyCode == CONTROL) {
+        keyCtrl = false;
         //moveLeft = 0;
       }
       
