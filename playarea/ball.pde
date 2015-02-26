@@ -77,7 +77,7 @@ class Ball {
   void step(float xplus, float yplus){
     Vec2 pos = box2d.getBodyPixelCoord(body);
     body.setLinearVelocity(new Vec2(xplus, yplus));
-    body.setAngularVelocity(random(-xplus,yplus));
+    body.setAngularVelocity(-xplus);
   }
 } 
 
