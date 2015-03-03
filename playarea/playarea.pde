@@ -33,12 +33,12 @@ void setup(){
   //create a Ball with specified size and at given coordinates in screen
   ball = new Ball(width*0.5, height*0.4, 16);
   // Create the surface
-  surface = new Surface(width, height - 20, -10);
-  surface2 = new Surface(width, height - 250, 320);
-  surface3 = new Surface(width, height - 230, 320); 
-  ceiling1 = new Surface(width, 0, -10);
-  ceiling2 = new Surface(width, 20, -10);
-  verticalSurface = new Surface(0, 640, -10);
+  surface = new Surface(width, height - 20, -10, 0);
+  surface2 = new Surface(width, height - 250, 320, 0);
+  surface3 = new Surface(width, height - 230, 320, 0); 
+  ceiling1 = new Surface(width, 0, -10, 0);
+  ceiling2 = new Surface(width, 20, -10, 0);
+  verticalSurface = new Surface(0, 640, -10, 0);
   
 }
 
@@ -71,9 +71,13 @@ boolean keyR = false;
 
 void keyPressed() {
   if(key == 'r' || key == 'R'){
-    if(ball.done()){
+    /*if(ball.done()){
       ball = new Ball(width*0.5, height*0.4, 16);
-    } 
+    } */
+    ceiling1.kill();
+    ceiling2.kill();
+    ceiling1 = new Surface(width, 0, -10, 1);
+    ceiling2 = new Surface(width, 20, -10, 1);
   }
   if (key == CODED) {
     if(keyCode == CONTROL) {
