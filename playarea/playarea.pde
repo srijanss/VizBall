@@ -15,7 +15,8 @@ PImage sky, bg;
 Ball ball;
 
 // An objects to store information about the surfaces
-Surface surface, surface2, surface3, verticalSurface;
+//3rd March 2015: Srijan: Added ceiling surface
+Surface surface, surface2, surface3, verticalSurface, ceiling1, ceiling2;
 
 
 void setup(){
@@ -35,6 +36,8 @@ void setup(){
   surface = new Surface(width, height - 20, -10);
   surface2 = new Surface(width, height - 250, 320);
   surface3 = new Surface(width, height - 230, 320); 
+  ceiling1 = new Surface(width, 0, -10);
+  ceiling2 = new Surface(width, 20, -10);
   verticalSurface = new Surface(0, 640, -10);
   
 }
@@ -52,6 +55,7 @@ void draw(){
   surface.display();
   surface2.display();
   //surface3.display();
+  ceiling1.display();
 
   // Draw the ball
   ball.display();
