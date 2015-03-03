@@ -66,7 +66,11 @@ boolean keyCtrl = false;
 boolean keyR = false;
 
 void keyPressed() {
-  
+  if(key == 'r' || key == 'R'){
+    if(ball.done()){
+      ball = new Ball(width*0.5, height*0.4, 16);
+    } 
+  }
   if (key == CODED) {
     if(keyCode == CONTROL) {
     keyCtrl = true; 

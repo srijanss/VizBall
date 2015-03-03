@@ -21,11 +21,11 @@ class Ball {
     // Let's find the screen position of the ball
     Vec2 pos = box2d.getBodyPixelCoord(body);
     // Is it off the bottom of the screen?
-    if (pos.y > height+r*2) {
+    //if (pos.y > height+r*2) {
       killBody();
       return true;
-    }
-    return false;
+    //}
+    //return false;
   }
 
   // 
