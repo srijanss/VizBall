@@ -15,10 +15,11 @@ ArrayList<Box> platforms;
 ArrayList<Box> ceilings;
 ArrayList<Box> floors;
 
+
 //Ball in the playarea
 Ball ball;
-Box box;
 float game_width = 640 * 5;
+float shift = 0;
 
 // An objects to store information about the surfaces
 //3rd March 2015: Srijan: Added ceiling surface
@@ -66,6 +67,8 @@ void setup(){
     ceiling_gap += 100;
     //ceilings.add(new Box(0,5,width*2,10));
   }
+  
+  
   // Create the surface
   //surface = new Surface(width, height - 20, -10, 0);
   //surface2 = new Surface(width/4,110, 50, 0);
@@ -96,6 +99,7 @@ void draw(){
   //surface2.display();
   //surface3.display();
   //int index=0;
+ 
   for(Box b: platforms) {
       b.display();
   }
@@ -110,7 +114,10 @@ void draw(){
   // Draw the ball
   ball.display();
   //box.display();
-  
+  if(ball.get_ball_pos() > height+16 || ball.get_ball_pos() < -16){
+    ball.done(); 
+    ball = new Ball(width*0.5, height*0.4, 16);
+  }
   //print(ball.get_ball_pos());
  
   
@@ -124,19 +131,52 @@ boolean keyLeft = false;
 boolean keyCtrl = false;
 boolean keyR = false;
 
+void scroll(float value){
+  shift += value;
+    for(int i=0; i<platforms.size(); i++){
+       Box b = platforms.get(i);
+       if(b.kill()){
+         platforms.remove(i);
+       } 
+    }
+    float platform_gap = 0;
+    for(float w=width; w<=game_width; w+=width){
+      platforms.add(new Box(shift+platform_gap + 3*w/4,height-150,width/2-50,10));
+      platforms.add(new Box(shift+platform_gap + w/4,height-250,width/2-50,10));
+      platforms.add(new Box(shift+platform_gap + 5*w/4,height-200,width/2-50,10));
+      platform_gap += width;
+    }
+   float floor_gap = 0;
+   float ceiling_gap = 0;
+   for(int i=0; i<floors.size(); i++){
+       Box f = floors.get(i);
+       if(f.kill()){
+         floors.remove(i);
+       } 
+    }
+    for(int i=0; i<ceilings.size(); i++){
+       Box c = ceilings.get(i);
+       if(c.kill()){
+         ceilings.remove(i);
+       } 
+    }
+   for(float w=0; w<game_width; w+=width/2){
+     floors.add(new Box(shift+w+floor_gap,height-5,width/2,10));
+     floor_gap +=100;
+   }
+   for(float w=0; w<game_width; w+=width/4){  
+     ceilings.add(new Box(shift+w+ceiling_gap,5,width/4,10));
+     ceiling_gap += 100;
+    }
+  
+}
+
 void keyPressed() {
   if(key == 'r' || key == 'R'){
-    /*for(Box b: platforms) {
-      float x_pos = b.get_position();
-    }*/
-  
-    /*if(ball.done()){
-      ball = new Ball(width*0.5, height*0.4, 16);
-    } */
-    /*ceiling1.kill();
-    ceiling2.kill();
-    ceiling1 = new Surface(width, 0, -10, 1);
-    ceiling2 = new Surface(width, 20, -10, 1);*/
+     scroll(0.5);
+  }
+  if(key == 'l' || key == 'L'){
+     scroll(-0.5);
   }
   if (key == CODED) {
     if(keyCode == CONTROL) {
