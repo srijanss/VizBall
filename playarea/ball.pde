@@ -79,5 +79,10 @@ class Ball {
     body.setLinearVelocity(new Vec2(xplus, yplus));
     body.setAngularVelocity(-xplus);
   }
+  
+  float get_ball_pos(){
+    Vec2 pos = box2d.getBodyPixelCoord(body);
+    return pos.y;
+  }
 } 
 
