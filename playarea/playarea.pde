@@ -6,10 +6,20 @@ import org.jbox2d.collision.shapes.*;
 import org.jbox2d.common.*;
 import org.jbox2d.dynamics.*;
 import org.jbox2d.dynamics.*;
+import controlP5.*;
 
 // A reference to our box2d world
 Box2DProcessing box2d;
-PImage sky, bg;
+PImage sky, bg, startupImg;
+int gameScreen, timer, gameStartupCount;
+//ControlP5 Library used
+// 2nd March: Bikram: Added startup of Name Inquiry and greetings Screen.
+ControlP5 cp5;
+Textfield targetField;
+Textlabel displayGreetings;
+String playerName;
+Button bangButton;
+
 
 //Ball in the playarea
 Ball ball;
@@ -18,13 +28,23 @@ Ball ball;
 //3rd March 2015: Srijan: Added ceiling surface
 Surface surface, surface2, surface3, verticalSurface, ceiling1, ceiling2;
 
+//Startup Screen object 
+StartUpScreen s;
 
 void setup(){
   size(640, 360);
   sky = loadImage("./images/sky.png");
   bg = loadImage("./images/mountain_trees.png");
+  startupImg = loadImage("./images/1.jpg");
   smooth();
   
+
+  cp5 = new ControlP5(this);
+  s = new StartUpScreen();
+  s.display();
+  gameScreen = 1;
+  gameStartupCount = 3;
+
   // Initialize box2d physics and create the world
   box2d = new Box2DProcessing(this);
   box2d.createWorld();
@@ -43,23 +63,51 @@ void setup(){
 }
 
 void draw(){
-  // We must always step through time!
-  box2d.step();
-
-  background(255,204,153);
-  image(sky, 0, 0);
-  image(bg, 0, 0);
-  //background(bg);
-
-  // Draw the surface
-  surface.display();
-  surface2.display();
-  //surface3.display();
-  ceiling1.display();
-
-  // Draw the ball
-  ball.display();
+  switch (gameScreen){
+      case 1:{
+          /*Show Homepage Name Input Screen*/
+          background(startupImg);
+          break;  
+      }
+      case 2:{
+         /*Show Greetings and Play buttons*/
+          background(startupImg);
+          displayGreetings.setText("Welcome " + playerName + " \n Game Starting in \n" + gameStartupCount + " Seconds"); 
+          if (millis() - timer >= 1000) {
+              timer = millis();
+              gameStartupCount  -= 1;
+              if(gameStartupCount==0){
+                displayGreetings.remove();
+                gameScreen = 3;
+              }
+           }
+            
+          /* Removing GUI */
+          targetField.remove();
+          bangButton.remove();
+          break;
+      }
+      case 3:{
+           // We must always step through time!
+            box2d.step();
+            background(255,204,153);
+            image(sky, 0, 0);
+            image(bg, 0, 0);
+           // Draw the surface
+            surface.display();
+            surface2.display();
+            surface3.display();
+            ceiling1.display();
+           // Draw the ball
+            ball.display();
+            
+            break;
+      }
+      default:{
+      }
+  }
 }
+
 boolean keyUp = false;
 boolean keyDown = false;
 boolean keyRight = false;
@@ -174,4 +222,8 @@ void keyPressed() {
     }
   }
 
-
+//Play button click event
+public void play() {
+  gameScreen = 2;
+  playerName = targetField.getText();
+}
