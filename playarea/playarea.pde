@@ -173,17 +173,6 @@ void draw(){
         scroll(1); 
       }
     }
-    else{
-      if((current_pos - old_pos) > 0.15) { 
-        scroll(-2);
-      }
-      else{
-        scroll(-1); 
-      }
-     }
-  }
-  old_pos = current_pos;
-  
 }
 
 boolean keyUp = false;
@@ -197,146 +186,143 @@ boolean keyR = false;
 
 //Scroll function to scroll the floor, ceilings and platforms : Srijan 5th March 2015
 void scroll(float value){
-  shift += value;
+    shift += value;
     for(int i=0; i<platforms.size(); i++){
-       Box b = platforms.get(i);
-       if(b.kill()){
-         platforms.remove(i);
-       } 
+        Box b = platforms.get(i);
+        if(b.kill()){
+            platforms.remove(i);
+        } 
     }
     float platform_gap = 0;
     for(float w=width; w<=game_width; w+=width){
-      platforms.add(new Box(shift+platform_gap + 3*w/4,height-150,width/2-50,10));
-      platforms.add(new Box(shift+platform_gap + w/4,height-250,width/2-50,10));
-      platforms.add(new Box(shift+platform_gap + 5*w/4,height-200,width/2-50,10));
-      platform_gap += width;
+        platforms.add(new Box(shift+platform_gap + 3*w/4,height-150,width/2-50,10));
+        platforms.add(new Box(shift+platform_gap + w/4,height-250,width/2-50,10));
+        platforms.add(new Box(shift+platform_gap + 5*w/4,height-200,width/2-50,10));
+        platform_gap += width;
     }
-   float floor_gap = 0;
-   float ceiling_gap = 0;
-   for(int i=0; i<floors.size(); i++){
-       Box f = floors.get(i);
-       if(f.kill()){
-         floors.remove(i);
-       } 
+    float floor_gap = 0;
+    float ceiling_gap = 0;
+    for(int i=0; i<floors.size(); i++){
+        Box f = floors.get(i);
+        if(f.kill()){
+            floors.remove(i);
+        } 
     }
     for(int i=0; i<ceilings.size(); i++){
-       Box c = ceilings.get(i);
-       if(c.kill()){
-         ceilings.remove(i);
-       } 
+        Box c = ceilings.get(i);
+        if(c.kill()){
+            ceilings.remove(i);
+        } 
     }
-   for(float w=0; w<game_width; w+=width/2){
-     floors.add(new Box(shift+w+floor_gap,height-5,width/2,10));
-     floor_gap +=100;
-   }
-   for(float w=0; w<game_width; w+=width/4){  
-     ceilings.add(new Box(shift+w+ceiling_gap,5,width/4,10));
-     ceiling_gap += 100;
+    for(float w=0; w<game_width; w+=width/2){
+        floors.add(new Box(shift+w+floor_gap,height-5,width/2,10));
+        floor_gap +=100;
     }
-  
+    for(float w=0; w<game_width; w+=width/4){  
+        ceilings.add(new Box(shift+w+ceiling_gap,5,width/4,10));
+        ceiling_gap += 100;
+    }
+
 }
 
 void keyPressed() {
-  if(key == 'r' || key == 'R'){
-     scroll(0.5);
-  }
-  if(key == 'l' || key == 'L'){
-     scroll(-0.5);
-  }
-  if (key == CODED) {
-    if(keyCode == CONTROL) {
-    keyCtrl = true; 
-  }
-    if (keyCode == UP) {
-      keyUp = true;
-      //ball.step(0,10);
-    } 
-    if (keyCode == DOWN) {
-      keyDown = true;
-      //ball.step(0,-30);
-    } 
-    if (keyCode == RIGHT) {
-      keyRight = true;
-      //ball.step(30,-2);
-      //redraw();
+    if(key == 'r' || key == 'R'){
+        scroll(0.5);
     }
-    if (keyCode == LEFT) {
-      keyLeft = true;
-      //ball.step(-30,-2);
-      //redraw();
+    if(key == 'l' || key == 'L'){
+        scroll(-0.5);
     }
-    if(keyUp == true && keyRight == true) {
-      ball.step(0.1,10); 
+    if (key == CODED) {
+        if(keyCode == CONTROL) {
+            keyCtrl = true; 
+        }
+        if (keyCode == UP) {
+            keyUp = true;
+            //ball.step(0,10);
+        } 
+        if (keyCode == DOWN) {
+            keyDown = true;
+            //ball.step(0,-30);
+        } 
+        if (keyCode == RIGHT) {
+            keyRight = true;
+            //ball.step(30,-2);
+            //redraw();
+        }
+        if (keyCode == LEFT) {
+            keyLeft = true;
+            //ball.step(-30,-2);
+            //redraw();
+        }
+        if(keyUp == true && keyRight == true) {
+            ball.step(0.1,10); 
+        }
+        else if(keyUp == true && keyLeft == true) {
+            ball.step(-0.1,10);
+        }
+        else if(keyCtrl == true && keyUp == true){
+            box2d.setGravity(0, 5); 
+            //keyCtrl = false;
+        }
+        else if(keyCtrl == true && keyDown == true){
+            box2d.setGravity(0, -20);
+            //keyCtrl = false; 
+        }
+        else if(keyUp == true) {
+            ball.step(0,10);
+            moveLeft = 0;
+            moveRight = 0;
+        }
+        /*else if(keyDown == true && keyRight == true) {
+          ball.step(5, -15); 
+          }
+          else if(keyDown == true && keyLeft == true) {
+          ball.step(-5, -15);
+          }*/
+        else if(keyDown == true) {
+            //ball.step(0, -30);
+            moveLeft = 0;
+            moveRight = 0;
+        }
+        else if(keyRight == true) {
+            ball.step(0.05 + moveRight, -10);
+            if(moveRight < 3 && moveRight < 4){
+                moveRight += 0.1;
+            }
+            moveLeft = 0;
+        }
+        else if(keyLeft == true) {
+            ball.step(-0.05 + moveLeft, -10);
+            if(moveLeft > -5 && moveLeft > -6){
+                moveLeft -= 0.1;
+            }
+            moveRight = 0;
+        }
+
     }
-    else if(keyUp == true && keyLeft == true) {
-      ball.step(-0.1,10);
-    }
-    else if(keyCtrl == true && keyUp == true){
-      box2d.setGravity(0, 5); 
-      //keyCtrl = false;
-    }
-    else if(keyCtrl == true && keyDown == true){
-      box2d.setGravity(0, -20);
-      //keyCtrl = false; 
-    }
-    else if(keyUp == true) {
-      ball.step(0,10);
-      moveLeft = 0;
-      moveRight = 0;
-    }
-    /*else if(keyDown == true && keyRight == true) {
-      ball.step(5, -15); 
-    }
-    else if(keyDown == true && keyLeft == true) {
-      ball.step(-5, -15);
-    }*/
-    else if(keyDown == true) {
-      //ball.step(0, -30);
-      moveLeft = 0;
-      moveRight = 0;
-    }
-    else if(keyRight == true) {
-      ball.step(0.05 + moveRight, -10);
-      if(moveRight < 3 && moveRight < 4){
-        moveRight += 0.1;
-      }
-      moveLeft = 0;
-    }
-    else if(keyLeft == true) {
-      ball.step(-0.05 + moveLeft, -10);
-      if(moveLeft > -5 && moveLeft > -6){
-        moveLeft -= 0.1;
-      }
-      moveRight = 0;
-    }
-    
-  }
-  
+
 }
-  
-  void keyReleased(){
+
+void keyReleased(){
     if(key == CODED) {
-      if(keyCode == UP){
-         keyUp = false; 
-      }
-      if(keyCode == DOWN) {
-        keyDown = false;
-      }
-      if(keyCode == RIGHT) {
-        keyRight = false;
-        //moveRight = 0;
-      }
-      if(keyCode == LEFT) {
-        keyLeft = false;
-        //moveLeft = 0;
-      }
-      if(keyCode == CONTROL) {
-        keyCtrl = false;
-        //moveLeft = 0;
-      }
-      
-    }
-  }
+        if(keyCode == UP){
+            keyUp = false; 
+        }
+        if(keyCode == DOWN) {
+            keyDown = false;
+        }
+        if(keyCode == RIGHT) {
+            keyRight = false;
+            //moveRight = 0;
+        }
+        if(keyCode == LEFT) {
+            keyLeft = false;
+            //moveLeft = 0;
+        }
+        if(keyCode == CONTROL) {
+            keyCtrl = false;
+            //moveLeft = 0;
+        }
 
 //Play button click event
 public void play() {
