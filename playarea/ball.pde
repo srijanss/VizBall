@@ -77,12 +77,18 @@ class Ball {
   void step(float xplus, float yplus){
     Vec2 pos = box2d.getBodyPixelCoord(body);
     body.setLinearVelocity(new Vec2(xplus, yplus));
-    body.setAngularVelocity(-xplus);
+    body.setAngularVelocity(-xplus * 10);
   }
   
-  float get_ball_pos(){
+  //Function that returns ball's x and y coordinates in the game area : Srijan 7th March 2015
+  float get_ball_pos(String cord){
     Vec2 pos = box2d.getBodyPixelCoord(body);
-    return pos.y;
+    if(cord == "x"){
+      return pos.x;
+    }
+    else{
+      return pos.y;
+    }
   }
 } 
 

@@ -19,6 +19,9 @@ ArrayList<Box> floors;
 //Ball in the playarea
 Ball ball;
 float game_width = 640 * 5;
+float scroll_flag = 0;
+float old_pos = 0;
+float current_pos = 0;
 float shift = 0;
 
 // An objects to store information about the surfaces
@@ -44,10 +47,11 @@ void setup(){
   floors = new ArrayList<Box>();
   
   //create a Ball with specified size and at given coordinates in screen
-  ball = new Ball(width*0.5, height*0.4, 16);
-  //float platform_x_pos = random(1,5);
-  //float platform_y_pos = random(10,20);
+  ball = new Ball(width*0.1, height*0.4, 16);
+  
+  //gap that defines the platforms to occur after the screen width : Srijan 3rd March 2015
   float platform_gap = 0;
+  //Creating new platforms and adding to ArrayList : Srijan 3rd March 2015
   for(float w=width; w<=width; w+=width){
     //float platform_x_pos = random(3,5);
     //float platform_y_pos = random(10,20);
@@ -56,12 +60,16 @@ void setup(){
     platforms.add(new Box(platform_gap + 5*w/4,height-200,width/2-50,10));
     platform_gap += width;
   }
+  //Defines the gap between the floors : Srijan 3rd March 2015
   float floor_gap = 0;
+  //Defines the gap between the ceilings : Srijan 3rd March 2015
   float ceiling_gap = 0;
+  //Create floors and adds to Arraylist : Srijan 3rd March 2015
   for(float w=0; w<game_width; w+=width/2){
     floors.add(new Box(w+floor_gap,height-5,width/2,10));
     floor_gap +=100;
   }
+  //Create ceilings and adds to Arraylist : Srijan 3rd March 2015
   for(float w=0; w<game_width; w+=width/4){  
     ceilings.add(new Box(w+ceiling_gap,5,width/4,10));
     ceiling_gap += 100;
@@ -70,18 +78,7 @@ void setup(){
   
   
   // Create the surface
-  //surface = new Surface(width, height - 20, -10, 0);
-  //surface2 = new Surface(width/4,110, 50, 0);
-  //surface3 = new Surface(width/4, 130, 50, 0); 
-  /*platforms.add(new Surface(width/4, 110, 50, 0));
-  platforms.add(new Surface(width/4, 130, 50, 0));
-  platforms.add(new Surface(width/4, 180, 500, 0));
-  platforms.add(new Surface(width/4, 200, 500, 0));
-  platforms.add(new Surface(width/4, 70, 300, 0));
-  platforms.add(new Surface(width/4, 90, 300, 0));
-  ceiling1 = new Surface(width, 0, -10, 0);
-  ceiling2 = new Surface(width, 20, -10, 0);
-  verticalSurface = new Surface(0, 640, -10, 0);*/
+  //verticalSurface = new Surface(0, 640, -10, 0);*/
   
 }
 
@@ -94,12 +91,7 @@ void draw(){
   image(bg, 0, 0);
   //background(bg);
 
-  // Draw the surface
-  //surface.display();
-  //surface2.display();
-  //surface3.display();
-  //int index=0;
- 
+  //Display platforms, floors, ceilings in the Array list : Srijan 3th March 2015
   for(Box b: platforms) {
       b.display();
   }
@@ -114,12 +106,34 @@ void draw(){
   // Draw the ball
   ball.display();
   //box.display();
-  if(ball.get_ball_pos() > height+16 || ball.get_ball_pos() < -16){
+  
+  //Kill the ball if ball goes through hole in floors or ceiling : Srijan 5th March 2015
+  if(ball.get_ball_pos("y") > height+16 || ball.get_ball_pos("y") < -16){
     ball.done(); 
     ball = new Ball(width*0.5, height*0.4, 16);
   }
-  //print(ball.get_ball_pos());
- 
+  
+  //Scrolling effect when the ball is moved : Srijan 8th March 2015
+  current_pos = ball.get_ball_pos("x");
+  if(old_pos != current_pos){
+    if(old_pos > current_pos){
+      if((old_pos - current_pos) > 0.15) { 
+        scroll(2);
+      }
+      else{
+        scroll(1); 
+      }
+    }
+    else{
+      if((current_pos - old_pos) > 0.15) { 
+        scroll(-2);
+      }
+      else{
+        scroll(-1); 
+      }
+     }
+  }
+  old_pos = current_pos;
   
 }
 boolean keyUp = false;
@@ -131,6 +145,7 @@ boolean keyLeft = false;
 boolean keyCtrl = false;
 boolean keyR = false;
 
+//Scroll function to scroll the floor, ceilings and platforms : Srijan 5th March 2015
 void scroll(float value){
   shift += value;
     for(int i=0; i<platforms.size(); i++){
@@ -201,10 +216,10 @@ void keyPressed() {
       //redraw();
     }
     if(keyUp == true && keyRight == true) {
-      ball.step(10,10); 
+      ball.step(0.1,10); 
     }
     else if(keyUp == true && keyLeft == true) {
-      ball.step(-10,10);
+      ball.step(-0.1,10);
     }
     else if(keyCtrl == true && keyUp == true){
       box2d.setGravity(0, 5); 
@@ -231,16 +246,16 @@ void keyPressed() {
       moveRight = 0;
     }
     else if(keyRight == true) {
-      ball.step(10 + moveRight, -10);
-      if(moveRight < 20){
-        moveRight += 5;
+      ball.step(0.05 + moveRight, -10);
+      if(moveRight < 3 && moveRight < 4){
+        moveRight += 0.1;
       }
       moveLeft = 0;
     }
     else if(keyLeft == true) {
-      ball.step(- 10 + moveLeft, -10);
-      if(moveLeft > -20){
-        moveLeft -= 5;
+      ball.step(-0.05 + moveLeft, -10);
+      if(moveLeft > -5 && moveLeft > -6){
+        moveLeft -= 0.1;
       }
       moveRight = 0;
     }
