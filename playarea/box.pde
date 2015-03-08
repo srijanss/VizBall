@@ -1,3 +1,8 @@
+/**
+Box Class to for creating floors, ceilings and platforms
+This creates box objects and adds to Box2d world
+Srijan 3rd March 2015
+**/
 class Box {
 
   // A boundary is a simple rectangle with x,y,width,and height
