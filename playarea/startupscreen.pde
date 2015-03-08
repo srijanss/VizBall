@@ -14,9 +14,14 @@ class StartUpScreen{
         
        displayGreetings = cp5.addTextlabel("displayUsername")
                           .setText("")
-                          .setPosition(280,120)
-                          .setColorValue(0xffffff00)
+                          .setPosition(140,120)
+                          //.setColorValue(0xffffff00)
                           .setFont(createFont("Georgia",20))
+                          ;
+      displayNameOnLeft = cp5.addTextlabel("displayUsernameOnLeft")
+                          .setText("")
+                          .setPosition(20,0)
+                          .setFont(createFont("Georgia",13))
                           ;
      
        bangButton      =  cp5.addButton("play")

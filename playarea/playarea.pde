@@ -16,7 +16,7 @@ int gameScreen, timer, gameStartupCount;
 // 2nd March: Bikram: Added startup of Name Inquiry and greetings Screen.
 ControlP5 cp5;
 Textfield targetField;
-Textlabel displayGreetings;
+Textlabel displayGreetings, displayNameOnLeft;
 String playerName;
 Button bangButton;
 
@@ -43,7 +43,7 @@ void setup(){
   s = new StartUpScreen();
   s.display();
   gameScreen = 1;
-  gameStartupCount = 3;
+  gameStartupCount = 5;
 
   // Initialize box2d physics and create the world
   box2d = new Box2DProcessing(this);
@@ -57,7 +57,7 @@ void setup(){
   surface2 = new Surface(width, height - 250, 320, 0);
   surface3 = new Surface(width, height - 230, 320, 0); 
   ceiling1 = new Surface(width, 0, -10, 0);
-  ceiling2 = new Surface(width, 20, -10, 0);
+ // ceiling2 = new Surface(width, 20, -10, 0);
   verticalSurface = new Surface(0, 640, -10, 0);
   
 }
@@ -71,8 +71,9 @@ void draw(){
       }
       case 2:{
          /*Show Greetings and Play buttons*/
+         //1/8/015: Bikram
           background(startupImg);
-          displayGreetings.setText("Welcome " + playerName + " \n Game Starting in \n" + gameStartupCount + " Seconds"); 
+          displayGreetings.setText("Welcome " + playerName + " , Your Game Starting in \n                      " + gameStartupCount + " Seconds"); 
           if (millis() - timer >= 1000) {
               timer = millis();
               gameStartupCount  -= 1;
@@ -88,6 +89,9 @@ void draw(){
           break;
       }
       case 3:{
+           //Display Username: left
+           //3/8/015: Bikram
+           displayNameOnLeft.setText(playerName);
            // We must always step through time!
             box2d.step();
             background(255,204,153);
@@ -96,7 +100,7 @@ void draw(){
            // Draw the surface
             surface.display();
             surface2.display();
-            surface3.display();
+            //surface3.display();
             ceiling1.display();
            // Draw the ball
             ball.display();
@@ -123,7 +127,7 @@ void keyPressed() {
       ball = new Ball(width*0.5, height*0.4, 16);
     } */
     ceiling1.kill();
-    ceiling2.kill();
+   // ceiling2.kill();
     ceiling1 = new Surface(width, 0, -10, 1);
     ceiling2 = new Surface(width, 20, -10, 1);
   }
@@ -224,6 +228,8 @@ void keyPressed() {
 
 //Play button click event
 public void play() {
-  gameScreen = 2;
   playerName = targetField.getText();
+  if(playerName!=""){
+     gameScreen = 2;
+  }
 }
