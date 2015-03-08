@@ -42,140 +42,150 @@ float shift = 0;
 StartUpScreen s;
 
 void setup(){
-  size(640, 360);
-  sky = loadImage("./images/sky.png");
-  bg = loadImage("./images/mountain_trees.png");
-  startupImg = loadImage("./images/1.jpg");
-  smooth();
-  
+    size(640, 360);
+    sky = loadImage("./images/sky.png");
+    bg = loadImage("./images/mountain_trees.png");
+    startupImg = loadImage("./images/1.jpg");
+    smooth();
 
-  cp5 = new ControlP5(this);
-  s = new StartUpScreen();
-  s.display();
-  gameScreen = 1;
-  gameStartupCount = 5;
 
-  // Initialize box2d physics and create the world
-  box2d = new Box2DProcessing(this);
-  box2d.createWorld();
-  // We are setting a custom gravity
-  box2d.setGravity(0, -20);
-  
-  //Create the empty list for surfaces
-  platforms = new ArrayList<Box>();
-  ceilings = new ArrayList<Box>();
-  floors = new ArrayList<Box>();
-  
-  //create a Ball with specified size and at given coordinates in screen
-  ball = new Ball(width*0.1, height*0.4, 16);
-  
-  //gap that defines the platforms to occur after the screen width : Srijan 3rd March 2015
-  float platform_gap = 0;
-  //Creating new platforms and adding to ArrayList : Srijan 3rd March 2015
-  for(float w=width; w<=width; w+=width){
-    //float platform_x_pos = random(3,5);
-    //float platform_y_pos = random(10,20);
-    platforms.add(new Box(platform_gap + 3*w/4,height-150,width/2-50,10));
-    platforms.add(new Box(platform_gap + w/4,height-250,width/2-50,10));
-    platforms.add(new Box(platform_gap + 5*w/4,height-200,width/2-50,10));
-    platform_gap += width;
-  }
-  //Defines the gap between the floors : Srijan 3rd March 2015
-  float floor_gap = 0;
-  //Defines the gap between the ceilings : Srijan 3rd March 2015
-  float ceiling_gap = 0;
-  //Create floors and adds to Arraylist : Srijan 3rd March 2015
-  for(float w=0; w<game_width; w+=width/2){
-    floors.add(new Box(w+floor_gap,height-5,width/2,10));
-    floor_gap +=100;
-  }
-  //Create ceilings and adds to Arraylist : Srijan 3rd March 2015
-  for(float w=0; w<game_width; w+=width/4){  
-    ceilings.add(new Box(w+ceiling_gap,5,width/4,10));
-    ceiling_gap += 100;
-    //ceilings.add(new Box(0,5,width*2,10));
-  }
-  
-  
-  // Create the surface
-  //verticalSurface = new Surface(0, 640, -10, 0);*/
-  
+    cp5 = new ControlP5(this);
+    s = new StartUpScreen();
+    s.display();
+    gameScreen = 1;
+    gameStartupCount = 5;
+
+    // Initialize box2d physics and create the world
+    box2d = new Box2DProcessing(this);
+    box2d.createWorld();
+    // We are setting a custom gravity
+    box2d.setGravity(0, -20);
+
+    //Create the empty list for surfaces
+    platforms = new ArrayList<Box>();
+    ceilings = new ArrayList<Box>();
+    floors = new ArrayList<Box>();
+
+    //create a Ball with specified size and at given coordinates in screen
+    ball = new Ball(width*0.1, height*0.4, 16);
+
+    //gap that defines the platforms to occur after the screen width : Srijan 3rd March 2015
+    float platform_gap = 0;
+    //Creating new platforms and adding to ArrayList : Srijan 3rd March 2015
+    for(float w=width; w<=width; w+=width){
+        //float platform_x_pos = random(3,5);
+        //float platform_y_pos = random(10,20);
+        platforms.add(new Box(platform_gap + 3*w/4,height-150,width/2-50,10));
+        platforms.add(new Box(platform_gap + w/4,height-250,width/2-50,10));
+        platforms.add(new Box(platform_gap + 5*w/4,height-200,width/2-50,10));
+        platform_gap += width;
+    }
+    //Defines the gap between the floors : Srijan 3rd March 2015
+    float floor_gap = 0;
+    //Defines the gap between the ceilings : Srijan 3rd March 2015
+    float ceiling_gap = 0;
+    //Create floors and adds to Arraylist : Srijan 3rd March 2015
+    for(float w=0; w<game_width; w+=width/2){
+        floors.add(new Box(w+floor_gap,height-5,width/2,10));
+        floor_gap +=100;
+    }
+    //Create ceilings and adds to Arraylist : Srijan 3rd March 2015
+    for(float w=0; w<game_width; w+=width/4){  
+        ceilings.add(new Box(w+ceiling_gap,5,width/4,10));
+        ceiling_gap += 100;
+        //ceilings.add(new Box(0,5,width*2,10));
+    }
+
+
+    // Create the surface
+    //verticalSurface = new Surface(0, 640, -10, 0);*/
+
 }
 
 void draw(){
-  switch (gameScreen){
-      case 1:{
-          /*Show Homepage Name Input Screen*/
-          background(startupImg);
-          break;  
-      }
-      case 2:{
-         /*Show Greetings and Play buttons*/
-         //1/8/015: Bikram
-          background(startupImg);
-          displayGreetings.setText("Welcome " + playerName + " , Your Game Starting in \n                      " + gameStartupCount + " Seconds"); 
-          if (millis() - timer >= 1000) {
-              timer = millis();
-              gameStartupCount  -= 1;
-              if(gameStartupCount==0){
-                displayGreetings.remove();
-                gameScreen = 3;
-              }
-           }
-            
-          /* Removing GUI */
-          targetField.remove();
-          bangButton.remove();
-          break;
-      }
-      case 3:{
-           //Display Username: left
-           //3/8/015: Bikram
-           displayNameOnLeft.setText(playerName);
-  // We must always step through time!
-  box2d.step();
+    switch (gameScreen){
+        case 1:{
+                   /*Show Homepage Name Input Screen*/
+                   background(startupImg);
+                   break;  
+               }
+        case 2:{
+                   /*Show Greetings and Play buttons*/
+                   //1/8/015: Bikram
+                   background(startupImg);
+                   displayGreetings.setText("Welcome " + playerName + " , Your Game Starting in \n                      " + gameStartupCount + " Seconds"); 
+                   if (millis() - timer >= 1000) {
+                       timer = millis();
+                       gameStartupCount  -= 1;
+                       if(gameStartupCount==0){
+                           displayGreetings.remove();
+                           gameScreen = 3;
+                       }
+                   }
 
-  background(255,204,153);
-  image(sky, 0, 0);
-  image(bg, 0, 0);
-  //background(bg);
+                   /* Removing GUI */
+                   targetField.remove();
+                   bangButton.remove();
+                   break;
+               }
+        case 3:{
+                   //Display Username: left
+                   //3/8/015: Bikram
+                   displayNameOnLeft.setText(playerName);
+                   // We must always step through time!
+                   box2d.step();
 
-  //Display platforms, floors, ceilings in the Array list : Srijan 3th March 2015
-  for(Box b: platforms) {
-      b.display();
-  }
-  for(Box b: floors) {
-      b.display();
-  }
-  for(Box b: ceilings) {
-      b.display();
-  }
-  //ceiling1.display();
+                   background(255,204,153);
+                   image(sky, 0, 0);
+                   image(bg, 0, 0);
+                   //background(bg);
 
-  // Draw the ball
-  ball.display();
-  //box.display();
-  
-  //Kill the ball if ball goes through hole in floors or ceiling : Srijan 5th March 2015
-  if(ball.get_ball_pos("y") > height+16 || ball.get_ball_pos("y") < -16){
-    ball.done(); 
-    ball = new Ball(width*0.5, height*0.4, 16);
-  }
-  
-  //Scrolling effect when the ball is moved : Srijan 8th March 2015
-  current_pos = ball.get_ball_pos("x");
-  if(old_pos != current_pos){
-    if(old_pos > current_pos){
-      if((old_pos - current_pos) > 0.15) { 
-        scroll(2);
-      }
-      else{
-        scroll(1); 
-      }
+                   //Display platforms, floors, ceilings in the Array list : Srijan 3th March 2015
+                   for(Box b: platforms) {
+                       b.display();
+                   }
+                   for(Box b: floors) {
+                       b.display();
+                   }
+                   for(Box b: ceilings) {
+                       b.display();
+                   }
+                   //ceiling1.display();
+
+                   // Draw the ball
+                   ball.display();
+                   //box.display();
+
+                   //Kill the ball if ball goes through hole in floors or ceiling : Srijan 5th March 2015
+                   if(ball.get_ball_pos("y") > height+16 || ball.get_ball_pos("y") < -16){
+                       ball.done(); 
+                       ball = new Ball(width*0.5, height*0.4, 16);
+                   }
+
+                   //Scrolling effect when the ball is moved : Srijan 8th March 2015
+                   current_pos = ball.get_ball_pos("x");
+                   if(old_pos != current_pos){
+                       if(old_pos > current_pos){
+                           if((old_pos - current_pos) > 0.15) { 
+                               scroll(2);
+                           }
+                           else{
+                               scroll(1); 
+                           }
+                       }
+                       if(old_pos < current_pos){
+                           if((current_pos - old_pos) > 0.15) { 
+                               scroll(-2);
+                           }
+                           else{
+                               scroll(-1); 
+                           }
+                       }
+                       old_pos = current_pos;
+                   }
+               }
     }
-    old_pos = current_pos;
 }
-
 boolean keyUp = false;
 boolean keyDown = false;
 boolean keyRight = false;
@@ -324,6 +334,8 @@ void keyReleased(){
             keyCtrl = false;
             //moveLeft = 0;
         }
+    }
+}
 
 //Play button click event
 public void play() {
