@@ -173,6 +173,7 @@ void draw(){
         scroll(1); 
       }
     }
+    old_pos = current_pos;
 }
 
 boolean keyUp = false;
@@ -326,8 +327,9 @@ void keyReleased(){
 
 //Play button click event
 public void play() {
-  playerName = targetField.getText();
-  if(playerName!=""){
-     gameScreen = 2;
-  }
+    playerName = targetField.getText();
+    if(playerName!=""){
+        gameScreen = 2;
+    }
 }
+
