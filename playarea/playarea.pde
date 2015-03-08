@@ -16,11 +16,11 @@ int gameScreen, timer, gameStartupCount;
 // 2nd March: Bikram: Added startup of Name Inquiry and greetings Screen.
 ControlP5 cp5;
 Textfield targetField;
-Textlabel displayGreetings, displayNameOnLeft;
+Textlabel displayGreetings, displayNameOnLeft, displayGameOver;
 String playerName;
 Button bangButton;
 
-
+//Array list to hold box objects for floors, ceilings and platforms
 ArrayList<Box> platforms;
 ArrayList<Box> ceilings;
 ArrayList<Box> floors;
@@ -34,12 +34,18 @@ float old_pos = 0;
 float current_pos = 0;
 float shift = 0;
 
+//Check to Restart the game
+boolean game_over = false;
+
 // An objects to store information about the surfaces
 //3rd March 2015: Srijan: Added ceiling surface
 //Surface surface, surface2, surface3, verticalSurface, ceiling1, ceiling2;
 
 //Startup Screen object 
 StartUpScreen s;
+
+//GameOver Screen object
+EndScreen endscreen;
 
 void setup(){
     size(640, 360);
@@ -51,6 +57,8 @@ void setup(){
 
     cp5 = new ControlP5(this);
     s = new StartUpScreen();
+    endscreen = new EndScreen();
+    
     s.display();
     gameScreen = 1;
     gameStartupCount = 5;
@@ -97,6 +105,7 @@ void setup(){
     }
 
 
+     //Commented out the vertical surface : Srijan 7th March 2015
     // Create the surface
     //verticalSurface = new Surface(0, 640, -10, 0);*/
 
@@ -129,6 +138,10 @@ void draw(){
                    break;
                }
         case 3:{
+                  //Check if game is restarting : Srijan 8th March 2015 
+                  if(game_over){
+                      displayGameOver.remove(); 
+                   }
                    //Display Username: left
                    //3/8/015: Bikram
                    displayNameOnLeft.setText(playerName);
@@ -160,6 +173,7 @@ void draw(){
                    if(ball.get_ball_pos("y") > height+16 || ball.get_ball_pos("y") < -16){
                        ball.done(); 
                        ball = new Ball(width*0.5, height*0.4, 16);
+                       gameScreen = 4;
                    }
 
                    //Scrolling effect when the ball is moved : Srijan 8th March 2015
@@ -183,7 +197,16 @@ void draw(){
                        }
                        old_pos = current_pos;
                    }
+                 break;
                }
+        case 4:{
+          //Show Game over to user : Srijan 8th March 2015
+          endscreen.display();
+          displayGameOver.setText("GAME OVER, " + playerName);
+          gameScreen = 1;
+          break;
+        }
+        default:{}
     }
 }
 boolean keyUp = false;
@@ -344,4 +367,13 @@ public void play() {
         gameScreen = 2;
     }
 }
+
+//Restart button 
+public void restart() {
+   
+   bangButton.remove();
+   game_over = true;
+   gameScreen = 3;
+}
+
 
