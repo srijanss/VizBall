@@ -26,16 +26,20 @@ ArrayList<Box> ceilings;
 ArrayList<Box> floors;
 
 
+
 //Ball in the playarea
 Ball ball;
 float game_width = 640 * 5;
-float scroll_flag = 0;
+//float scroll_flag = 0;
 float old_pos = 0;
 float current_pos = 0;
 float shift = 0;
 
 //Check to Restart the game
 boolean game_over = false;
+
+float x_bg = 0;
+
 
 // An objects to store information about the surfaces
 //3rd March 2015: Srijan: Added ceiling surface
@@ -58,7 +62,7 @@ void setup(){
     cp5 = new ControlP5(this);
     s = new StartUpScreen();
     endscreen = new EndScreen();
-    
+
     s.display();
     gameScreen = 1;
     gameStartupCount = 5;
@@ -76,6 +80,7 @@ void setup(){
 
     //create a Ball with specified size and at given coordinates in screen
     ball = new Ball(width*0.1, height*0.4, 16);
+    
 
     //gap that defines the platforms to occur after the screen width : Srijan 3rd March 2015
     float platform_gap = 0;
@@ -105,7 +110,7 @@ void setup(){
     }
 
 
-     //Commented out the vertical surface : Srijan 7th March 2015
+    //Commented out the vertical surface : Srijan 7th March 2015
     // Create the surface
     //verticalSurface = new Surface(0, 640, -10, 0);*/
 
@@ -138,9 +143,9 @@ void draw(){
                    break;
                }
         case 3:{
-                  //Check if game is restarting : Srijan 8th March 2015 
-                  if(game_over){
-                      displayGameOver.remove(); 
+                   //Check if game is restarting : Srijan 8th March 2015 
+                   if(game_over){
+                       displayGameOver.remove(); 
                    }
                    //Display Username: left
                    //3/8/015: Bikram
@@ -150,8 +155,10 @@ void draw(){
 
                    background(255,204,153);
                    image(sky, 0, 0);
-                   image(bg, 0, 0);
-                   //background(bg);
+                   // Background scrolling with repetition , Parallax scrolling implemented : Srijan 10th March 2015
+                   for(int i=0; i<game_width; i+=width) {
+                     image(bg, x_bg + i, 0);
+                   }
 
                    //Display platforms, floors, ceilings in the Array list : Srijan 3th March 2015
                    for(Box b: platforms) {
@@ -182,30 +189,34 @@ void draw(){
                        if(old_pos > current_pos){
                            if((old_pos - current_pos) > 0.15) { 
                                scroll(2);
+                               x_bg += 0.5;
                            }
                            else{
-                               scroll(1); 
+                               scroll(1);
+                               x_bg += 0.25;
                            }
                        }
                        if(old_pos < current_pos){
                            if((current_pos - old_pos) > 0.15) { 
                                scroll(-2);
+                               x_bg -= 0.5;
                            }
                            else{
-                               scroll(-1); 
+                               scroll(-1);
+                               x_bg -= 0.25;
                            }
                        }
                        old_pos = current_pos;
                    }
-                 break;
+                   break;
                }
         case 4:{
-          //Show Game over to user : Srijan 8th March 2015
-          endscreen.display();
-          displayGameOver.setText("GAME OVER, " + playerName);
-          gameScreen = 1;
-          break;
-        }
+                   //Show Game over to user : Srijan 8th March 2015
+                   endscreen.display();
+                   displayGameOver.setText("GAME OVER, " + playerName);
+                   gameScreen = 1;
+                   break;
+               }
         default:{}
     }
 }
@@ -370,10 +381,10 @@ public void play() {
 
 //Restart button 
 public void restart() {
-   
-   bangButton.remove();
-   game_over = true;
-   gameScreen = 3;
+
+    bangButton.remove();
+    game_over = true;
+    gameScreen = 3;
 }
 
 
