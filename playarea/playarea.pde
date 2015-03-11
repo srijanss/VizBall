@@ -26,16 +26,29 @@ ArrayList<Box> ceilings;
 ArrayList<Box> floors;
 
 
+
 //Ball in the playarea
 Ball ball;
 float game_width = 640 * 5;
-float scroll_flag = 0;
+float scrolled_width = 0;
+//float scroll_flag = 0;
 float old_pos = 0;
 float current_pos = 0;
 float shift = 0;
 
 //Check to Restart the game
 boolean game_over = false;
+
+//Background shift value
+float x_bg = 0;
+
+// Game Level 
+int level = 0;
+
+// Scroll value
+float fast_scroll = 2;
+float slow_scroll = 1;
+
 
 // An objects to store information about the surfaces
 //3rd March 2015: Srijan: Added ceiling surface
@@ -58,7 +71,7 @@ void setup(){
     cp5 = new ControlP5(this);
     s = new StartUpScreen();
     endscreen = new EndScreen();
-    
+
     s.display();
     gameScreen = 1;
     gameStartupCount = 5;
@@ -78,6 +91,7 @@ void setup(){
 
     //create a Ball with specified size and at given coordinates in screen
     ball = new Ball(width*0.1, height*0.4, 16);
+
 
     //gap that defines the platforms to occur after the screen width : Srijan 3rd March 2015
     float platform_gap = 0;
@@ -107,7 +121,7 @@ void setup(){
     }
 
 
-     //Commented out the vertical surface : Srijan 7th March 2015
+    //Commented out the vertical surface : Srijan 7th March 2015
     // Create the surface
     //verticalSurface = new Surface(0, 640, -10, 0);*/
 
@@ -137,9 +151,9 @@ void draw(){
                   break;
                }
         case 3:{
-                  //Check if game is restarting : Srijan 8th March 2015 
-                  if(game_over){
-                      displayGameOver.remove(); 
+                   //Check if game is restarting : Srijan 8th March 2015 
+                   if(game_over){
+                       displayGameOver.remove(); 
                    }
                    //Display Username: left
                    //3/8/015: Bikram
@@ -152,8 +166,10 @@ void draw(){
 
                    background(255,204,153);
                    image(sky, 0, 0);
-                   image(bg, 0, 0);
-                   //background(bg);
+                   // Background scrolling with repetition , Parallax scrolling implemented : Srijan 10th March 2015
+                   for(int i=0; i<game_width; i+=width) {
+                       image(bg, x_bg + i, 0);
+                   }
 
                    //Display platforms, floors, ceilings in the Array list : Srijan 3th March 2015
                    for(Box b: platforms) {
@@ -174,7 +190,7 @@ void draw(){
                    //Kill the ball if ball goes through hole in floors or ceiling : Srijan 5th March 2015
                    if(ball.get_ball_pos("y") > height+16 || ball.get_ball_pos("y") < -16){
                        ball.done(); 
-                       ball = new Ball(width*0.5, height*0.4, 16);
+                       ball = new Ball(width*0.1, height*0.4, 16);
                        gameScreen = 4;
                    }
 
@@ -182,32 +198,73 @@ void draw(){
                    current_pos = ball.get_ball_pos("x");
                    if(old_pos != current_pos){
                        if(old_pos > current_pos){
-                           if((old_pos - current_pos) > 0.15) { 
-                               scroll(2);
-                           }
-                           else{
-                               scroll(1); 
+                           /* 
+                              monitoring background scrolling to disable scrolling left at level start
+                              :Srijan 11th March 2015
+                            */
+                           if(x_bg <=0){
+                               //Calculate left displacement of the ball
+                               float left_displacement = old_pos - current_pos;
+                               if(left_displacement > 0.15) {
+                                   scroll(fast_scroll);
+                                   x_bg += 0.5;
+                               }
+                               else{
+                                   scroll(slow_scroll);
+                                   x_bg += 0.25;
+                               }
                            }
                        }
                        if(old_pos < current_pos){
-                           if((current_pos - old_pos) > 0.15) { 
-                               scroll(-2);
+                           /* 
+                              monitoring background scrolling to disable scrolling more that level width
+                              :Srijan 11th March 2015
+                            */
+                           if(x_bg >= -640 * 3){
+                               //Calculating right displacement of the ball : Srijan 11th March 2015
+                               float right_displacement = current_pos - old_pos;
+                               if(right_displacement > 0.15) {
+                                   scroll(-fast_scroll);
+                                   x_bg -= 0.5;
+                               }
+                               else{
+                                   scroll(-slow_scroll);
+                                   x_bg -= 0.25;
+                               }
                            }
-                           else{
-                               scroll(-1); 
-                           }
+                           //Check for end of level : Srijan 11th March 2015
+                           if(x_bg <=-640*3 && current_pos <= 540){
+                               // Level up and Increase scroll speed
+                               level +=1;
+                               fast_scroll +=1;
+                               slow_scroll +=1;
+                               // Recreate the ball at the start for new level
+                               ball.done();
+                               ball = new Ball(width*0.1, height*0.4, 16);
+                               // reset the shift value
+                               shift = 0;
+                               // create the floors, platforms, ceilings for new level
+                               scroll(0);
+                               // reset the background scroll value
+                               x_bg = 0;
+                               /*
+                                TODO: Show Level up screen , Currently game over screen is used
+                                :Srijan 11th March 2015
+                                */
+                               gameScreen = 4; 
+                           } 
                        }
                        old_pos = current_pos;
                    }
-                 break;
+                   break;
                }
         case 4:{
-          //Show Game over to user : Srijan 8th March 2015
-          endscreen.display();
-          displayGameOver.setText("GAME OVER, " + playerName);
-          gameScreen = 1;
-          break;
-        }
+                   //Show Game over to user : Srijan 8th March 2015
+                   endscreen.display();
+                   displayGameOver.setText("GAME OVER, " + playerName);
+                   gameScreen = 1;
+                   break;
+               }
         default:{}
     }
 }
@@ -378,10 +435,10 @@ public void play_Game() {
 
 //Restart button 
 public void restart() {
-   
-   bangButton.remove();
-   game_over = true;
-   gameScreen = 3;
+
+    bangButton.remove();
+    game_over = true;
+    gameScreen = 3;
 }
 
 
