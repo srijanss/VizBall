@@ -30,6 +30,7 @@ ArrayList<Box> floors;
 //Ball in the playarea
 Ball ball;
 float game_width = 640 * 5;
+float scrolled_width = 0;
 //float scroll_flag = 0;
 float old_pos = 0;
 float current_pos = 0;
@@ -187,24 +188,40 @@ void draw(){
                    current_pos = ball.get_ball_pos("x");
                    if(old_pos != current_pos){
                        if(old_pos > current_pos){
-                           if((old_pos - current_pos) > 0.15) { 
-                               scroll(2);
-                               x_bg += 0.5;
+                         /* 
+                         monitoring background scrolling to disable scrolling left at level start
+                         :Srijan 11th March 2015
+                         */
+                         if(x_bg <=0){
+                         //Calculate left displacement of the ball
+                         float left_displacement = old_pos - current_pos;
+                           if(left_displacement > 0.15) {
+                                 scroll(2);
+                                 x_bg += 0.5;
                            }
                            else{
                                scroll(1);
                                x_bg += 0.25;
                            }
+                         }
                        }
                        if(old_pos < current_pos){
-                           if((current_pos - old_pos) > 0.15) { 
+                         /* 
+                         monitoring background scrolling to disable scrolling more that level width
+                         :Srijan 11th March 2015
+                         */
+                         if(x_bg >= -640 * 2.5){
+                           //Calculating right displacement of the ball : Srijan 11th March 2015
+                           float right_displacement = current_pos - old_pos;
+                           if(right_displacement > 0.15) {
                                scroll(-2);
                                x_bg -= 0.5;
-                           }
-                           else{
-                               scroll(-1);
-                               x_bg -= 0.25;
-                           }
+                             }
+                             else{
+                                 scroll(-1);
+                                 x_bg -= 0.25;
+                             }
+                         }
                        }
                        old_pos = current_pos;
                    }
