@@ -157,6 +157,7 @@ void draw(){
                    }
                    //Display Username: left
                    //3/8/015: Bikram
+                   displayNameOnLeft.setVisible(true);
                    displayGreetings.remove();
                    displayNameOnLeft.setText(playerName);
                    helpTextarea.remove();
@@ -430,12 +431,13 @@ public void play() {
 //OkPlay button click event
 public void play_Game() {
         gameScreen = 3;
+
 }
 
 
 //Restart button 
 public void restart() {
-
+    displayNameOnLeft.setVisible(false);
     bangButton.remove();
     game_over = true;
     gameScreen = 3;

@@ -24,7 +24,7 @@ class StartUpScreen{
                           .setFont(createFont("Georgia",13))
                           ;
      
-       bangButton      =  cp5.addButton("play")
+       bangButton      = cp5.addButton("play")
                            .setValue(128)
                            .setPosition(280,180)
                            .setImages(imgs)
