@@ -39,7 +39,15 @@ float shift = 0;
 //Check to Restart the game
 boolean game_over = false;
 
+//Background shift value
 float x_bg = 0;
+
+// Game Level 
+int level = 0;
+
+// Scroll value
+float fast_scroll = 2;
+float slow_scroll = 1;
 
 
 // An objects to store information about the surfaces
@@ -81,7 +89,7 @@ void setup(){
 
     //create a Ball with specified size and at given coordinates in screen
     ball = new Ball(width*0.1, height*0.4, 16);
-    
+
 
     //gap that defines the platforms to occur after the screen width : Srijan 3rd March 2015
     float platform_gap = 0;
@@ -158,7 +166,7 @@ void draw(){
                    image(sky, 0, 0);
                    // Background scrolling with repetition , Parallax scrolling implemented : Srijan 10th March 2015
                    for(int i=0; i<game_width; i+=width) {
-                     image(bg, x_bg + i, 0);
+                       image(bg, x_bg + i, 0);
                    }
 
                    //Display platforms, floors, ceilings in the Array list : Srijan 3th March 2015
@@ -180,7 +188,7 @@ void draw(){
                    //Kill the ball if ball goes through hole in floors or ceiling : Srijan 5th March 2015
                    if(ball.get_ball_pos("y") > height+16 || ball.get_ball_pos("y") < -16){
                        ball.done(); 
-                       ball = new Ball(width*0.5, height*0.4, 16);
+                       ball = new Ball(width*0.1, height*0.4, 16);
                        gameScreen = 4;
                    }
 
@@ -188,40 +196,61 @@ void draw(){
                    current_pos = ball.get_ball_pos("x");
                    if(old_pos != current_pos){
                        if(old_pos > current_pos){
-                         /* 
-                         monitoring background scrolling to disable scrolling left at level start
-                         :Srijan 11th March 2015
-                         */
-                         if(x_bg <=0){
-                         //Calculate left displacement of the ball
-                         float left_displacement = old_pos - current_pos;
-                           if(left_displacement > 0.15) {
-                                 scroll(2);
-                                 x_bg += 0.5;
+                           /* 
+                              monitoring background scrolling to disable scrolling left at level start
+                              :Srijan 11th March 2015
+                            */
+                           if(x_bg <=0){
+                               //Calculate left displacement of the ball
+                               float left_displacement = old_pos - current_pos;
+                               if(left_displacement > 0.15) {
+                                   scroll(fast_scroll);
+                                   x_bg += 0.5;
+                               }
+                               else{
+                                   scroll(slow_scroll);
+                                   x_bg += 0.25;
+                               }
                            }
-                           else{
-                               scroll(1);
-                               x_bg += 0.25;
-                           }
-                         }
                        }
                        if(old_pos < current_pos){
-                         /* 
-                         monitoring background scrolling to disable scrolling more that level width
-                         :Srijan 11th March 2015
-                         */
-                         if(x_bg >= -640 * 2.5){
-                           //Calculating right displacement of the ball : Srijan 11th March 2015
-                           float right_displacement = current_pos - old_pos;
-                           if(right_displacement > 0.15) {
-                               scroll(-2);
-                               x_bg -= 0.5;
-                             }
-                             else{
-                                 scroll(-1);
-                                 x_bg -= 0.25;
-                             }
-                         }
+                           /* 
+                              monitoring background scrolling to disable scrolling more that level width
+                              :Srijan 11th March 2015
+                            */
+                           if(x_bg >= -640 * 3){
+                               //Calculating right displacement of the ball : Srijan 11th March 2015
+                               float right_displacement = current_pos - old_pos;
+                               if(right_displacement > 0.15) {
+                                   scroll(-fast_scroll);
+                                   x_bg -= 0.5;
+                               }
+                               else{
+                                   scroll(-slow_scroll);
+                                   x_bg -= 0.25;
+                               }
+                           }
+                           //Check for end of level : Srijan 11th March 2015
+                           if(x_bg <=-640*3 && current_pos <= 540){
+                               // Level up and Increase scroll speed
+                               level +=1;
+                               fast_scroll +=1;
+                               slow_scroll +=1;
+                               // Recreate the ball at the start for new level
+                               ball.done();
+                               ball = new Ball(width*0.1, height*0.4, 16);
+                               // reset the shift value
+                               shift = 0;
+                               // create the floors, platforms, ceilings for new level
+                               scroll(0);
+                               // reset the background scroll value
+                               x_bg = 0;
+                               /*
+                                TODO: Show Level up screen , Currently game over screen is used
+                                :Srijan 11th March 2015
+                                */
+                               gameScreen = 4; 
+                           } 
                        }
                        old_pos = current_pos;
                    }
