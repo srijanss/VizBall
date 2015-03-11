@@ -11,15 +11,15 @@ import controlP5.*;
 // A reference to our box2d world
 Box2DProcessing box2d;
 PImage sky, bg, startupImg;
-int gameScreen, timer, gameStartupCount;
+int gameScreen, isHelpDisplayed, gameStartupCount;
 //ControlP5 Library used
 // 2nd March: Bikram: Added startup of Name Inquiry and greetings Screen.
 ControlP5 cp5;
 Textfield targetField;
 Textlabel displayGreetings, displayNameOnLeft, displayGameOver;
+Textarea helpTextarea;
 String playerName;
-Button bangButton;
-
+Button bangButton, playButton;
 //Array list to hold box objects for floors, ceilings and platforms
 ArrayList<Box> platforms;
 ArrayList<Box> ceilings;
@@ -62,6 +62,8 @@ void setup(){
     s.display();
     gameScreen = 1;
     gameStartupCount = 5;
+    //Check if if help is displayed
+    isHelpDisplayed = 0;
 
     // Initialize box2d physics and create the world
     box2d = new Box2DProcessing(this);
@@ -119,23 +121,20 @@ void draw(){
                    break;  
                }
         case 2:{
-                   /*Show Greetings and Play buttons*/
+                   /*Show Greetings, Help and Play buttons*/
                    //1/8/015: Bikram
+                   displayGreetings.setText("Welcome " + playerName); 
                    background(startupImg);
-                   displayGreetings.setText("Welcome " + playerName + " , Your Game Starting in \n                      " + gameStartupCount + " Seconds"); 
-                   if (millis() - timer >= 1000) {
-                       timer = millis();
-                       gameStartupCount  -= 1;
-                       if(gameStartupCount==0){
-                           displayGreetings.remove();
-                           gameScreen = 3;
-                       }
-                   }
-
-                   /* Removing GUI */
-                   targetField.remove();
-                   bangButton.remove();
-                   break;
+                   
+                  if(isHelpDisplayed == 0){
+                     /* Removing GUI */
+                    targetField.remove();
+                    bangButton.remove();
+                    s.displayHelp();
+                    gameScreen = 2;
+                    isHelpDisplayed =1;
+                  }
+                  break;
                }
         case 3:{
                   //Check if game is restarting : Srijan 8th March 2015 
@@ -144,7 +143,10 @@ void draw(){
                    }
                    //Display Username: left
                    //3/8/015: Bikram
+                   displayGreetings.remove();
                    displayNameOnLeft.setText(playerName);
+                   helpTextarea.remove();
+                   playButton.remove();
                    // We must always step through time!
                    box2d.step();
 
@@ -367,6 +369,12 @@ public void play() {
         gameScreen = 2;
     }
 }
+
+//OkPlay button click event
+public void play_Game() {
+        gameScreen = 3;
+}
+
 
 //Restart button 
 public void restart() {

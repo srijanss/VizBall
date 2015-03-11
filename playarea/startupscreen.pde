@@ -12,9 +12,9 @@ class StartUpScreen{
                           .setColor(color(255,0,0))
                           ;
         
-       displayGreetings = cp5.addTextlabel("displayUsername")
+      displayGreetings = cp5.addTextlabel("displayUsername")
                           .setText("")
-                          .setPosition(140,120)
+                          .setPosition(90,30)
                           //.setColorValue(0xffffff00)
                           .setFont(createFont("Georgia",20))
                           ;
@@ -29,9 +29,37 @@ class StartUpScreen{
                            .setPosition(280,180)
                            .setImages(imgs)
                            .updateSize()
-                           ; 
- } 
+                             ; 
+}
 
- 
+void displayHelp(){      
+      PImage[] imgs = {loadImage("./images/button1.jpg"),loadImage("./images/button1.jpg"),loadImage("./images/button1.jpg")};
+      helpTextarea = cp5.addTextarea("txt")
+                  .setPosition(100,60)
+                  .setSize(450,160)
+                  .setFont(createFont("arial",16))
+                  .setLineHeight(14)
+                  .setColor(color(128))
+                  .setColorBackground(color(00, 00))
+                  .setColorForeground(color(255,255));
+                  ;
+                  
+      helpTextarea.setText("Lorem Ipsum is simply dummy text of the printing and typesetting"
+                      +" industry. Lorem Ipsum has been the industry's standard dummy text"
+                      +" ever since the 1500s, when an unknown printer took a galley of type"
+                      +" and scrambled it to make a type specimen book. It has survived not"
+                      +" only five centuries, but also the leap into electronic typesetting,"
+                      +" remaining essentially unchanged. It was popularised in the 1960s"
+                      +" with the release of Letraset sheets containing Lorem Ipsum passages,"
+                      +" and more recently with desktop publishing software like Aldus"
+                      +" PageMaker including versions of Lorem Ipsum."
+                      );
+     playButton        =  cp5.addButton("play_Game")
+                           .setValue(128)
+                           .setPosition(120,240)
+                           .setImages(imgs)
+                           .updateSize()
+                             ; 
+}
 }
 
