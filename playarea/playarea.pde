@@ -16,7 +16,7 @@ int gameScreen, isHelpDisplayed, gameStartupCount;
 // 2nd March: Bikram: Added startup of Name Inquiry and greetings Screen.
 ControlP5 cp5;
 Textfield targetField;
-Textlabel displayGreetings, displayNameOnLeft, displayGameOver;
+Textlabel displayGreetings, displayNameOnLeft, displayGameOver, timerRight;
 Textarea helpTextarea;
 String playerName;
 Button bangButton, playButton;
@@ -56,6 +56,8 @@ float slow_scroll = 1;
 
 //Startup Screen object 
 StartUpScreen s;
+// Timer object
+Timer t;
 
 //GameOver Screen object
 EndScreen endscreen;
@@ -71,12 +73,15 @@ void setup(){
     cp5 = new ControlP5(this);
     s = new StartUpScreen();
     endscreen = new EndScreen();
+    t  =  new Timer();
 
     s.display();
     gameScreen = 1;
     gameStartupCount = 5;
     //Check if if help is displayed
     isHelpDisplayed = 0;
+    t.initializeTimer();
+    
 
     // Initialize box2d physics and create the world
     box2d = new Box2DProcessing(this);
@@ -154,6 +159,7 @@ void draw(){
                    //Check if game is restarting : Srijan 8th March 2015 
                    if(game_over){
                        displayGameOver.remove(); 
+                       t.showTimer();
                    }
                    //Display Username: left
                    //3/8/015: Bikram
@@ -162,6 +168,15 @@ void draw(){
                    displayNameOnLeft.setText(playerName);
                    helpTextarea.remove();
                    playButton.remove();
+                   //Display Timer on right
+                   //13/8/015: Bikram
+                   if(t.isTimeOver()==true)
+                     gameScreen = 4;
+                   else                   
+                     timerRight.setText(""+t.getTimerValue());
+                   
+                   
+                   
                    // We must always step through time!
                    box2d.step();
 
@@ -264,6 +279,11 @@ void draw(){
                    endscreen.display();
                    displayGameOver.setText("GAME OVER, " + playerName);
                    gameScreen = 1;
+                   
+                   // Reset Timer and Remove it; Bikram 14th March 015
+                   t.resetTimer();
+                   t.hideTimer();
+                   
                    break;
                }
         default:{}
