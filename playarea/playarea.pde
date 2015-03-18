@@ -16,7 +16,7 @@ int gameScreen, isHelpDisplayed, gameStartupCount;
 // 2nd March: Bikram: Added startup of Name Inquiry and greetings Screen.
 ControlP5 cp5;
 Textfield targetField;
-Textlabel displayGreetings, displayNameOnLeft, displayGameOver, timerRight;
+Textlabel displayGreetings, displayNameOnLeft, displayGameOver, timerRight, gameLevel;
 Textarea helpTextarea;
 String playerName;
 Button bangButton, playButton;
@@ -58,6 +58,8 @@ float slow_scroll = 1;
 StartUpScreen s;
 // Timer object
 Timer t;
+// Game Level Object
+GameLevel gl;
 
 //GameOver Screen object
 EndScreen endscreen;
@@ -81,7 +83,8 @@ void setup(){
     //Check if if help is displayed
     isHelpDisplayed = 0;
     t.initializeTimer();
-    
+    // Initiliaze Game level
+    gl = new GameLevel();
 
     // Initialize box2d physics and create the world
     box2d = new Box2DProcessing(this);
@@ -174,7 +177,9 @@ void draw(){
                      gameScreen = 4;
                    else                   
                      timerRight.setText(""+t.getTimerValue());
-                   
+                   //Show Game Level
+                   gl.showLevel();
+                   gl.display();
                    
                    
                    // We must always step through time!
@@ -458,6 +463,7 @@ public void play_Game() {
 //Restart button 
 public void restart() {
     displayNameOnLeft.setVisible(false);
+    gl.hideLevel();
     bangButton.remove();
     game_over = true;
     gameScreen = 3;
