@@ -213,6 +213,12 @@ void draw(){
                        ball.done(); 
                        ball = new Ball(width*0.1, height*0.4, 16);
                        gameScreen = 4;
+                       // reset the shift value
+                       shift = 0;
+                       // create the floors, platforms, ceilings for new level
+                       scroll(0);
+                       // reset the background scroll value
+                       x_bg = 0;
                    }
 
                    //Scrolling effect when the ball is moved : Srijan 8th March 2015
