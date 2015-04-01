@@ -44,6 +44,10 @@ class Surface {
     else {
       for(float y = surface_height; y > start_pos; y -= 5) {
         float x = 0;
+        if(gap!= 0)
+        {
+          x = 640;
+        }
         surface.add(new Vec2(x,y));
       }
     }

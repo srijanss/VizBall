@@ -14,6 +14,7 @@ class Box {
   // But we also have to make a body for box2d to know about it
   Body b;
   BodyDef bd;
+  PolygonShape sd;
 
   Box(float x_,float y_, float w_, float h_) {
     x = x_;
@@ -22,7 +23,7 @@ class Box {
     h = h_;
 
     // Define the polygon
-    PolygonShape sd = new PolygonShape();
+    sd = new PolygonShape();
     // Figure out the box2d coordinates
     float box2dW = box2d.scalarPixelsToWorld(w/2);
     float box2dH = box2d.scalarPixelsToWorld(h/2);
@@ -49,9 +50,9 @@ class Box {
     rect(x,y,w,h);
   }
  boolean kill() {
-   //print("Body"+b+"\n");
-    box2d.destroyBody(b);
-    return true;
+    
+     box2d.destroyBody(b);
+      return true;
   }
   float lifespan = 0;
   boolean isDead(){
@@ -63,16 +64,20 @@ class Box {
     } 
   }
   
-  void update() {
-    //fill(0);
-    noFill();
-    noStroke();
-    //remove();
-    //fill(129, 206, 15);
-    //stroke(0);
-    //rectMode(CENTER);
-    //rect(x,y,w,h);
+  void update(float _x, float _y) {
+    //b.setTransform(new Vec2(_x+2, _y), b.getAngle());
+    //b.setPosition(new Vec2(b.getPosition(), b.setPosition()), b.getAngle());
     lifespan = -1;
+  }
+  
+  float get_box_pos(String cord){
+    Vec2 pos = box2d.getBodyPixelCoord(b);
+    if(cord == "x"){
+      return pos.x;
+    }
+    else{
+      return pos.y;
+    }
   }
  
 }
