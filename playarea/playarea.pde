@@ -33,6 +33,9 @@ Ball ball;
 float game_width = 640 * 5;
 float scrolled_width = 0;
 //float scroll_flag = 0;
+float floor_width = 0;
+float ceiling_width = 0;
+
 float old_pos = 0;
 float current_pos = 0;
 float shift = 0;
@@ -132,16 +135,29 @@ void setup() {
   //Defines the gap between the ceilings : Srijan 3rd March 2015
   float ceiling_gap = 0;
   //Create floors and adds to Arraylist : Srijan 3rd March 2015
+  float floor_width = 0;
+   float ceiling_width = 0;
+  //for (float w=0; w<game_width; w+=width/2) {
   for (float w=0; w<game_width; w+=width/2) {
     floors.add(new Box(w+floor_gap, height-5, width/2, 10));
     floor_gap +=100;
+    floor_width = w+floor_gap;
+    if(floor_width >= game_width){
+       break; 
+    }
   }
   //Create ceilings and adds to Arraylist : Srijan 3rd March 2015
-  for (float w=0; w<game_width; w+=width/4) {  
-    ceilings.add(new Box(w+ceiling_gap, 5, width/4, 10));
+  for (float w=0; w<game_width; w+=width) {  
+    ceilings.add(new Box(w+ceiling_gap, 5, width, 10));
     ceiling_gap += 100;
     //ceilings.add(new Box(0,5,width*2,10));
+    ceiling_width = w+ceiling_gap;
+    if(ceiling_width >= game_width){
+       break; 
+    }
   }
+  println("Ceilings", ceilings.size());
+  println("Floors", floors.size());
 
 
   //Commented out the vertical surface : Srijan 7th March 2015
@@ -247,20 +263,25 @@ void draw() {
 
       //Scrolling effect when the ball is moved : Srijan 8th March 2015
       current_pos = ball.get_ball_pos("x");
-
+      
+     
       if (old_pos != current_pos) {
 
         left_scroll_state = false;
-        if (current_pos < 45) {
+        if (current_pos < 65) {
+          println(x_bg);
           if (keyRight == true && keyUp == false) {
             ball.step(5, -10);
           } else if (keyRight == true && keyUp == true) {
             ball.step(5, 10);
           } else if (keyLeft == true && keyUp == false) {
             ball.step(-0.05, -10);
-          } else if (keyLeft == true && keyUp == true) {
+          } else if (keyLeft == true && keyUp == true && x_bg < 0.25) {
             ball.step(-0.05, 10);
-          }
+          } else if (keyLeft == true && keyUp == true && x_bg >= 0) {
+            println(x_bg);
+            ball.step(-5, 10);
+          } 
 
           left_scroll_state = true;
           if (old_pos > current_pos) {
@@ -281,6 +302,7 @@ void draw() {
             }
           }
         }
+        if(x_bg > -640) {
         right_scroll_state = false;
         if (current_pos >525) {
           if (keyLeft == true && keyUp == false) {
@@ -311,7 +333,7 @@ void draw() {
             }
             //Check for end of level : Srijan 11th March 2015
             //print(x_bg);
-            if (x_bg <=-50 && current_pos <= 540) {
+            if (x_bg <=-540 && current_pos <= 540) {
               // Level up and Increase scroll speed
               level +=1;
               fast_scroll +=1;
@@ -333,8 +355,10 @@ void draw() {
             }
           }
         }
+        }
         old_pos = current_pos;
       }
+    
       break;
     }
   case 4:
@@ -415,13 +439,21 @@ void scroll(float value) {
     for (float w=0; w<game_width; w+=width/2) {
       floors.add(new Box(shift+w+floor_gap, height-5, width/2, 10));
       floor_gap +=100;
+      floor_width = w+floor_gap;
+    if(floor_width >= game_width){
+       break; 
+    }
     }
   }
   if(destroy_box(ceilings)){
     float ceiling_gap = 0;
-    for (float w=0; w<game_width; w+=width/4) {  
-      ceilings.add(new Box(shift+w+ceiling_gap, 5, width/4, 10));
+    for (float w=0; w<game_width; w+=width) {  
+      ceilings.add(new Box(shift+w+ceiling_gap, 5, width, 10));
       ceiling_gap += 100;
+      ceiling_width = w+ceiling_gap;
+    if(ceiling_width >= game_width){
+       break; 
+    }
     }
   }
 }
@@ -469,10 +501,10 @@ void keyPressed() {
         ball.step(5, 10);
       }
     } else if (keyUp == true && keyLeft == true) {
-      if (right_scroll_state == true) {
+      if (right_scroll_state == true && x_bg > -640) {
         ball.step(-0.1, 10);
       } else {
-        ball.step(-5, 10);
+         ball.step(-5,10); 
       }
     } else if (keyUp == true && keyRight == false && keyLeft == false) {
 
@@ -530,7 +562,7 @@ void keyPressed() {
         moveRight = 0;
       } else {
         ball.step(-1 + moveLeft, -y_mov);
-        if (moveLeft < 5 && moveLeft < 4) {
+        if (moveLeft > -6 && moveLeft > -5) {
           moveLeft -= 1;
         }
         moveRight = 0;
