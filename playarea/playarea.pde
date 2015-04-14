@@ -141,7 +141,7 @@ void setup() {
   ball = new Ball(width*0.1, height*0.4, 16);
   
   // endbox object
-  endbox = new Box(3000, -10, 100, 1024); 
+  endbox = new Box(3000, -10, 200, 600); 
 
 
   //gap that defines the platforms to occur after the screen width : Srijan 3rd March 2015
@@ -375,7 +375,7 @@ void draw() {
             }
             //Check for end of level : Srijan 11th March 2015
             print(x_bg);
-            if (x_bg <=-630) {
+            if (x_bg <=-610) {
               // Level up and Increase scroll speed
               level +=1;
               //fast_scroll +=1;
@@ -471,7 +471,7 @@ void scroll(float value) {
   }*/
   // scrolling the enemies in the playarea
   endbox.kill();
-  endbox = new Box(shift+3000, -10, 100, 1024);
+  endbox = new Box(shift+3000, -10, 200, 600);
   if(destroy_enemy(enemy)) {
     float enemy_gap = 0;
     for (float w=width; w<=game_width; w+=width) {
