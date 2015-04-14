@@ -12,7 +12,7 @@ import controlP5.*;
 
 // A reference to our box2d world
 Box2DProcessing box2d;
-PImage sky, bg, startupImg, enemy1;
+PImage sky, bg, startupImg, enemyOne, enemyTwo;
 int gameScreen, isHelpDisplayed, gameStartupCount;
 //ControlP5 Library used
 // 2nd March: Bikram: Added startup of Name Inquiry and greetings Screen.
@@ -32,8 +32,12 @@ Box endbox;
 
 // enemy object
 ArrayList<Enemy> enemy;
+ArrayList<Enemy2> enemy2;
 
 boolean collission_with_enemy = false;
+
+
+int bounce_count = 0;
 
 
 // Vertical surface
@@ -98,7 +102,8 @@ void setup() {
   sky = loadImage("./images/sky.png");
   bg = loadImage("./images/mountain_trees.png");
   startupImg = loadImage("./images/1.jpg");
-  enemy1 = loadImage("./images/enemy1.png");
+  enemyOne = loadImage("./images/enemy1.png");
+  enemyTwo = loadImage("./images/enemy2.png");
   smooth();
 
 
@@ -136,6 +141,7 @@ void setup() {
   
   // Create empty list for enemies
   enemy = new ArrayList<Enemy>();
+  enemy2 = new ArrayList<Enemy2>();
 
   //create a Ball with specified size and at given coordinates in screen
   ball = new Ball(width*0.1, height*0.4, 16);
@@ -192,6 +198,9 @@ void setup() {
      //enemy.add(new Enemy(enemy_gap+width*0.5, height*0.65, 8));
      enemy_gap += 512;
   }
+  
+  // adding enemy2 to the playarea
+  create_enemy2_obj(enemy2, 0);
 
 
   //Commented out the vertical surface : Srijan 7th March 2015
@@ -278,6 +287,23 @@ void draw() {
       // display enemies listed in ArrayList
       for (Enemy e: enemy) {
         e.display(); 
+      }
+      
+      for (Enemy2 e: enemy2) {
+        e.display(); 
+        
+          if(bounce_count<=200){
+          e.bounce(10);
+          bounce_count++; 
+          }
+          else if(bounce_count > 100 && bounce_count <=400) {
+            e.bounce(-10);
+             bounce_count++; 
+          }
+          else {
+             bounce_count = 0; 
+          }
+     
       }
       //ceiling1.display();
 
@@ -424,6 +450,22 @@ void draw() {
   }
 }
 
+/*
+ *
+ * Enemy2 object create
+ * April 15 2015 : Srijan
+ *
+ */
+void create_enemy2_obj(ArrayList<Enemy2> enemy2, float vshift) {
+  float enemy2_gap = 0;
+    for (float w=width; w<=game_width; w+=width) {
+       enemy2.add(new Enemy2(enemy2_gap+width*0.65, height*0.90+vshift, 25));
+       //enemy.add(new Enemy(enemy_gap+width*0.3, height*0.45, 8));
+       //enemy.add(new Enemy(enemy_gap+width*0.5, height*0.65, 8));
+       enemy2_gap += 512;
+    }
+}
+
 
 /* 
   April 1st 2015 : Srijan
@@ -459,6 +501,24 @@ boolean destroy_enemy(ArrayList<Enemy> enemyobj){
 return true; 
 }
 
+float enemy2_xpos = 0;
+float enemy2_ypos = 0;
+
+boolean destroy_enemy2(ArrayList<Enemy2> enemyobj){
+ while(enemyobj.size() > 0){
+   for (int i=0; i<enemyobj.size(); i++) {
+      Enemy2 e = enemyobj.get(i);
+      enemy2_xpos = e.get_enemy2_pos("x");
+      enemy2_ypos = e.get_enemy2_pos("y");
+      //b.update();
+      if (e.kill()) {
+        enemyobj.remove(i);
+       }
+    }
+ }
+return true; 
+}
+
 //Scroll function to scroll the floor, ceilings and platforms : Srijan 5th March 2015
 void scroll(float value) {
   shift += value;
@@ -479,6 +539,15 @@ void scroll(float value) {
        //enemy.add(new Enemy(shift+enemy_gap+width*0.3, height*0.45, 8));
        //enemy.add(new Enemy(shift+enemy_gap+width*0.5, height*0.65, 8));
        enemy_gap += 512;
+    }
+  }
+  if(destroy_enemy2(enemy2)) {
+    float enemy2_gap = 0;
+    for (float w=width; w<=game_width; w+=width) {
+       enemy2.add(new Enemy2(shift+enemy2_gap+width*0.65, height*0.90, 25));
+       //enemy.add(new Enemy(shift+enemy_gap+width*0.3, height*0.45, 8));
+       //enemy.add(new Enemy(shift+enemy_gap+width*0.5, height*0.65, 8));
+       enemy2_gap += 512;
     }
   }
   if(destroy_box(platforms)){
@@ -708,11 +777,11 @@ void beginContact(Contact cp) {
   Object o1 = b1.getUserData();
   Object o2 = b2.getUserData();
 
-  if ((o1.getClass() == Ball.class && o2.getClass() == Enemy.class) ) {
+  if ((o1.getClass() == Ball.class && (o2.getClass() == Enemy.class || o2.getClass() == Enemy2.class) )) {
       println("collided with enemy");
       collission_with_enemy = true;
   }
-  else if ((o2.getClass() == Ball.class && o1.getClass() == Enemy.class)) {
+  else if ((o2.getClass() == Ball.class && (o1.getClass() == Enemy.class || o1.getClass() == Enemy2.class))) {
     println("collided with enemy");
      collission_with_enemy = true;
     
