@@ -2,15 +2,17 @@
 
 //imports from box2d library
 import shiffman.box2d.*;
+import org.jbox2d.dynamics.joints.*;
 import org.jbox2d.collision.shapes.*;
+import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.*;
 import org.jbox2d.dynamics.*;
-import org.jbox2d.dynamics.*;
+import org.jbox2d.dynamics.contacts.*;
 import controlP5.*;
 
 // A reference to our box2d world
 Box2DProcessing box2d;
-PImage sky, bg, startupImg;
+PImage sky, bg, startupImg, enemy1;
 int gameScreen, isHelpDisplayed, gameStartupCount;
 //ControlP5 Library used
 // 2nd March: Bikram: Added startup of Name Inquiry and greetings Screen.
@@ -24,6 +26,15 @@ Button bangButton, playButton;
 ArrayList<Box> platforms;
 ArrayList<Box> ceilings;
 ArrayList<Box> floors;
+
+//endbox at the end of each level
+Box endbox;
+
+// enemy object
+ArrayList<Enemy> enemy;
+
+boolean collission_with_enemy = false;
+
 
 // Vertical surface
 Surface verticalSurface, verticalSurfaceRight;
@@ -87,6 +98,7 @@ void setup() {
   sky = loadImage("./images/sky.png");
   bg = loadImage("./images/mountain_trees.png");
   startupImg = loadImage("./images/1.jpg");
+  enemy1 = loadImage("./images/enemy1.png");
   smooth();
 
 
@@ -109,14 +121,27 @@ void setup() {
   box2d.createWorld();
   // We are setting a custom gravity
   box2d.setGravity(0, -20);
+  
+  /*
+   * Turn on collission listening
+   * April 15 2015 : Srijan
+   *
+   */
+  box2d.listenForCollisions();
 
   //Create the empty list for surfaces
   platforms = new ArrayList<Box>();
   ceilings = new ArrayList<Box>();
   floors = new ArrayList<Box>();
+  
+  // Create empty list for enemies
+  enemy = new ArrayList<Enemy>();
 
   //create a Ball with specified size and at given coordinates in screen
   ball = new Ball(width*0.1, height*0.4, 16);
+  
+  // endbox object
+  endbox = new Box(3000, -10, 100, 1024); 
 
 
   //gap that defines the platforms to occur after the screen width : Srijan 3rd March 2015
@@ -158,6 +183,15 @@ void setup() {
   }
   println("Ceilings", ceilings.size());
   println("Floors", floors.size());
+  
+  // adding enemies to the playarea
+  float enemy_gap = 0;
+  for (float w=width; w<=game_width; w+=width) {
+     enemy.add(new Enemy(enemy_gap+width*0.1, height*0.25, 8));
+     //enemy.add(new Enemy(enemy_gap+width*0.3, height*0.45, 8));
+     //enemy.add(new Enemy(enemy_gap+width*0.5, height*0.65, 8));
+     enemy_gap += 512;
+  }
 
 
   //Commented out the vertical surface : Srijan 7th March 2015
@@ -241,14 +275,20 @@ void draw() {
       for (Box b : ceilings) {
         b.display();
       }
+      // display enemies listed in ArrayList
+      for (Enemy e: enemy) {
+        e.display(); 
+      }
       //ceiling1.display();
 
       // Draw the ball
       ball.display();
       //box.display();
+      
+      endbox.display();
 
       //Kill the ball if ball goes through hole in floors or ceiling : Srijan 5th March 2015
-      if (ball.get_ball_pos("y") > height+16 || ball.get_ball_pos("y") < -16) {
+      if (ball.get_ball_pos("y") > height+16 || ball.get_ball_pos("y") < -16 || collission_with_enemy == true) {
 
         ball.done(); 
         ball = new Ball(width*0.1, height*0.4, 16);
@@ -259,6 +299,8 @@ void draw() {
         scroll(0);
         // reset the background scroll value
        x_bg = 0;   
+       //reset collision flag
+       collission_with_enemy = false;
       }
 
       //Scrolling effect when the ball is moved : Srijan 8th March 2015
@@ -332,12 +374,12 @@ void draw() {
               }
             }
             //Check for end of level : Srijan 11th March 2015
-            //print(x_bg);
-            if (x_bg <=-540 && current_pos <= 540) {
+            print(x_bg);
+            if (x_bg <=-630) {
               // Level up and Increase scroll speed
               level +=1;
-              fast_scroll +=1;
-              slow_scroll +=1;
+              //fast_scroll +=1;
+              //slow_scroll +=1;
               // Recreate the ball at the start for new level
               ball.done();
               ball = new Ball(width*0.1, height*0.4, 16);
@@ -400,6 +442,23 @@ boolean destroy_box(ArrayList<Box> boxobj){
 return true; 
 }
 
+/* 
+  April 13th 2015 : Srijan
+  Created destroy box function to destroy the enemy objects in the box2d area
+*/
+boolean destroy_enemy(ArrayList<Enemy> enemyobj){
+ while(enemyobj.size() > 0){
+   for (int i=0; i<enemyobj.size(); i++) {
+      Enemy e = enemyobj.get(i);
+      //b.update();
+      if (e.kill()) {
+        enemyobj.remove(i);
+       }
+    }
+ }
+return true; 
+}
+
 //Scroll function to scroll the floor, ceilings and platforms : Srijan 5th March 2015
 void scroll(float value) {
   shift += value;
@@ -410,6 +469,18 @@ void scroll(float value) {
       platforms.remove(i);
     }
   }*/
+  // scrolling the enemies in the playarea
+  endbox.kill();
+  endbox = new Box(shift+3000, -10, 100, 1024);
+  if(destroy_enemy(enemy)) {
+    float enemy_gap = 0;
+    for (float w=width; w<=game_width; w+=width) {
+       enemy.add(new Enemy(shift+enemy_gap+width*0.1, height*0.25, 8));
+       //enemy.add(new Enemy(shift+enemy_gap+width*0.3, height*0.45, 8));
+       //enemy.add(new Enemy(shift+enemy_gap+width*0.5, height*0.65, 8));
+       enemy_gap += 512;
+    }
+  }
   if(destroy_box(platforms)){
     float platform_gap = 0;
     for (float w=width; w<=game_width; w+=width) {
@@ -616,4 +687,46 @@ public void restart() {
   game_over = true;
   gameScreen = 3;
 }
+
+/*
+   * Collission event listener
+   * Check if Ball collides with Enemy
+   * If Ball collides with Enemy kill ball 
+   * April 15 2015 : Srijan
+   *
+   */
+void beginContact(Contact cp) {
+  
+  // Get both fixtures
+  Fixture f1 = cp.getFixtureA();
+  Fixture f2 = cp.getFixtureB();
+  // Get both bodies
+  Body b1 = f1.getBody();
+  Body b2 = f2.getBody();
+
+  // Get our objects that reference these bodies
+  Object o1 = b1.getUserData();
+  Object o2 = b2.getUserData();
+
+  if ((o1.getClass() == Ball.class && o2.getClass() == Enemy.class) ) {
+      println("collided with enemy");
+      collission_with_enemy = true;
+  }
+  else if ((o2.getClass() == Ball.class && o1.getClass() == Enemy.class)) {
+    println("collided with enemy");
+     collission_with_enemy = true;
+    
+  }
+  /*
+  else if ((o1.getClass() == Ball.class && o2.getClass() == Box.class) ) {
+      println("collided with box");
+  }
+  else if ((o2.getClass() == Ball.class && o1.getClass() == Box.class)) {
+    println("collided with box");
+    
+  }
+  */
+
+}
+  
 
