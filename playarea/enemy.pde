@@ -63,7 +63,7 @@ class Enemy {
     }
     endShape(CLOSE);
     //ellipse(0,0,r*2,r*2);
-    image(enemyOne,-284,-180);
+    image(enemyOne,-240,-125);
     // Let's add a line so we can see the rotation
     //line(0,0,r,0);
     popMatrix();
@@ -76,10 +76,16 @@ class Enemy {
     PolygonShape sd = new PolygonShape();
 
     Vec2[] vertices = new Vec2[4];
-    vertices[0] = box2d.vectorPixelsToWorld(new Vec2(-10, -35));
-    vertices[1] = box2d.vectorPixelsToWorld(new Vec2(10, -35));
-    vertices[2] = box2d.vectorPixelsToWorld(new Vec2(28, 15));
-    vertices[3] = box2d.vectorPixelsToWorld(new Vec2(-28, 15));
+    //vertices[0] = box2d.vectorPixelsToWorld(new Vec2(-10, -35));
+    //vertices[1] = box2d.vectorPixelsToWorld(new Vec2(10, -35));
+    //vertices[2] = box2d.vectorPixelsToWorld(new Vec2(28, 15));
+    //vertices[3] = box2d.vectorPixelsToWorld(new Vec2(-28, 15));
+    
+    //for smaller image
+    vertices[0] = box2d.vectorPixelsToWorld(new Vec2(-5, -18));
+    vertices[1] = box2d.vectorPixelsToWorld(new Vec2(5, -18));
+    vertices[2] = box2d.vectorPixelsToWorld(new Vec2(15, 15));
+    vertices[3] = box2d.vectorPixelsToWorld(new Vec2(-15, 15));
     
 
     sd.set(vertices, vertices.length);

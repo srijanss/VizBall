@@ -46,14 +46,14 @@ class Enemy2 {
     pushMatrix();
     translate(pos.x,pos.y);
     rotate(-a);
-    //noFill();
-    //noStroke();
-    fill(51,51,205);
+    noFill();
+    noStroke();
+    //fill(51,51,205);
     stroke(0);
     strokeWeight(1);
     
     ellipse(0,0,r*2,r*2);
-    image(enemyTwo, -320, -180);
+    image(enemyTwo, -291, -103);
     // Let's add a line so we can see the rotation
     //line(0,0,r,0);
     popMatrix();

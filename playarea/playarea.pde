@@ -12,7 +12,7 @@ import controlP5.*;
 
 // A reference to our box2d world
 Box2DProcessing box2d;
-PImage sky, bg, startupImg, enemyOne, enemyTwo;
+PImage sky, nightsky, bg, startupImg, enemyOne, enemyTwo;
 int gameScreen, isHelpDisplayed, gameStartupCount;
 //ControlP5 Library used
 // 2nd March: Bikram: Added startup of Name Inquiry and greetings Screen.
@@ -100,6 +100,7 @@ EndScreen endscreen;
 void setup() {
   size(640, 360);
   sky = loadImage("./images/sky.png");
+  nightsky = loadImage("./images/nightsky.png");
   bg = loadImage("./images/mountain_trees.png");
   startupImg = loadImage("./images/1.jpg");
   enemyOne = loadImage("./images/enemy1.png");
@@ -268,7 +269,12 @@ void draw() {
       box2d.step();
 
       background(255, 204, 153);
-      image(sky, 0, 0);
+      if(level == 0){
+        image(sky, 0, 0);
+      }
+      else if (level == 1) {
+        image(nightsky, 0, 0); 
+      }
       // Background scrolling with repetition , Parallax scrolling implemented : Srijan 10th March 2015
       for (int i=0; i<game_width; i+=width) {
         image(bg, x_bg + i, 0);
@@ -459,7 +465,7 @@ void draw() {
 void create_enemy2_obj(ArrayList<Enemy2> enemy2, float vshift) {
   float enemy2_gap = 0;
     for (float w=width; w<=game_width; w+=width) {
-       enemy2.add(new Enemy2(enemy2_gap+width*0.65, height*0.90+vshift, 25));
+       enemy2.add(new Enemy2(enemy2_gap+width*0.65, height*0.90+vshift, 13));
        //enemy.add(new Enemy(enemy_gap+width*0.3, height*0.45, 8));
        //enemy.add(new Enemy(enemy_gap+width*0.5, height*0.65, 8));
        enemy2_gap += 512;
@@ -544,7 +550,7 @@ void scroll(float value) {
   if(destroy_enemy2(enemy2)) {
     float enemy2_gap = 0;
     for (float w=width; w<=game_width; w+=width) {
-       enemy2.add(new Enemy2(shift+enemy2_gap+width*0.65, height*0.90, 25));
+       enemy2.add(new Enemy2(shift+enemy2_gap+width*0.65, height*0.90, 13));
        //enemy.add(new Enemy(shift+enemy_gap+width*0.3, height*0.45, 8));
        //enemy.add(new Enemy(shift+enemy_gap+width*0.5, height*0.65, 8));
        enemy2_gap += 512;
