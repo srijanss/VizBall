@@ -37,7 +37,7 @@ ArrayList<Enemy2> enemy2;
 boolean collission_with_enemy = false;
 
 
-int bounce_count = 0;
+int hmove_count = 0;
 
 
 // Vertical surface
@@ -63,6 +63,9 @@ float x_bg = 0;
 
 // Game Level 
 int level = 0;
+
+// Player life
+int life = 1;
 
 // Scroll value
 float fast_scroll = 2;
@@ -105,6 +108,7 @@ void setup() {
   startupImg = loadImage("./images/1.jpg");
   enemyOne = loadImage("./images/enemy1.png");
   enemyTwo = loadImage("./images/enemy2.png");
+  //enemyThree = loadImage("./images/enemy3.png");
   smooth();
 
 
@@ -127,7 +131,7 @@ void setup() {
   box2d.createWorld();
   // We are setting a custom gravity
   box2d.setGravity(0, -20);
-  
+
   /*
    * Turn on collission listening
    * April 15 2015 : Srijan
@@ -139,14 +143,14 @@ void setup() {
   platforms = new ArrayList<Box>();
   ceilings = new ArrayList<Box>();
   floors = new ArrayList<Box>();
-  
+
   // Create empty list for enemies
   enemy = new ArrayList<Enemy>();
   enemy2 = new ArrayList<Enemy2>();
 
   //create a Ball with specified size and at given coordinates in screen
   ball = new Ball(width*0.1, height*0.4, 16);
-  
+
   // endbox object
   endbox = new Box(3000, -10, 200, 600); 
 
@@ -168,14 +172,14 @@ void setup() {
   float ceiling_gap = 0;
   //Create floors and adds to Arraylist : Srijan 3rd March 2015
   float floor_width = 0;
-   float ceiling_width = 0;
+  float ceiling_width = 0;
   //for (float w=0; w<game_width; w+=width/2) {
   for (float w=0; w<game_width; w+=width/2) {
     floors.add(new Box(w+floor_gap, height-5, width/2, 10));
     floor_gap +=100;
     floor_width = w+floor_gap;
-    if(floor_width >= game_width){
-       break; 
+    if (floor_width >= game_width) {
+      break;
     }
   }
   //Create ceilings and adds to Arraylist : Srijan 3rd March 2015
@@ -184,24 +188,25 @@ void setup() {
     ceiling_gap += 100;
     //ceilings.add(new Box(0,5,width*2,10));
     ceiling_width = w+ceiling_gap;
-    if(ceiling_width >= game_width){
-       break; 
+    if (ceiling_width >= game_width) {
+      break;
     }
   }
   println("Ceilings", ceilings.size());
   println("Floors", floors.size());
-  
+
   // adding enemies to the playarea
   float enemy_gap = 0;
   for (float w=width; w<=game_width; w+=width) {
-     enemy.add(new Enemy(enemy_gap+width*0.1, height*0.25, 8));
-     //enemy.add(new Enemy(enemy_gap+width*0.3, height*0.45, 8));
-     //enemy.add(new Enemy(enemy_gap+width*0.5, height*0.65, 8));
-     enemy_gap += 512;
+    enemy.add(new Enemy(enemy_gap+width*0.1, height*0.25, 8));
+    //enemy.add(new Enemy(enemy_gap+width*0.3, height*0.45, 8));
+    //enemy.add(new Enemy(enemy_gap+width*0.5, height*0.65, 8));
+    enemy_gap += 512;
   }
-  
+
   // adding enemy2 to the playarea
-  create_enemy2_obj(enemy2, 0);
+  create_enemy2_obj(enemy2, 0.93, 0.65);
+
 
 
   //Commented out the vertical surface : Srijan 7th March 2015
@@ -242,11 +247,12 @@ void draw() {
       if (game_over) {
         displayGameOver.remove(); 
         t.showTimer();
-        game_over = false;}
-          //scroll(0.05);
-          //scroll(0);
+        game_over = false;
+      }
+      //scroll(0.05);
+      //scroll(0);
 
-        
+
       //Display Username: left
       //3/8/015: Bikram
       displayNameOnLeft.setVisible(true);
@@ -269,11 +275,10 @@ void draw() {
       box2d.step();
 
       background(255, 204, 153);
-      if(level == 0){
+      if (level == 0) {
         image(sky, 0, 0);
-      }
-      else if (level == 1) {
-        image(nightsky, 0, 0); 
+      } else if (level == 1) {
+        image(nightsky, 0, 0);
       }
       // Background scrolling with repetition , Parallax scrolling implemented : Srijan 10th March 2015
       for (int i=0; i<game_width; i+=width) {
@@ -291,32 +296,65 @@ void draw() {
         b.display();
       }
       // display enemies listed in ArrayList
-      for (Enemy e: enemy) {
-        e.display(); 
+      for (Enemy e : enemy) {
+        e.display();
       }
-      
-      for (Enemy2 e: enemy2) {
-        e.display(); 
-        
-          if(bounce_count<=200){
-          e.bounce(10);
-          bounce_count++; 
-          }
-          else if(bounce_count > 100 && bounce_count <=400) {
-            e.bounce(-10);
-             bounce_count++; 
-          }
-          else {
-             bounce_count = 0; 
-          }
-     
-      }
-      //ceiling1.display();
 
+
+      for(int i=0; i<enemy2.size(); i++){
+        Enemy2 e = enemy2.get(i);
+        e.display();
+        if(i%2 == 0){//Bouncing enemy implementation
+         if (e.get_enemy2_pos("y") >333) {
+          e.bounce(10);
+          //bounce_count++;
+          }
+          //else if(bounce_count > 100 && bounce_count <=400) {
+          else if (e.get_enemy2_pos("y") < 250) {
+            e.bounce(-10);
+            //bounce_count++;
+          } 
+          //else {
+          //  bounce_count = 0;
+          //}
+        }
+        else { //TODO: Crawling enemy implementation
+          if(hmove_count <=100){
+            e.crawl(10);
+            hmove_count++;
+          }else if(hmove_count > 100 && hmove_count <= 200){
+            e.crawl(-10);
+            hmove_count++; 
+          }else {
+            hmove_count = 0; 
+          }
+        }
+      }
+      //for (Enemy2 e : enemy2) {
+      //  e.display(); 
+        /*
+         * Bouncing enemy 
+         */
+
+      /*  if (e.get_enemy2_pos("y") >333) {
+          e.bounce(10);
+          //bounce_count++;
+        }
+        //else if(bounce_count > 100 && bounce_count <=400) {
+        else if (e.get_enemy2_pos("y") < 250) {
+          e.bounce(-10);
+          //bounce_count++;
+        } 
+        //else {
+        //  bounce_count = 0;
+        //}
+      }*/
+      //ceiling1.display();
+      
       // Draw the ball
       ball.display();
       //box.display();
-      
+
       endbox.display();
 
       //Kill the ball if ball goes through hole in floors or ceiling : Srijan 5th March 2015
@@ -330,15 +368,22 @@ void draw() {
         // create the floors, platforms, ceilings for new level
         scroll(0);
         // reset the background scroll value
-       x_bg = 0;   
-       //reset collision flag
-       collission_with_enemy = false;
+        x_bg = 0;   
+        //reset level to zero
+        if(life > 0){
+          life--;
+        }
+        else {
+          level = 0;
+        }
+        //reset collision flag
+        collission_with_enemy = false;
       }
 
       //Scrolling effect when the ball is moved : Srijan 8th March 2015
       current_pos = ball.get_ball_pos("x");
-      
-     
+
+
       if (old_pos != current_pos) {
 
         left_scroll_state = false;
@@ -376,69 +421,69 @@ void draw() {
             }
           }
         }
-        if(x_bg > -640) {
-        right_scroll_state = false;
-        if (current_pos >525) {
-          if (keyLeft == true && keyUp == false) {
-            ball.step(-5, -10);
-          } else if (keyLeft == true && keyUp == true) {
-            ball.step(-5, 10);
-          } else if (keyRight == true && keyUp == false) {
-            ball.step(0.05, -10);
-          } else if (keyRight == true && keyUp == true) {
-            ball.step(0.05, 10);
-          }
-          right_scroll_state = true;
-          if (old_pos < current_pos) {
-            /* 
-             monitoring background scrolling to disable scrolling more that level width
-             :Srijan 11th March 2015
-             */
-            if (x_bg >= -640 * 3) {
-              //Calculating right displacement of the ball : Srijan 11th March 2015
-              float right_displacement = current_pos - old_pos;
-              if (right_displacement > 0.15) {
-                scroll(-fast_scroll);
-                x_bg -= 0.5;
-              } else {
-                scroll(-slow_scroll);
-                x_bg -= 0.25;
-              }
+        if (x_bg > -640) {
+          right_scroll_state = false;
+          if (current_pos >525) {
+            if (keyLeft == true && keyUp == false) {
+              ball.step(-5, -10);
+            } else if (keyLeft == true && keyUp == true) {
+              ball.step(-5, 10);
+            } else if (keyRight == true && keyUp == false) {
+              ball.step(0.05, -10);
+            } else if (keyRight == true && keyUp == true) {
+              ball.step(0.05, 10);
             }
-            //Check for end of level : Srijan 11th March 2015
-            print(x_bg);
-            if (x_bg <=-610) {
-              // Level up and Increase scroll speed
-              level +=1;
-              //fast_scroll +=1;
-              //slow_scroll +=1;
-              // Recreate the ball at the start for new level
-              ball.done();
-              ball = new Ball(width*0.1, height*0.4, 16);
-              // reset the shift value
-              shift = 0;
-              // create the floors, platforms, ceilings for new level
-              scroll(0);
-              // reset the background scroll value
-              x_bg = 0;
-              /*
-                                TODO: Show Level up screen , Currently game over screen is used
+            right_scroll_state = true;
+            if (old_pos < current_pos) {
+              /* 
+               monitoring background scrolling to disable scrolling more that level width
                :Srijan 11th March 2015
                */
-              gameScreen = 4;
+              if (x_bg >= -640 * 3) {
+                //Calculating right displacement of the ball : Srijan 11th March 2015
+                float right_displacement = current_pos - old_pos;
+                if (right_displacement > 0.15) {
+                  scroll(-fast_scroll);
+                  x_bg -= 0.5;
+                } else {
+                  scroll(-slow_scroll);
+                  x_bg -= 0.25;
+                }
+              }
+              //Check for end of level : Srijan 11th March 2015
+              print(x_bg);
+              if (x_bg <=-610) {
+                // Level up and Increase scroll speed
+                level +=1;
+                //fast_scroll +=1;
+                //slow_scroll +=1;
+                // Recreate the ball at the start for new level
+                ball.done();
+                ball = new Ball(width*0.1, height*0.4, 16);
+                // reset the shift value
+                shift = 0;
+                // create the floors, platforms, ceilings for new level
+                scroll(0);
+                // reset the background scroll value
+                x_bg = 0;
+                /*
+                                TODO: Show Level up screen , Currently game over screen is used
+                 :Srijan 11th March 2015
+                 */
+                gameScreen = 4;
+              }
             }
           }
-        }
         }
         old_pos = current_pos;
       }
-    
+
       break;
     }
   case 4:
     {
       //Show Game over to user : Srijan 8th March 2015
-      
+
       //scroll(-5);
       endscreen.display();
       displayGameOver.setText("GAME OVER, " + playerName);
@@ -462,101 +507,106 @@ void draw() {
  * April 15 2015 : Srijan
  *
  */
-void create_enemy2_obj(ArrayList<Enemy2> enemy2, float vshift) {
+void create_enemy2_obj(ArrayList<Enemy2> enemy2, float vshift, float hshift) {
   float enemy2_gap = 0;
-    for (float w=width; w<=game_width; w+=width) {
-       enemy2.add(new Enemy2(enemy2_gap+width*0.65, height*0.90+vshift, 13));
-       //enemy.add(new Enemy(enemy_gap+width*0.3, height*0.45, 8));
-       //enemy.add(new Enemy(enemy_gap+width*0.5, height*0.65, 8));
-       enemy2_gap += 512;
-    }
+  for (float w=width; w<=game_width; w+=width) {
+    enemy2.add(new Enemy2(enemy2_gap+width*hshift, height*vshift, 13));
+    //enemy.add(new Enemy(enemy_gap+width*0.3, height*0.45, 8));
+    //enemy.add(new Enemy(enemy_gap+width*0.5, height*0.65, 8));
+    enemy2_gap += 512;
+  }
 }
 
 
+
 /* 
-  April 1st 2015 : Srijan
-  Created destroy box function to destroy the box objects inthe box2d area
-*/
-boolean destroy_box(ArrayList<Box> boxobj){
- while(boxobj.size() > 0){
-   for (int i=0; i<boxobj.size(); i++) {
+ April 1st 2015 : Srijan
+ Created destroy box function to destroy the box objects inthe box2d area
+ */
+boolean destroy_box(ArrayList<Box> boxobj) {
+  while (boxobj.size () > 0) {
+    for (int i=0; i<boxobj.size (); i++) {
       Box b = boxobj.get(i);
       //b.update();
       if (b.kill()) {
         boxobj.remove(i);
-       }
+      }
     }
- }
-return true; 
+  }
+  return true;
 }
 
 /* 
-  April 13th 2015 : Srijan
-  Created destroy box function to destroy the enemy objects in the box2d area
-*/
-boolean destroy_enemy(ArrayList<Enemy> enemyobj){
- while(enemyobj.size() > 0){
-   for (int i=0; i<enemyobj.size(); i++) {
+ April 13th 2015 : Srijan
+ Created destroy box function to destroy the enemy objects in the box2d area
+ */
+boolean destroy_enemy(ArrayList<Enemy> enemyobj) {
+  while (enemyobj.size () > 0) {
+    for (int i=0; i<enemyobj.size (); i++) {
       Enemy e = enemyobj.get(i);
       //b.update();
       if (e.kill()) {
         enemyobj.remove(i);
-       }
+      }
     }
- }
-return true; 
+  }
+  return true;
 }
 
 float enemy2_xpos = 0;
 float enemy2_ypos = 0;
 
-boolean destroy_enemy2(ArrayList<Enemy2> enemyobj){
- while(enemyobj.size() > 0){
-   for (int i=0; i<enemyobj.size(); i++) {
+boolean destroy_enemy2(ArrayList<Enemy2> enemyobj) {
+  while (enemyobj.size () > 0) {
+    for (int i=0; i<enemyobj.size (); i++) {
       Enemy2 e = enemyobj.get(i);
       enemy2_xpos = e.get_enemy2_pos("x");
       enemy2_ypos = e.get_enemy2_pos("y");
       //b.update();
       if (e.kill()) {
         enemyobj.remove(i);
-       }
+      }
     }
- }
-return true; 
+  }
+  return true;
 }
+
 
 //Scroll function to scroll the floor, ceilings and platforms : Srijan 5th March 2015
 void scroll(float value) {
   shift += value;
   /*for (int i=0; i<platforms.size (); i++) {
-    Box b = platforms.get(i);
-    //b.update();
-    if (b.kill()) {
-      platforms.remove(i);
-    }
-  }*/
+   Box b = platforms.get(i);
+   //b.update();
+   if (b.kill()) {
+   platforms.remove(i);
+   }
+   }*/
   // scrolling the enemies in the playarea
   endbox.kill();
   endbox = new Box(shift+3000, -10, 200, 600);
-  if(destroy_enemy(enemy)) {
+  if (destroy_enemy(enemy)) {
     float enemy_gap = 0;
     for (float w=width; w<=game_width; w+=width) {
-       enemy.add(new Enemy(shift+enemy_gap+width*0.1, height*0.25, 8));
-       //enemy.add(new Enemy(shift+enemy_gap+width*0.3, height*0.45, 8));
-       //enemy.add(new Enemy(shift+enemy_gap+width*0.5, height*0.65, 8));
-       enemy_gap += 512;
+      enemy.add(new Enemy(shift+enemy_gap+width*0.1, height*0.25, 8));
+      //enemy.add(new Enemy(shift+enemy_gap+width*0.3, height*0.45, 8));
+      //enemy.add(new Enemy(shift+enemy_gap+width*0.5, height*0.65, 8));
+      enemy_gap += 512;
     }
   }
-  if(destroy_enemy2(enemy2)) {
+  if (destroy_enemy2(enemy2)) {
     float enemy2_gap = 0;
     for (float w=width; w<=game_width; w+=width) {
-       enemy2.add(new Enemy2(shift+enemy2_gap+width*0.65, height*0.90, 13));
-       //enemy.add(new Enemy(shift+enemy_gap+width*0.3, height*0.45, 8));
-       //enemy.add(new Enemy(shift+enemy_gap+width*0.5, height*0.65, 8));
-       enemy2_gap += 512;
+      //enemy2.add(new Enemy2(shift+enemy2_gap+width*0.65, enemy2_ypos, 13));
+      enemy2.add(new Enemy2(shift+enemy2_gap+width*0.65, height*0.93, 13));
+      //enemy.add(new Enemy(shift+enemy_gap+width*0.3, height*0.45, 8));
+      //enemy.add(new Enemy(shift+enemy_gap+width*0.5, height*0.65, 8));
+      enemy2_gap += 512;
     }
   }
-  if(destroy_box(platforms)){
+  
+  
+  if (destroy_box(platforms)) {
     float platform_gap = 0;
     for (float w=width; w<=game_width; w+=width) {
       platforms.add(new Box(shift+platform_gap + 3*w/4, height-150, width/2-50, 10));
@@ -565,48 +615,48 @@ void scroll(float value) {
       platform_gap += width;
     }
   }
-  
+
   /*for (int i=0; i<floors.size (); i++) {
-    Box f = floors.get(i);
-    //f.update();
-    if (f.kill()) {
-      floors.remove(i);
-    }
-  }
-  for (int i=0; i<ceilings.size (); i++) {
-    Box c = ceilings.get(i);
-    //c.update();
-    if (c.kill()) {
-      ceilings.remove(i);
-    }
-  }*/
-  if(destroy_box(floors)){
+   Box f = floors.get(i);
+   //f.update();
+   if (f.kill()) {
+   floors.remove(i);
+   }
+   }
+   for (int i=0; i<ceilings.size (); i++) {
+   Box c = ceilings.get(i);
+   //c.update();
+   if (c.kill()) {
+   ceilings.remove(i);
+   }
+   }*/
+  if (destroy_box(floors)) {
     float floor_gap = 0;
     for (float w=0; w<game_width; w+=width/2) {
       floors.add(new Box(shift+w+floor_gap, height-5, width/2, 10));
       floor_gap +=100;
       floor_width = w+floor_gap;
-    if(floor_width >= game_width){
-       break; 
-    }
+      if (floor_width >= game_width) {
+        break;
+      }
     }
   }
-  if(destroy_box(ceilings)){
+  if (destroy_box(ceilings)) {
     float ceiling_gap = 0;
     for (float w=0; w<game_width; w+=width) {  
       ceilings.add(new Box(shift+w+ceiling_gap, 5, width, 10));
       ceiling_gap += 100;
       ceiling_width = w+ceiling_gap;
-    if(ceiling_width >= game_width){
-       break; 
-    }
+      if (ceiling_width >= game_width) {
+        break;
+      }
     }
   }
 }
 
 void keyPressed() {
   if (key == 'r' || key == 'R') {
-      print("R pressed\n");
+    print("R pressed\n");
   }
   if (key == 'l' || key == 'L') {
     scroll(-0.5);
@@ -639,8 +689,7 @@ void keyPressed() {
     } else if (keyCtrl == true && keyDown == true) {
       box2d.setGravity(0, -20);
       //keyCtrl = false;
-    }
-    else if (keyUp == true && keyRight == true) {
+    } else if (keyUp == true && keyRight == true) {
       if (left_scroll_state == true) {
         ball.step(0.1, 10);
       } else {
@@ -650,7 +699,7 @@ void keyPressed() {
       if (right_scroll_state == true && x_bg > -640) {
         ball.step(-0.1, 10);
       } else {
-         ball.step(-5,10); 
+        ball.step(-5, 10);
       }
     } else if (keyUp == true && keyRight == false && keyLeft == false) {
 
@@ -658,7 +707,7 @@ void keyPressed() {
     } else if (keyUp == false && keyRight == false && keyLeft == false) {
 
       ball.step(0, 0);
-    }  else if (keyUp == true) {
+    } else if (keyUp == true) {
       ball.step(0, 10);
       moveLeft = 0;
       moveRight = 0;
@@ -765,13 +814,13 @@ public void restart() {
 
 /*
    * Collission event listener
-   * Check if Ball collides with Enemy
-   * If Ball collides with Enemy kill ball 
-   * April 15 2015 : Srijan
-   *
-   */
+ * Check if Ball collides with Enemy
+ * If Ball collides with Enemy kill ball 
+ * April 15 2015 : Srijan
+ *
+ */
 void beginContact(Contact cp) {
-  
+
   // Get both fixtures
   Fixture f1 = cp.getFixtureA();
   Fixture f2 = cp.getFixtureB();
@@ -784,24 +833,20 @@ void beginContact(Contact cp) {
   Object o2 = b2.getUserData();
 
   if ((o1.getClass() == Ball.class && (o2.getClass() == Enemy.class || o2.getClass() == Enemy2.class) )) {
-      println("collided with enemy");
-      collission_with_enemy = true;
-  }
-  else if ((o2.getClass() == Ball.class && (o1.getClass() == Enemy.class || o1.getClass() == Enemy2.class))) {
     println("collided with enemy");
-     collission_with_enemy = true;
-    
+    collission_with_enemy = true;
+  } else if ((o2.getClass() == Ball.class && (o1.getClass() == Enemy.class || o1.getClass() == Enemy2.class))) {
+    println("collided with enemy");
+    collission_with_enemy = true;
   }
   /*
   else if ((o1.getClass() == Ball.class && o2.getClass() == Box.class) ) {
-      println("collided with box");
-  }
-  else if ((o2.getClass() == Ball.class && o1.getClass() == Box.class)) {
-    println("collided with box");
-    
-  }
-  */
-
+   println("collided with box");
+   }
+   else if ((o2.getClass() == Ball.class && o1.getClass() == Box.class)) {
+   println("collided with box");
+   
+   }
+   */
 }
-  
 

@@ -91,6 +91,10 @@ class Enemy2 {
   void bounce(float y) {
     body.setLinearVelocity(new Vec2(0, y));
   }
+  
+  void crawl(float x) {
+    body.setLinearVelocity(new Vec2(x, 0));
+  }
  /* 
   void step(float xplus, float yplus){
     Vec2 pos = box2d.getBodyPixelCoord(body);
