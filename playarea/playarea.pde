@@ -832,12 +832,14 @@ void beginContact(Contact cp) {
   Object o1 = b1.getUserData();
   Object o2 = b2.getUserData();
 
-  if ((o1.getClass() == Ball.class && (o2.getClass() == Enemy.class || o2.getClass() == Enemy2.class) )) {
-    println("collided with enemy");
-    collission_with_enemy = true;
-  } else if ((o2.getClass() == Ball.class && (o1.getClass() == Enemy.class || o1.getClass() == Enemy2.class))) {
-    println("collided with enemy");
-    collission_with_enemy = true;
+  if (o1 != null && o2 != null) {
+    if ((o1.getClass() == Ball.class && (o2.getClass() == Enemy.class || o2.getClass() == Enemy2.class) )) {
+      println("collided with enemy");
+      collission_with_enemy = true;
+    } else if ((o2.getClass() == Ball.class && (o1.getClass() == Enemy.class || o1.getClass() == Enemy2.class))) {
+      println("collided with enemy");
+      collission_with_enemy = true;
+    }
   }
   /*
   else if ((o1.getClass() == Ball.class && o2.getClass() == Box.class) ) {
@@ -850,3 +852,5 @@ void beginContact(Contact cp) {
    */
 }
 
+void endContact(Contact cp) {
+}
