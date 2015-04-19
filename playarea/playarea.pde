@@ -85,6 +85,7 @@ boolean keyLeft = false;
 boolean keyCtrl = false;
 boolean keyR = false;
 
+float pad_top = 30;
 
 // An objects to store information about the surfaces
 //3rd March 2015: Srijan: Added ceiling surface
@@ -184,7 +185,7 @@ void setup() {
   }
   //Create ceilings and adds to Arraylist : Srijan 3rd March 2015
   for (float w=0; w<game_width; w+=width) {  
-    ceilings.add(new Box(w+ceiling_gap, 5, width, 10));
+    ceilings.add(new Box(w+ceiling_gap, pad_top + 5, width, 10));
     ceiling_gap += 100;
     //ceilings.add(new Box(0,5,width*2,10));
     ceiling_width = w+ceiling_gap;
@@ -251,8 +252,7 @@ void draw() {
       }
       //scroll(0.05);
       //scroll(0);
-
-
+ 
       //Display Username: left
       //3/8/015: Bikram
       displayNameOnLeft.setVisible(true);
@@ -356,9 +356,13 @@ void draw() {
       //box.display();
 
       endbox.display();
+      
+      //Background for username and timer
+      fill(50,50,50);
+      rect(0, 0, game_width, 30);      
 
       //Kill the ball if ball goes through hole in floors or ceiling : Srijan 5th March 2015
-      if (ball.get_ball_pos("y") > height+16 || ball.get_ball_pos("y") < -16 || collission_with_enemy == true) {
+      if (ball.get_ball_pos("y") > height + 16 || ball.get_ball_pos("y") < -16 + pad_top  || collission_with_enemy == true) {
 
         ball.done(); 
         ball = new Ball(width*0.1, height*0.4, 16);
@@ -644,7 +648,7 @@ void scroll(float value) {
   if (destroy_box(ceilings)) {
     float ceiling_gap = 0;
     for (float w=0; w<game_width; w+=width) {  
-      ceilings.add(new Box(shift+w+ceiling_gap, 5, width, 10));
+      ceilings.add(new Box(shift+w+ceiling_gap, pad_top + 5, width, 10));
       ceiling_gap += 100;
       ceiling_width = w+ceiling_gap;
       if (ceiling_width >= game_width) {
