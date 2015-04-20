@@ -28,9 +28,10 @@ class Ball {
     //}
     //return false;
   }
+  
 
   // 
-  void display() {
+  void display(String powerful) {
     // We look at each body and get its screen position
     Vec2 pos = box2d.getBodyPixelCoord(body);
     // Get its angle of rotation
@@ -38,10 +39,20 @@ class Ball {
     pushMatrix();
     translate(pos.x,pos.y);
     rotate(-a);
-    fill(175);
     stroke(0);
     strokeWeight(1);
+    if(powerful == "normal"){
+    fill(175);
+    
+    }
+    else if(powerful == "shield"){
+      fill(204,0,0);
+    }
+    else{
+     fill(0);
+    }
     ellipse(0,0,r*2,r*2);
+    
     // Let's add a line so we can see the rotation
     //line(0,0,r,0);
     popMatrix();
