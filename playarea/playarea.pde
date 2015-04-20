@@ -36,11 +36,12 @@ ArrayList<Enemy2> enemy2;
 
 // shield object
 ArrayList <Shield> shield1;
+int[] shieldSize = {1,1,1,1,1};
 Shield acquired_shield;
 
-float shield_move = 0.10;
-float addT = 0;
-float[] shield_pos = {-12.8, -7.8, -2.8};
+//float shield_move = 0.10;
+//float addT = 0;
+//float[] shield_pos = {-12.8, -7.8, -2.8};
 //float shield_right = -0.10;
 
 
@@ -224,9 +225,11 @@ void setup() {
   
   // adding shields to the playarea
   float shield_gap = 0;
-  for (int w=0; w<3; w++) {
-    shield1.add(new Shield(shield_gap+width*0.3, height*0.20, 16));
-    shield_gap += 50;
+  for (int w=0; w<shieldSize.length; w++) {
+    if(shieldSize[w] == 1){
+      shield1.add(new Shield(shield_gap+width*0.3, height*0.20, 16));
+      shield_gap += 50;
+    }
   }
 
 
@@ -322,8 +325,13 @@ void draw() {
       }
       
       //display shield
-      for(Shield s: shield1) {
-           s.display();
+      //for(Shield s: shield1) {
+      //     s.display();
+      //}
+      for(int shield=0; shield<shieldSize.length; shield++){
+         if(shieldSize[shield] == 1){
+            shield1.get(shield).display();
+         } 
       }
       
       
@@ -400,6 +408,10 @@ void draw() {
         scroll(0);
         // reset the background scroll value
         x_bg = 0;   
+        //reset enemies and shields to initial position
+        destroy_enemy(enemy);
+        destroy_enemy2(enemy2);
+        destroy_shield(shield1);
         //reset level to zero
         if(life > 0){
           life--;
@@ -503,6 +515,14 @@ void draw() {
                 scroll(0);
                 // reset the background scroll value
                 x_bg = 0;
+                // reset shieldSize array
+                for(int shield=0; shield<shieldSize.length; shield++) {
+                    shieldSize[shield] = 1;
+                }  
+                //reset enemies and shields to initial position
+                destroy_enemy(enemy);
+                destroy_enemy2(enemy2);
+                destroy_shield(shield1);
                 /*
                                 TODO: Show Level up screen , Currently game over screen is used
                  :Srijan 11th March 2015
@@ -577,7 +597,7 @@ boolean destroy_box(ArrayList<Box> boxobj) {
  April 13th 2015 : Srijan
  Created destroy box function to destroy the enemy objects in the box2d area
  */
-boolean destroy_enemy(ArrayList<Enemy> enemyobj) {
+void destroy_enemy(ArrayList<Enemy> enemyobj) {
   while (enemyobj.size () > 0) {
     for (int i=0; i<enemyobj.size (); i++) {
       Enemy e = enemyobj.get(i);
@@ -587,13 +607,19 @@ boolean destroy_enemy(ArrayList<Enemy> enemyobj) {
       }
     }
   }
-  return true;
+ // if (destroy_enemy(enemy)) {
+    float enemy_gap = 0;
+    for (float w=width; w<=game_width; w+=width) {
+      enemy.add(new Enemy(enemy_gap+width*0.1, height*0.25, 8));
+      enemy_gap += 512;
+    }
+  //return true;
 }
 
 float enemy2_xpos = 0;
 float enemy2_ypos = 0;
 
-boolean destroy_enemy2(ArrayList<Enemy2> enemyobj) {
+void destroy_enemy2(ArrayList<Enemy2> enemyobj) {
   while (enemyobj.size () > 0) {
     for (int i=0; i<enemyobj.size (); i++) {
       Enemy2 e = enemyobj.get(i);
@@ -605,10 +631,15 @@ boolean destroy_enemy2(ArrayList<Enemy2> enemyobj) {
       }
     }
   }
-  return true;
+  float enemy2_gap = 0;
+    for (float w=width; w<=game_width; w+=width) {
+      enemy2.add(new Enemy2(enemy2_gap+width*0.65, height*0.93, 13));
+      enemy2_gap += 512;
+    }
+  //return true;
 }
 
-boolean destroy_shield(ArrayList<Shield> shieldobj) {
+void destroy_shield(ArrayList<Shield> shieldobj) {
   while (shieldobj.size () > 0) {
     for (int i=0; i<shieldobj.size (); i++) {
       Shield s = shieldobj.get(i);
@@ -618,7 +649,13 @@ boolean destroy_shield(ArrayList<Shield> shieldobj) {
         }
       }
   }
-  return true;
+  //if (destroy_shield(shield1)) {
+    float shield_gap = 0;
+    for (int w=0; w<shieldSize.length; w++) {
+        shield1.add(new Shield(shield_gap+width*0.3, height*0.2, 16));
+        shield_gap +=50;
+    }
+  //return true;
 }
 
 //Scroll function to scroll the floor, ceilings and platforms : Srijan 5th March 2015
@@ -684,64 +721,11 @@ void scroll(float value) {
   
    for(i=0; i<shield1.size(); i++){
     if(left_scroll_state == true){ 
-     if(i==0){
-       shield1.get(i).shiftBody(shield_pos[i] + addT,10.8);
-       shield_pos[i] += addT;
+     shield1.get(i).shiftBody("l");
      }
-     else if(i==1) {
-       shield1.get(i).shiftBody(shield_pos[i] + addT, 10.8);
-       //shield1.get(i).shiftBody(-12.8 - addT, 5.8);
-       shield_pos[i] += addT;
-       
-     }  
-     else if(i==2) {
-       shield1.get(i).shiftBody(shield_pos[i] + addT, 10.8);
-       //shield1.get(i).shiftBody(-12.8 - addT, 0.8);
-       shield_pos[i] += addT;
-     }
-    }
-    else if(right_scroll_state == true){
-     for(i=0; i<shield1.size(); i++){ 
-     if(i==0){
-       shield1.get(i).shiftBody(-12.8 - addT,10.8);
-       shield_pos[i] -= addT;
-     }
-     else if(i==1) {
-       shield1.get(i).shiftBody(-7.8 - addT, 10.8);
-       shield_pos[i] -= addT;
-     }  
-     else if(i==2) {
-       shield1.get(i).shiftBody(-2.8 - addT, 10.8);
-       shield_pos[i] -= addT;
-     }
-      } 
-    }
-    addT += 0.1; 
-    /*
-    for(i=0; i<shield1.size(); i++) {
-      if(left_scroll_state == true) {
-        if(i==0){
-         shield_pos[i] += addT;
-        }
-         else if(i==1) {
-           shield_pos[i] += addT;
-       }  
-       else if(i==2) {
-           shield_pos[i] += addT;
-       } 
-      }
-      else if(right_scroll_state == true) {
-       if(i==0){
-         shield_pos[i] -=  addT;
-        }
-         else if(i==1) {
-           shield_pos[i] -= addT;
-       }  
-       else if(i==2) {
-           shield_pos[i] -= addT;
-       } 
-      }
-    }*/
+     else if(right_scroll_state == true) {
+     shield1.get(i).shiftBody("r");
+     } 
    }
   
   
@@ -780,6 +764,7 @@ void scroll(float value) {
       }
     }
   }
+  
   if (destroy_box(ceilings)) {
     float ceiling_gap = 0;
     for (float w=0; w<game_width; w+=width) {  
@@ -798,25 +783,7 @@ void keyPressed() {
   if (key == 'r' || key == 'R') {
     
     print("R pressed\n");
-    //for(Shield s: shield1){
-      for(int i=0; i<shield1.size(); i++){ 
-     if(i==0){
-       // Coordinate for Transform is (320, 320)
-       // if actual coordinate is (192, 64) and transformed coordinate is (-12.8, 10.8)
-       shield1.get(i).shiftBody(-12.8 - addT,10.8);
-     }
-     else if(i==1) {
-       //shield1.get(i).shiftBody(-7.8 - addT, 10.8);
-       shield1.get(i).shiftBody(-12.8 - addT,5.8);
-     }  
-     else if(i==2) {
-       //shield1.get(i).shiftBody(-2.8 - addT, 10.8);
-       shield1.get(i).shiftBody(-12.8 - addT,0.8);
-     }
-      }
-      addT += 0.05; 
     
-    //}
   }
   if (key == 'l' || key == 'L') {
     scroll(-0.5);
@@ -974,12 +941,14 @@ public void restart() {
 
 
 boolean get_shield(Shield s) {
-    for (int i=0; i<shield1.size(); i++) {
+    for (int i=0; i<shieldSize.length; i++) {
       if (shield1.get(i) == s) {
         println("shield removed from arraylist");
-        if (s.kill()) {
-          shield1.remove(i);
-        }
+        //if (s.kill()) {
+        //  shield1.remove(i);
+        //}
+        shieldSize[i] = 0;
+        
       }
     }
     return true;

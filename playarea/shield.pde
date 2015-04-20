@@ -57,11 +57,12 @@ class Shield {
     popMatrix();
   }
   
-  void shiftBody(float x, float y) {
-   //Vec2 pos = box2d.getBodyPixelCoord(body);
-   //println("X", pos.x);
-   print("position", body.getPosition().x);
-   body.setTransform(new Vec2(body.getPosition().x - 0.1, body.getPosition().y), body.getAngle()); 
+  void shiftBody(String dir) {
+   if(dir == "l"){
+     body.setTransform(new Vec2(body.getPosition().x + 0.1, body.getPosition().y), body.getAngle());
+   }else{
+    body.setTransform(new Vec2(body.getPosition().x - 0.1, body.getPosition().y), body.getAngle());
+   } 
   }
 
   // Here's our function that adds the ball to the Box2D world
