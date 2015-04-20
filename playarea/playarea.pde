@@ -33,11 +33,17 @@ Box endbox;
 // enemy object
 ArrayList<Enemy> enemy;
 ArrayList<Enemy2> enemy2;
+int[] enemySize = {1,1,1,1,1,1,1,1,1,1};
+int[] enemy2Size = {1,1,1,1,1,1,1,1,1,1};
+Enemy acquired_enemy;
+Enemy2 acquired_enemy2;
+//boolean killed_enemy = false;
 
 // shield object
 ArrayList <Shield> shield1;
 int[] shieldSize = {1,1,1,1,1};
 Shield acquired_shield;
+boolean got_shield = false;
 
 //float shield_move = 0.10;
 //float addT = 0;
@@ -47,6 +53,9 @@ Shield acquired_shield;
 
 boolean collission_with_enemy = false;
 boolean collission_with_shield = false;
+boolean enemy_collide_with_shield = false;
+boolean enemy2_collide_with_shield = false;
+
 
 int hmove_count = 0;
 
@@ -208,12 +217,12 @@ void setup() {
       break;
     }
   }
-  println("Ceilings", ceilings.size());
-  println("Floors", floors.size());
+  //println("Ceilings", ceilings.size());
+  //println("Floors", floors.size());
 
   // adding enemies to the playarea
   float enemy_gap = 0;
-  for (float w=width; w<=game_width; w+=width) {
+  for (float w=0; w<enemySize.length; w++) {
     enemy.add(new Enemy(enemy_gap+width*0.1, height*0.25, 8));
     //enemy.add(new Enemy(enemy_gap+width*0.3, height*0.45, 8));
     //enemy.add(new Enemy(enemy_gap+width*0.5, height*0.65, 8));
@@ -227,8 +236,14 @@ void setup() {
   float shield_gap = 0;
   for (int w=0; w<shieldSize.length; w++) {
     if(shieldSize[w] == 1){
-      shield1.add(new Shield(shield_gap+width*0.3, height*0.20, 16));
-      shield_gap += 50;
+      if(w%2 == 0)
+      {
+        shield1.add(new Shield(shield_gap+width*0.3, height*0.20, 16));
+      }
+      else{
+        shield1.add(new Shield(shield_gap+width*0.3, height*0.50, 16));
+      }
+      shield_gap += 440;
     }
   }
 
@@ -320,8 +335,13 @@ void draw() {
         b.display();
       }
       // display enemies listed in ArrayList
-      for (Enemy e : enemy) {
-        e.display();
+      //for (Enemy e : enemy) {
+      //  e.display();
+      //}
+      for(int e=0; e<enemySize.length; e++){
+         if(enemySize[e] == 1){
+           enemy.get(e).display();
+         } 
       }
       
       //display shield
@@ -330,41 +350,44 @@ void draw() {
       //}
       for(int shield=0; shield<shieldSize.length; shield++){
          if(shieldSize[shield] == 1){
-            shield1.get(shield).display();
+             shield1.get(shield).display();
          } 
       }
       
       
       // display bouncing and crawling enemies
       for(int i=0; i<enemy2.size(); i++){
-        Enemy2 e = enemy2.get(i);
-        e.display();
-        if(i%2 == 0){//Bouncing enemy implementation
-         if (e.get_enemy2_pos("y") >333) {
-          e.bounce(10);
-          //bounce_count++;
-          }
-          //else if(bounce_count > 100 && bounce_count <=400) {
-          else if (e.get_enemy2_pos("y") < 250) {
-            e.bounce(-10);
+        if(enemy2Size[i] == 1){
+          Enemy2 e = enemy2.get(i);
+          e.display();
+          if(i%2 == 0){//Bouncing enemy implementation
+           if (e.get_enemy2_pos("y") >333) {
+            e.bounce(10);
             //bounce_count++;
-          } 
-          //else {
-          //  bounce_count = 0;
-          //}
-        }
-        else { //Crawling enemy implementation
-          if(hmove_count <=100){
-            e.crawl(10);
-            hmove_count++;
-          }else if(hmove_count > 100 && hmove_count <= 200){
-            e.crawl(-10);
-            hmove_count++; 
-          }else {
-            hmove_count = 0; 
+            }
+            //else if(bounce_count > 100 && bounce_count <=400) {
+            else if (e.get_enemy2_pos("y") < 250) {
+              e.bounce(-10);
+              //bounce_count++;
+            } 
+            //else {
+            //  bounce_count = 0;
+            //}
+          }
+          else { //Crawling enemy implementation
+            if(hmove_count <=100){
+              e.crawl(10);
+              hmove_count++;
+            }else if(hmove_count > 100 && hmove_count <= 200){
+              e.crawl(-10);
+              hmove_count++; 
+            }else {
+              hmove_count = 0; 
+            }
           }
         }
       }
+      
       //for (Enemy2 e : enemy2) {
       //  e.display(); 
         /*
@@ -387,7 +410,13 @@ void draw() {
       //ceiling1.display();
       
       // Draw the ball
-      ball.display();
+      if(got_shield){
+        ball.display("shield");
+      }else if(collission_with_enemy){
+         ball.display("dead");
+      }else {
+         ball.display("normal"); 
+      }
       //box.display();
 
       endbox.display();
@@ -395,6 +424,20 @@ void draw() {
       //Background for username and timer
       fill(50,50,50);
       rect(0, 0, game_width, 30);      
+      
+      // Kill the enemy if it collides with shielded ball
+      if(enemy_collide_with_shield == true) {
+         
+         kill_enemy(acquired_enemy);
+         enemy_collide_with_shield = false; 
+      }
+      
+      if(enemy2_collide_with_shield == true) {
+         
+         kill_enemy2(acquired_enemy2);
+         enemy2_collide_with_shield = false; 
+      }
+      
 
       //Kill the ball if ball goes through hole in floors or ceiling : Srijan 5th March 2015
       if (ball.get_ball_pos("y") > height + 16 || ball.get_ball_pos("y") < -16 + pad_top  || collission_with_enemy == true) {
@@ -519,6 +562,12 @@ void draw() {
                 for(int shield=0; shield<shieldSize.length; shield++) {
                     shieldSize[shield] = 1;
                 }  
+                for(int e=0; e<enemySize.length; e++) {
+                    enemySize[e] = 1;
+                } 
+                for(int e2=0; e2<enemy2Size.length; e2++) {
+                    enemy2Size[e2] = 1;
+                }  
                 //reset enemies and shields to initial position
                 destroy_enemy(enemy);
                 destroy_enemy2(enemy2);
@@ -566,10 +615,8 @@ void draw() {
  */
 void create_enemy2_obj(ArrayList<Enemy2> enemy2, float vshift, float hshift) {
   float enemy2_gap = 0;
-  for (float w=width; w<=game_width; w+=width) {
+  for (float w=0; w<enemy2Size.length; w++) {
     enemy2.add(new Enemy2(enemy2_gap+width*hshift, height*vshift, 13));
-    //enemy.add(new Enemy(enemy_gap+width*0.3, height*0.45, 8));
-    //enemy.add(new Enemy(enemy_gap+width*0.5, height*0.65, 8));
     enemy2_gap += 512;
   }
 }
@@ -609,7 +656,7 @@ void destroy_enemy(ArrayList<Enemy> enemyobj) {
   }
  // if (destroy_enemy(enemy)) {
     float enemy_gap = 0;
-    for (float w=width; w<=game_width; w+=width) {
+    for (float w=0; w<enemySize.length; w++) {
       enemy.add(new Enemy(enemy_gap+width*0.1, height*0.25, 8));
       enemy_gap += 512;
     }
@@ -632,7 +679,7 @@ void destroy_enemy2(ArrayList<Enemy2> enemyobj) {
     }
   }
   float enemy2_gap = 0;
-    for (float w=width; w<=game_width; w+=width) {
+    for (float w=0; w<enemy2Size.length; w++) {
       enemy2.add(new Enemy2(enemy2_gap+width*0.65, height*0.93, 13));
       enemy2_gap += 512;
     }
@@ -652,8 +699,13 @@ void destroy_shield(ArrayList<Shield> shieldobj) {
   //if (destroy_shield(shield1)) {
     float shield_gap = 0;
     for (int w=0; w<shieldSize.length; w++) {
-        shield1.add(new Shield(shield_gap+width*0.3, height*0.2, 16));
-        shield_gap +=50;
+        if(w%2==0){
+          shield1.add(new Shield(shield_gap+width*0.3, height*0.2, 16));
+        }
+        else{
+          shield1.add(new Shield(shield_gap+width*0.3, height*0.50, 16));
+      }
+        shield_gap += 440;
     }
   //return true;
 }
@@ -944,10 +996,38 @@ boolean get_shield(Shield s) {
     for (int i=0; i<shieldSize.length; i++) {
       if (shield1.get(i) == s) {
         println("shield removed from arraylist");
+        s.kill();
         //if (s.kill()) {
         //  shield1.remove(i);
         //}
         shieldSize[i] = 0;
+        got_shield = true;
+        
+      }
+    }
+    return true;
+}
+
+boolean kill_enemy(Enemy e) {
+    for (int i=0; i<enemySize.length; i++) {
+      if (enemy.get(i) == e) {
+        println("enemy removed from playarea");
+        e.kill();
+        enemySize[i] = 0;
+        //killed_enemy = true;
+        
+      }
+    }
+    return true;
+}
+
+boolean kill_enemy2(Enemy2 e) {
+    for (int i=0; i<enemy2Size.length; i++) {
+      if (enemy2.get(i) == e) {
+        println("enemy removed from playarea");
+        e.kill();
+        enemy2Size[i] = 0;
+        //killed_enemy = true;
         
       }
     }
@@ -986,10 +1066,34 @@ void beginContact(Contact cp) {
 //=======
   if ((o1.getClass() == Ball.class && (o2.getClass() == Enemy.class || o2.getClass() == Enemy2.class) )) {
     println("collided with enemy");
-    collission_with_enemy = true;
+    if(got_shield == false){
+      collission_with_enemy = true;
+    }else {
+      if(o2.getClass() == Enemy.class){
+        acquired_enemy = (Enemy) o2;
+        enemy_collide_with_shield = true; 
+      }
+      else{
+        acquired_enemy2 = (Enemy2) o2;
+        enemy2_collide_with_shield = true;  
+      }
+      //enemy_collide_with_shield = true; 
+    }
   } else if ((o2.getClass() == Ball.class && (o1.getClass() == Enemy.class || o1.getClass() == Enemy2.class))) {
     println("collided with enemy");
-    collission_with_enemy = true;
+    if(got_shield == false){
+      collission_with_enemy = true;
+    }else {
+      if(o1.getClass() == Enemy.class){
+        acquired_enemy = (Enemy) o1;
+        enemy_collide_with_shield = true; 
+      }
+      else{
+        acquired_enemy2 = (Enemy2) o1;
+        enemy2_collide_with_shield = true;  
+      }
+      //enemy_collide_with_shield = true; 
+    }
   } else if (o1.getClass() == Ball.class && o2.getClass() == Shield.class) {
     println("collided with shield");
     acquired_shield = (Shield) o2;
