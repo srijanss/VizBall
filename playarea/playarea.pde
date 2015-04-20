@@ -34,8 +34,18 @@ Box endbox;
 ArrayList<Enemy> enemy;
 ArrayList<Enemy2> enemy2;
 
-boolean collission_with_enemy = false;
+// shield object
+ArrayList <Shield> shield1;
+Shield acquired_shield;
 
+float shield_move = 0.10;
+float addT = 0;
+float[] shield_pos = {-12.8, -7.8, -2.8};
+//float shield_right = -0.10;
+
+
+boolean collission_with_enemy = false;
+boolean collission_with_shield = false;
 
 int hmove_count = 0;
 
@@ -148,6 +158,10 @@ void setup() {
   // Create empty list for enemies
   enemy = new ArrayList<Enemy>();
   enemy2 = new ArrayList<Enemy2>();
+  
+  
+  // Create list of shields
+  shield1 = new ArrayList<Shield>();
 
   //create a Ball with specified size and at given coordinates in screen
   ball = new Ball(width*0.1, height*0.4, 16);
@@ -207,6 +221,13 @@ void setup() {
 
   // adding enemy2 to the playarea
   create_enemy2_obj(enemy2, 0.93, 0.65);
+  
+  // adding shields to the playarea
+  float shield_gap = 0;
+  for (int w=0; w<3; w++) {
+    shield1.add(new Shield(shield_gap+width*0.3, height*0.20, 16));
+    shield_gap += 50;
+  }
 
 
 
@@ -299,8 +320,14 @@ void draw() {
       for (Enemy e : enemy) {
         e.display();
       }
-
-
+      
+      //display shield
+      for(Shield s: shield1) {
+           s.display();
+      }
+      
+      
+      // display bouncing and crawling enemies
       for(int i=0; i<enemy2.size(); i++){
         Enemy2 e = enemy2.get(i);
         e.display();
@@ -318,7 +345,7 @@ void draw() {
           //  bounce_count = 0;
           //}
         }
-        else { //TODO: Crawling enemy implementation
+        else { //Crawling enemy implementation
           if(hmove_count <=100){
             e.crawl(10);
             hmove_count++;
@@ -382,6 +409,12 @@ void draw() {
         }
         //reset collision flag
         collission_with_enemy = false;
+      }
+      
+      // Hiding the acquired shield
+      if( collission_with_shield == true) {
+         get_shield(acquired_shield);
+         collission_with_shield = false; 
       }
 
       //Scrolling effect when the ball is moved : Srijan 8th March 2015
@@ -575,6 +608,18 @@ boolean destroy_enemy2(ArrayList<Enemy2> enemyobj) {
   return true;
 }
 
+boolean destroy_shield(ArrayList<Shield> shieldobj) {
+  while (shieldobj.size () > 0) {
+    for (int i=0; i<shieldobj.size (); i++) {
+      Shield s = shieldobj.get(i);
+      //b.update();
+        if (s.kill()) {
+          shieldobj.remove(i);
+        }
+      }
+  }
+  return true;
+}
 
 //Scroll function to scroll the floor, ceilings and platforms : Srijan 5th March 2015
 void scroll(float value) {
@@ -589,7 +634,7 @@ void scroll(float value) {
   // scrolling the enemies in the playarea
   endbox.kill();
   endbox = new Box(shift+3000, -10, 200, 600);
-  if (destroy_enemy(enemy)) {
+  /*if (destroy_enemy(enemy)) {
     float enemy_gap = 0;
     for (float w=width; w<=game_width; w+=width) {
       enemy.add(new Enemy(shift+enemy_gap+width*0.1, height*0.25, 8));
@@ -597,8 +642,8 @@ void scroll(float value) {
       //enemy.add(new Enemy(shift+enemy_gap+width*0.5, height*0.65, 8));
       enemy_gap += 512;
     }
-  }
-  if (destroy_enemy2(enemy2)) {
+  }*/
+  /*if (destroy_enemy2(enemy2)) {
     float enemy2_gap = 0;
     for (float w=width; w<=game_width; w+=width) {
       //enemy2.add(new Enemy2(shift+enemy2_gap+width*0.65, enemy2_ypos, 13));
@@ -607,7 +652,97 @@ void scroll(float value) {
       //enemy.add(new Enemy(shift+enemy_gap+width*0.5, height*0.65, 8));
       enemy2_gap += 512;
     }
+  }*/
+  
+  /*float shieldSize = shield1.size();
+  if (destroy_shield(shield1)) {
+    float shield_gap = 0;
+    for (int w=0; w<shieldSize; w++) {
+        shield1.add(new Shield(shift+shield_gap+width*0.3, height*0.2, 16));
+        shield_gap +=20;
+    }
+  }*/
+  int i=0;
+  for(i=0; i<enemy.size(); i++) {
+   if(left_scroll_state == true){
+    enemy.get(i).shiftBody("l");
+   } 
+   else if(right_scroll_state == true) {
+     enemy.get(i).shiftBody("r");
+   }
   }
+  
+  
+  for(i=0; i<enemy2.size(); i++) {
+   if(left_scroll_state == true){
+    enemy2.get(i).shiftBody("l");
+   } 
+   else if(right_scroll_state == true) {
+     enemy2.get(i).shiftBody("r");
+   }
+  }
+  
+   for(i=0; i<shield1.size(); i++){
+    if(left_scroll_state == true){ 
+     if(i==0){
+       shield1.get(i).shiftBody(shield_pos[i] + addT,10.8);
+       shield_pos[i] += addT;
+     }
+     else if(i==1) {
+       shield1.get(i).shiftBody(shield_pos[i] + addT, 10.8);
+       //shield1.get(i).shiftBody(-12.8 - addT, 5.8);
+       shield_pos[i] += addT;
+       
+     }  
+     else if(i==2) {
+       shield1.get(i).shiftBody(shield_pos[i] + addT, 10.8);
+       //shield1.get(i).shiftBody(-12.8 - addT, 0.8);
+       shield_pos[i] += addT;
+     }
+    }
+    else if(right_scroll_state == true){
+     for(i=0; i<shield1.size(); i++){ 
+     if(i==0){
+       shield1.get(i).shiftBody(-12.8 - addT,10.8);
+       shield_pos[i] -= addT;
+     }
+     else if(i==1) {
+       shield1.get(i).shiftBody(-7.8 - addT, 10.8);
+       shield_pos[i] -= addT;
+     }  
+     else if(i==2) {
+       shield1.get(i).shiftBody(-2.8 - addT, 10.8);
+       shield_pos[i] -= addT;
+     }
+      } 
+    }
+    addT += 0.1; 
+    /*
+    for(i=0; i<shield1.size(); i++) {
+      if(left_scroll_state == true) {
+        if(i==0){
+         shield_pos[i] += addT;
+        }
+         else if(i==1) {
+           shield_pos[i] += addT;
+       }  
+       else if(i==2) {
+           shield_pos[i] += addT;
+       } 
+      }
+      else if(right_scroll_state == true) {
+       if(i==0){
+         shield_pos[i] -=  addT;
+        }
+         else if(i==1) {
+           shield_pos[i] -= addT;
+       }  
+       else if(i==2) {
+           shield_pos[i] -= addT;
+       } 
+      }
+    }*/
+   }
   
   
   if (destroy_box(platforms)) {
@@ -658,9 +793,30 @@ void scroll(float value) {
   }
 }
 
+//float addT = 0;
 void keyPressed() {
   if (key == 'r' || key == 'R') {
+    
     print("R pressed\n");
+    //for(Shield s: shield1){
+      for(int i=0; i<shield1.size(); i++){ 
+     if(i==0){
+       // Coordinate for Transform is (320, 320)
+       // if actual coordinate is (192, 64) and transformed coordinate is (-12.8, 10.8)
+       shield1.get(i).shiftBody(-12.8 - addT,10.8);
+     }
+     else if(i==1) {
+       //shield1.get(i).shiftBody(-7.8 - addT, 10.8);
+       shield1.get(i).shiftBody(-12.8 - addT,5.8);
+     }  
+     else if(i==2) {
+       //shield1.get(i).shiftBody(-2.8 - addT, 10.8);
+       shield1.get(i).shiftBody(-12.8 - addT,0.8);
+     }
+      }
+      addT += 0.05; 
+    
+    //}
   }
   if (key == 'l' || key == 'L') {
     scroll(-0.5);
@@ -816,6 +972,19 @@ public void restart() {
   gameScreen = 3;
 }
 
+
+boolean get_shield(Shield s) {
+    for (int i=0; i<shield1.size(); i++) {
+      if (shield1.get(i) == s) {
+        println("shield removed from arraylist");
+        if (s.kill()) {
+          shield1.remove(i);
+        }
+      }
+    }
+    return true;
+}
+
 /*
    * Collission event listener
  * Check if Ball collides with Enemy
@@ -836,15 +1005,35 @@ void beginContact(Contact cp) {
   Object o1 = b1.getUserData();
   Object o2 = b2.getUserData();
 
-  if (o1 != null && o2 != null) {
-    if ((o1.getClass() == Ball.class && (o2.getClass() == Enemy.class || o2.getClass() == Enemy2.class) )) {
-      println("collided with enemy");
-      collission_with_enemy = true;
-    } else if ((o2.getClass() == Ball.class && (o1.getClass() == Enemy.class || o1.getClass() == Enemy2.class))) {
-      println("collided with enemy");
-      collission_with_enemy = true;
-    }
+//<<<<<<< Updated upstream
+//  if (o1 != null && o2 != null) {
+//    if ((o1.getClass() == Ball.class && (o2.getClass() == Enemy.class || o2.getClass() == Enemy2.class) )) {
+//      println("collided with enemy");
+//      collission_with_enemy = true;
+//    } else if ((o2.getClass() == Ball.class && (o1.getClass() == Enemy.class || o1.getClass() == Enemy2.class))) {
+//      println("collided with enemy");
+//      collission_with_enemy = true;
+//    }
+//=======
+  if ((o1.getClass() == Ball.class && (o2.getClass() == Enemy.class || o2.getClass() == Enemy2.class) )) {
+    println("collided with enemy");
+    collission_with_enemy = true;
+  } else if ((o2.getClass() == Ball.class && (o1.getClass() == Enemy.class || o1.getClass() == Enemy2.class))) {
+    println("collided with enemy");
+    collission_with_enemy = true;
+  } else if (o1.getClass() == Ball.class && o2.getClass() == Shield.class) {
+    println("collided with shield");
+    acquired_shield = (Shield) o2;
+    //get_shield(s);
+    collission_with_shield = true;
+  } else if (o2.getClass() == Ball.class && o1.getClass() == Shield.class) {
+    println("collided with shield");
+    Shield s = (Shield) o1;
+    //get_shield(s);
+    acquired_shield = s;
+    collission_with_shield = true;
   }
+  
   /*
   else if ((o1.getClass() == Ball.class && o2.getClass() == Box.class) ) {
    println("collided with box");

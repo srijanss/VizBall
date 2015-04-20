@@ -1,17 +1,18 @@
 /*
 *
 class defining the enemy
-13th April 2015 : Srijan
+16th April 2015 : Srijan
 *
 */
 
 
-class Enemy2 {
+class Shield {
   // We need to keep track of a Body and a radius
   Body body;
+  BodyDef bd;
   float r;
   
-  Enemy2(float x, float y, float r_) {
+  Shield(float x, float y, float r_) {
     r = r_;
     // This function puts the ball in the Box2d world
     makeBody(x,y,r);
@@ -28,12 +29,8 @@ class Enemy2 {
   boolean done() {
     // Let's find the screen position of the ball
     Vec2 pos = box2d.getBodyPixelCoord(body);
-    // Is it off the bottom of the screen?
-    //if (pos.y > height+r*2) {
       kill();
       return true;
-    //}
-    //return false;
   }
 
   // 
@@ -44,34 +41,34 @@ class Enemy2 {
     float a = body.getAngle();
 
     pushMatrix();
-    translate(pos.x,pos.y);
+    //translate(pos.x,pos.y);
+    translate(pos.x, pos.y);
     rotate(-a);
-    noFill();
-    noStroke();
-    //fill(51,51,205);
+    //noFill();
+    //noStroke();
+    fill(51,51,205);
     stroke(0);
     strokeWeight(1);
     
     ellipse(0,0,r*2,r*2);
-    image(enemyTwo, -291, -103);
+    //image(enemyTwo, -291, -103);
     // Let's add a line so we can see the rotation
     //line(0,0,r,0);
     popMatrix();
   }
   
-  void shiftBody(String dir) {
-   if(dir == "l"){
-     body.setTransform(new Vec2(body.getPosition().x + 0.1, body.getPosition().y), body.getAngle());
-   }else{
-    body.setTransform(new Vec2(body.getPosition().x - 0.1, body.getPosition().y), body.getAngle());
-   } 
+  void shiftBody(float x, float y) {
+   //Vec2 pos = box2d.getBodyPixelCoord(body);
+   //println("X", pos.x);
+   print("position", body.getPosition().x);
+   body.setTransform(new Vec2(body.getPosition().x - 0.1, body.getPosition().y), body.getAngle()); 
   }
 
   // Here's our function that adds the ball to the Box2D world
   void makeBody(float x, float y, float r) {
     
     // Define a body
-    BodyDef bd = new BodyDef();
+    bd = new BodyDef();
     // Set its position
     bd.position = box2d.coordPixelsToWorld(x,y);
     bd.type = BodyType.KINEMATIC;
@@ -96,12 +93,12 @@ class Enemy2 {
     //body.setAngularVelocity(random(-10,10));
   }
   
-  void bounce(float y) {
+  void hmove(float y) {
     body.setLinearVelocity(new Vec2(0, y));
   }
   
-  void crawl(float x) {
-    body.setLinearVelocity(new Vec2(x, 0));
+  void shiftBody(float x) {
+   body.setLinearVelocity(new Vec2(x, 0)); 
   }
  /* 
   void step(float xplus, float yplus){
@@ -112,7 +109,7 @@ class Enemy2 {
   */
   
   //Function that returns ball's x and y coordinates in the game area : Srijan 7th March 2015
-  float get_enemy2_pos(String cord){
+  float get_shield_pos(String cord){
     Vec2 pos = box2d.getBodyPixelCoord(body);
     if(cord == "x"){
       return pos.x;

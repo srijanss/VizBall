@@ -68,6 +68,14 @@ class Enemy {
     //line(0,0,r,0);
     popMatrix();
   }
+  
+  void shiftBody(String dir) {
+   if(dir == "l"){
+     body.setTransform(new Vec2(body.getPosition().x + 0.1, body.getPosition().y), body.getAngle());
+   }else{
+    body.setTransform(new Vec2(body.getPosition().x - 0.1, body.getPosition().y), body.getAngle());
+   } 
+  }
 
   // Here's our function that adds the ball to the Box2D world
   void makeBody(float x, float y, float r) {
