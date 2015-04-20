@@ -70,7 +70,7 @@ class Surface {
     // Shortcut, we could define a fixture if we
     // want to specify frictions, restitution, etc.
     body.createFixture(chain,1);
-
+    body.setUserData(this);
   }
   
   void kill(){
