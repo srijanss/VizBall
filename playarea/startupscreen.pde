@@ -1,5 +1,10 @@
+/*startupScreen class:: For start up screen to ask the user for username and 
+ take to next screen which is a story of game 
+ - Bikram 3/1/2015
+ */
+
 class StartUpScreen{  
- 
+ /*FUnction to display the screen at first stage of game lunch - Bikram */ 
  void display(){
        PFont font = createFont("arial",20);
        PImage[] imgs = {loadImage("./images/button1.jpg"),loadImage("./images/button1.jpg"),loadImage("./images/button1.jpg")};
@@ -11,7 +16,7 @@ class StartUpScreen{
                           .setFocus(true)
                           .setColor(color(255,0,0))
                           ;
-        
+      
       displayGreetings = cp5.addTextlabel("displayUsername")
                           .setText("")
                           .setPosition(90,30)
@@ -31,7 +36,7 @@ class StartUpScreen{
                            .updateSize()
                              ; 
 }
-
+/* FUnction to display user Game story - Bikram*/
 void displayHelp(){      
       PImage[] imgs = {loadImage("./images/button1.jpg"),loadImage("./images/button1.jpg"),loadImage("./images/button1.jpg")};
       helpTextarea = cp5.addTextarea("txt")
@@ -40,8 +45,8 @@ void displayHelp(){
                   .setFont(createFont("arial",16))
                   .setLineHeight(14)
                   .setColor(color(128))
-                  .setColorBackground(color(00, 00))
-                  .setColorForeground(color(255,255));
+                  .setColorBackground(color(255, 255))
+                  .setColorForeground(color(000,2000));
                   ;
                   
       helpTextarea.setText("Lorem Ipsum is simply dummy text of the printing and typesetting"
