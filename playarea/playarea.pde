@@ -9,10 +9,11 @@ import org.jbox2d.common.*;
 import org.jbox2d.dynamics.*;
 import org.jbox2d.dynamics.contacts.*;
 import controlP5.*;
+import java.util.concurrent.TimeUnit;
 
 // A reference to our box2d world
 Box2DProcessing box2d;
-PImage sky, nightsky, bg, startupImg, enemyOne, enemyTwo;
+PImage sky, nightsky, bg, startupImg, enemyOne, enemyTwo, levelup, shieldOne, powerOne, powerTwo;
 int gameScreen, isHelpDisplayed, gameStartupCount;
 //ControlP5 Library used
 // 2nd March: Bikram: Added startup of Name Inquiry and greetings Screen.
@@ -45,6 +46,14 @@ int[] shieldSize = {1,1,1,1,1};
 Shield acquired_shield;
 boolean got_shield = false;
 
+// power up object
+ArrayList <Power> heart;
+int[] heartSize = {1,1};
+Power acquired_power;
+ArrayList <Power> coin;
+int[] coinSize = {1,1,1,1,1,1,1,1,1,1};
+//Power acquired_coin;
+
 //float shield_move = 0.10;
 //float addT = 0;
 //float[] shield_pos = {-12.8, -7.8, -2.8};
@@ -55,6 +64,8 @@ boolean collission_with_enemy = false;
 boolean collission_with_shield = false;
 boolean enemy_collide_with_shield = false;
 boolean enemy2_collide_with_shield = false;
+boolean collission_with_power = false;
+//boolean collision_with_coin = false;
 
 
 int hmove_count = 0;
@@ -130,6 +141,10 @@ void setup() {
   enemyOne = loadImage("./images/enemy1.png");
   enemyTwo = loadImage("./images/enemy2.png");
   //enemyThree = loadImage("./images/enemy3.png");
+  levelup = loadImage("./images/level.png");
+  shieldOne = loadImage("./images/shield1.png");
+  powerOne = loadImage("./images/heart.png");
+  powerTwo = loadImage("./images/coin.png");
   smooth();
 
 
@@ -172,9 +187,13 @@ void setup() {
   
   // Create list of shields
   shield1 = new ArrayList<Shield>();
+  
+  // create list of power i.e coins and hearts
+  heart = new ArrayList<Power>();
+  coin = new ArrayList<Power>();
 
   //create a Ball with specified size and at given coordinates in screen
-  ball = new Ball(width*0.1, height*0.4, 16);
+  ball = new Ball(width*0.1, height*0.4, 10);
 
   // endbox object
   endbox = new Box(3000, -10, 200, 600); 
@@ -246,8 +265,31 @@ void setup() {
       shield_gap += 440;
     }
   }
-
-
+  
+  // adding hearts and coins to the playarea , Srijan : 21st April 2015
+  // HEARTS
+  float heart_gap = 0;
+  for (int w=0; w<heartSize.length; w++) {
+    if(heartSize[w] == 1){
+      heart.add(new Power(heart_gap+width*2, height*0.15, 8));
+      heart_gap += 1200;
+    }
+  }
+  // COINS
+  float coin_gap = 0;
+  for (int w=0; w<coinSize.length; w++) {
+    if(coinSize[w] == 1){
+      if(w%2 == 0)
+      {
+        coin.add(new Power(coin_gap+width*0.75, height*0.35, 8));
+      }
+      else{
+        coin.add(new Power(coin_gap+width*0.75, height*0.75, 8));
+      }
+      coin_gap += 200;
+    }
+  }
+  
 
   //Commented out the vertical surface : Srijan 7th March 2015
   // Create the surface
@@ -344,6 +386,20 @@ void draw() {
          } 
       }
       
+      //display hearts
+      for(int h=0; h<heartSize.length; h++){
+         if(heartSize[h] == 1){
+             heart.get(h).display("heart");
+         } 
+      }
+      
+      // display coin
+      for(int c=0; c<coinSize.length; c++){
+         if(coinSize[c] == 1){
+             coin.get(c).display("coin");
+         } 
+      }
+      
       //display shield
       //for(Shield s: shield1) {
       //     s.display();
@@ -423,7 +479,7 @@ void draw() {
       
       //Background for username and timer
       fill(50,50,50);
-      rect(0, 0, game_width, 30);      
+      rect(0, 0, game_width, 60);      
       
       // Kill the enemy if it collides with shielded ball
       if(enemy_collide_with_shield == true) {
@@ -443,7 +499,7 @@ void draw() {
       if (ball.get_ball_pos("y") > height + 16 || ball.get_ball_pos("y") < -16 + pad_top  || collission_with_enemy == true) {
 
         ball.done(); 
-        ball = new Ball(width*0.1, height*0.4, 16);
+        ball = new Ball(width*0.1, height*0.4, 10);
         gameScreen = 4;
         // reset the shift value
         shift = 0;
@@ -471,6 +527,23 @@ void draw() {
          get_shield(acquired_shield);
          collission_with_shield = false; 
       }
+      
+      // Hiding the acquired heart
+      if( collission_with_power == true) {
+        if(heart.contains(acquired_power)){
+           get_heart(acquired_power);
+        }
+        else if(coin.contains(acquired_power)){
+           get_coin(acquired_power); 
+        }
+         collission_with_power = false; 
+      }
+      
+      // Hiding the acquired coin
+      //if( collission_with_coin == true) {
+      //   get_coin(acquired_coin);
+      //   collission_with_coin = false; 
+      //}
 
       //Scrolling effect when the ball is moved : Srijan 8th March 2015
       current_pos = ball.get_ball_pos("x");
@@ -543,7 +616,7 @@ void draw() {
                 }
               }
               //Check for end of level : Srijan 11th March 2015
-              print(x_bg);
+              //print(x_bg);
               if (x_bg <=-610) {
                 // Level up and Increase scroll speed
                 level +=1;
@@ -551,17 +624,29 @@ void draw() {
                 //slow_scroll +=1;
                 // Recreate the ball at the start for new level
                 ball.done();
-                ball = new Ball(width*0.1, height*0.4, 16);
+                ball = new Ball(width*0.1, height*0.4, 10);
                 // reset the shift value
                 shift = 0;
                 // create the floors, platforms, ceilings for new level
                 scroll(0);
                 // reset the background scroll value
                 x_bg = 0;
+               
+                // TODO: Currently resetting when level up
+                //  Need to set different placement in the playarea for different level
                 // reset shieldSize array
                 for(int shield=0; shield<shieldSize.length; shield++) {
                     shieldSize[shield] = 1;
                 }  
+                // reset heartSize array
+                for(int h=0; h<heartSize.length; h++) {
+                    heartSize[h] = 1;
+                } 
+                // reset coinSize array
+                for(int c=0; c<coinSize.length; c++) {
+                    coinSize[c] = 1;
+                } 
+                // reset enemy positions
                 for(int e=0; e<enemySize.length; e++) {
                     enemySize[e] = 1;
                 } 
@@ -572,10 +657,13 @@ void draw() {
                 destroy_enemy(enemy);
                 destroy_enemy2(enemy2);
                 destroy_shield(shield1);
+                destroy_power(heart);
+                destroy_power(coin);
                 /*
                                 TODO: Show Level up screen , Currently game over screen is used
                  :Srijan 11th March 2015
                  */
+                 
                 gameScreen = 4;
               }
             }
@@ -608,7 +696,7 @@ void draw() {
 }
 
 /*
- *
+ * TODO: make Use of this function for other enemy objects and shield object
  * Enemy2 object create
  * April 15 2015 : Srijan
  *
@@ -666,6 +754,7 @@ void destroy_enemy(ArrayList<Enemy> enemyobj) {
 float enemy2_xpos = 0;
 float enemy2_ypos = 0;
 
+// destroys enemy2 arraylist in playarea
 void destroy_enemy2(ArrayList<Enemy2> enemyobj) {
   while (enemyobj.size () > 0) {
     for (int i=0; i<enemyobj.size (); i++) {
@@ -686,6 +775,7 @@ void destroy_enemy2(ArrayList<Enemy2> enemyobj) {
   //return true;
 }
 
+// destroys shields  arrraylist in playarea
 void destroy_shield(ArrayList<Shield> shieldobj) {
   while (shieldobj.size () > 0) {
     for (int i=0; i<shieldobj.size (); i++) {
@@ -696,7 +786,6 @@ void destroy_shield(ArrayList<Shield> shieldobj) {
         }
       }
   }
-  //if (destroy_shield(shield1)) {
     float shield_gap = 0;
     for (int w=0; w<shieldSize.length; w++) {
         if(w%2==0){
@@ -707,7 +796,38 @@ void destroy_shield(ArrayList<Shield> shieldobj) {
       }
         shield_gap += 440;
     }
-  //return true;
+}
+
+// destroys powerups , Srijan : 21st April 2015
+void destroy_power(ArrayList<Power> powerobj) {
+  while (powerobj.size () > 0) {
+    for (int i=0; i<powerobj.size (); i++) {
+      Power p = powerobj.get(i);
+      //b.update();
+        if (p.kill()) {
+          powerobj.remove(i);
+        }
+      }
+  }
+  if(powerobj == heart){
+    float heart_gap = 0;
+    for (int w=0; w<heartSize.length; w++) {
+      heart.add(new Power(heart_gap+width*2, height*0.15, 8));
+      heart_gap += 1200;
+    }
+  }
+  else{
+    float coin_gap = 0;
+    for (int w=0; w<coinSize.length; w++) {
+        if(w%2==0){
+          coin.add(new Power(coin_gap+width*0.75, height*0.35, 8));
+        }
+        else{
+          coin.add(new Power(coin_gap+width*0.75, height*0.75, 8));
+      }
+        coin_gap += 200;
+    }
+  }
 }
 
 //Scroll function to scroll the floor, ceilings and platforms : Srijan 5th March 2015
@@ -723,7 +843,11 @@ void scroll(float value) {
   // scrolling the enemies in the playarea
   endbox.kill();
   endbox = new Box(shift+3000, -10, 200, 600);
-  /*if (destroy_enemy(enemy)) {
+  
+  
+  /* Commented out this code as it is used as separate function
+   *
+  if (destroy_enemy(enemy)) {
     float enemy_gap = 0;
     for (float w=width; w<=game_width; w+=width) {
       enemy.add(new Enemy(shift+enemy_gap+width*0.1, height*0.25, 8));
@@ -751,6 +875,9 @@ void scroll(float value) {
         shield_gap +=20;
     }
   }*/
+  
+  // TODO: make scroll_object functions which can be used by all the scrolling objects in playarea
+  // Currently for loop used for individual object
   int i=0;
   for(i=0; i<enemy.size(); i++) {
    if(left_scroll_state == true){
@@ -777,6 +904,24 @@ void scroll(float value) {
      }
      else if(right_scroll_state == true) {
      shield1.get(i).shiftBody("r");
+     } 
+   }
+   
+   for(i=0; i<heart.size(); i++){
+    if(left_scroll_state == true){ 
+     heart.get(i).shiftBody("l");
+     }
+     else if(right_scroll_state == true) {
+     heart.get(i).shiftBody("r");
+     } 
+   }
+   
+   for(i=0; i<coin.size(); i++){
+    if(left_scroll_state == true){ 
+     coin.get(i).shiftBody("l");
+     }
+     else if(right_scroll_state == true) {
+     coin.get(i).shiftBody("r");
      } 
    }
   
@@ -991,11 +1136,11 @@ public void restart() {
   gameScreen = 3;
 }
 
-
+// acquires the shield object that collides with ball 
 boolean get_shield(Shield s) {
     for (int i=0; i<shieldSize.length; i++) {
       if (shield1.get(i) == s) {
-        println("shield removed from arraylist");
+        println("shield removed from playarea");
         s.kill();
         //if (s.kill()) {
         //  shield1.remove(i);
@@ -1008,6 +1153,41 @@ boolean get_shield(Shield s) {
     return true;
 }
 
+// acquires the heart that collides with shielded ball , Srijan : 21st April 2015 
+boolean get_heart(Power p) {
+    for (int i=0; i<heartSize.length; i++) {
+      if (heart.get(i) == p) {
+        println("heart removed from playarea");
+        p.kill();
+        //if (s.kill()) {
+        //  shield1.remove(i);
+        //}
+        heartSize[i] = 0;
+        //got_shield = true;
+        
+      }
+    }
+    return true;
+}
+
+// acquires the coin that collides with shielded ball, Srijan : 21st April 2015
+boolean get_coin(Power p) {
+    for (int i=0; i<coinSize.length; i++) {
+      if (coin.get(i) == p) {
+        println("coin removed from playarea");
+        p.kill();
+        //if (s.kill()) {
+        //  shield1.remove(i);
+        //}
+        coinSize[i] = 0;
+        //got_shield = true;
+        
+      }
+    }
+    return true;
+}
+
+// kill the enemy that collides with shielded ball
 boolean kill_enemy(Enemy e) {
     for (int i=0; i<enemySize.length; i++) {
       if (enemy.get(i) == e) {
@@ -1021,6 +1201,7 @@ boolean kill_enemy(Enemy e) {
     return true;
 }
 
+// kill the enemy2 that collides with shielded ball
 boolean kill_enemy2(Enemy2 e) {
     for (int i=0; i<enemy2Size.length; i++) {
       if (enemy2.get(i) == e) {
@@ -1054,6 +1235,12 @@ void beginContact(Contact cp) {
   Object o1 = b1.getUserData();
   Object o2 = b2.getUserData();
 
+/* Srijan : 21st April 2015
+ *
+ * Commented out this code as I addes setUserdata for surfaces as well 
+ * Now there is no exception when ball hits surfaces
+ *
+*/
 //<<<<<<< Updated upstream
 //  if (o1 != null && o2 != null) {
 //    if ((o1.getClass() == Ball.class && (o2.getClass() == Enemy.class || o2.getClass() == Enemy2.class) )) {
@@ -1064,6 +1251,8 @@ void beginContact(Contact cp) {
 //      collission_with_enemy = true;
 //    }
 //=======
+
+// Check if the Ball hits other objects in the playarea
   if ((o1.getClass() == Ball.class && (o2.getClass() == Enemy.class || o2.getClass() == Enemy2.class) )) {
     println("collided with enemy");
     if(got_shield == false){
@@ -1094,7 +1283,7 @@ void beginContact(Contact cp) {
       }
       //enemy_collide_with_shield = true; 
     }
-  } else if (o1.getClass() == Ball.class && o2.getClass() == Shield.class) {
+  } else if (o1.getClass() == Ball.class && o2.getClass() == Shield.class) { // Checks if the ball hits the shield object
     println("collided with shield");
     acquired_shield = (Shield) o2;
     //get_shield(s);
@@ -1105,6 +1294,17 @@ void beginContact(Contact cp) {
     //get_shield(s);
     acquired_shield = s;
     collission_with_shield = true;
+  } else if (o1.getClass() == Ball.class && o2.getClass() == Power.class) { // Checks if ball hits the power ups , Srijan : 21st April 2015
+    println("collided with power");
+    acquired_power = (Power) o2;
+    //get_shield(s);
+    collission_with_power = true;
+  } else if (o2.getClass() == Ball.class && o1.getClass() == Power.class) {
+    println("collided with power");
+    Power p = (Power) o1;
+    //get_shield(s);
+    acquired_power = p;
+    collission_with_power = true;
   }
   
   /*

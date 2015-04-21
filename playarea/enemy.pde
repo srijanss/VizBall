@@ -13,20 +13,20 @@ class Enemy {
   
   Enemy(float x, float y, float r_) {
     r = r_;
-    // This function puts the ball in the Box2d world
+    // This function puts the enemy in the Box2d world
     makeBody(x,y,r);
     body.setUserData(this);
   }
 
-  // This function removes the ball from the box2d world
+  // This function removes the enemy from the box2d world
   boolean kill() {
     box2d.destroyBody(body);
     return true;
   }
 
-  // Is the ball ready for deletion?
+  // Is the enemy ready for deletion?
   boolean done() {
-    // Let's find the screen position of the ball
+    // Let's find the screen position of the enemy
     Vec2 pos = box2d.getBodyPixelCoord(body);
     // Is it off the bottom of the screen?
     //if (pos.y > height+r*2) {
@@ -77,7 +77,7 @@ class Enemy {
    } 
   }
 
-  // Here's our function that adds the ball to the Box2D world
+  // Here's our function that adds the enemy to the Box2D world
   void makeBody(float x, float y, float r) {
     
     // custom polygon shape
@@ -132,7 +132,7 @@ class Enemy {
   }
   */
   
-  //Function that returns ball's x and y coordinates in the game area : Srijan 7th March 2015
+  //Function that returns enemy's x and y coordinates in the game area : Srijan 7th March 2015
   float get_enemy_pos(String cord){
     Vec2 pos = box2d.getBodyPixelCoord(body);
     if(cord == "x"){
