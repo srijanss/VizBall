@@ -223,9 +223,23 @@ void create_boxes(float shift){
   for (float w=width; w<=game_width; w+=width) {
     //float platform_x_pos = random(3,5);
     //float platform_y_pos = random(10,20);
-    platforms.add(new Box(shift+platform_gap + 3*w/4, height-150, width/2-50, 10));
-    platforms.add(new Box(shift+platform_gap + w/4, height-250, width/2-50, 10));
-    platforms.add(new Box(shift+platform_gap + 5*w/4, height-200, width/2-50, 10));
+    
+    if(level == 0){
+      platforms.add(new Box(shift+platform_gap + 3*w/4, height-150, width/2-50, 10));
+      platforms.add(new Box(shift+platform_gap + w/4, height-250, width/2-50, 10));
+      platforms.add(new Box(shift+platform_gap + 5*w/4, height-200, width/2-50, 10));
+    }
+    else if(level == 1) {
+      platforms.add(new Box(shift+platform_gap + 3*w/4, height-150, width/2-50, 10));
+      platforms.add(new Box(shift+platform_gap + w/4 + 100, height-250, 10, width/2-50));
+      platforms.add(new Box(shift+platform_gap + 5*w/4, height-200, width/2-50, 10));
+    }
+    else if (level == 2) {
+     platforms.add(new Box(shift+platform_gap + 3*w/4 + 100, height-150, 10, width/2-50));
+     platforms.add(new Box(shift+platform_gap + w/4, height-250, width/2-50, 10));
+     platforms.add(new Box(shift+platform_gap + 5*w/4 +100, height-200, 10, width/2-50)); 
+    }
+      
     platform_gap += width;
   }
   //Defines the gap between the floors : Srijan 3rd March 2015
@@ -260,7 +274,15 @@ void create_enemy_obj() {
  // adding enemies to the playarea
   float enemy_gap = 0;
   for (float w=0; w<enemySize.length; w++) {
-    enemy.add(new Enemy(enemy_gap+width*0.1, height*0.25, 8));
+    if(level == 0){
+      enemy.add(new Enemy(enemy_gap+width*0.5, height*0.25, 8));
+    }
+    else if(level == 1) {
+      enemy.add(new Enemy(enemy_gap+width*0.4, height*0.35, 8)); 
+    }
+    else if (level == 2) {
+     enemy.add(new Enemy(enemy_gap+width*0.6, height*0.45, 8)); 
+    }
     //enemy.add(new Enemy(enemy_gap+width*0.3, height*0.45, 8));
     //enemy.add(new Enemy(enemy_gap+width*0.5, height*0.65, 8));
     enemy_gap += 512;
@@ -276,7 +298,12 @@ void create_enemy_obj() {
 void create_enemy2_obj() {
   float enemy2_gap = 0;
   for (float w=0; w<enemy2Size.length; w++) {
-    enemy2.add(new Enemy2(enemy2_gap+width*0.65, height*0.93, 13));
+    if(level == 0){
+      enemy2.add(new Enemy2(enemy2_gap+width*0.65, height*0.93, 13));
+    }
+    else if(level > 0) {
+      enemy2.add(new Enemy2(enemy2_gap+width*0.35, height*0.93, 13));
+    }
     enemy2_gap += 512;
   }
 }
