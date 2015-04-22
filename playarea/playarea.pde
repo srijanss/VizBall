@@ -670,7 +670,7 @@ void draw() {
                     else if(laser.contains(acquired_weapon)){
                         get_laser(acquired_weapon); 
                     }
-                    else if(laser.contains(acquired_weapon)){
+                    else if(ammo.contains(acquired_weapon)){
                         get_ammo(acquired_weapon); 
                     }
                     collission_with_weapon = false; 
