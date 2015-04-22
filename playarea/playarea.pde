@@ -34,15 +34,15 @@ Box endbox;
 // enemy object
 ArrayList<Enemy> enemy;
 ArrayList<Enemy2> enemy2;
-int[] enemySize = {1,1,1,1,1,1,1,1,1,1};
-int[] enemy2Size = {1,1,1,1,1,1,1,1,1,1};
+int[] enemySize = {1,1,1,1,1};
+int[] enemy2Size = {1,1,1,1,1};
 Enemy acquired_enemy;
 Enemy2 acquired_enemy2;
 //boolean killed_enemy = false;
 
 // shield object
 ArrayList <Shield> shield1;
-int[] shieldSize = {1,1,1,1,1};
+int[] shieldSize = {1,1};
 Shield acquired_shield;
 boolean got_shield = false;
 
@@ -52,20 +52,12 @@ int[] heartSize = {1,1};
 Power acquired_power;
 ArrayList <Power> coin;
 int[] coinSize = {1,1,1,1,1,1,1,1,1,1};
-//Power acquired_coin;
-
-//float shield_move = 0.10;
-//float addT = 0;
-//float[] shield_pos = {-12.8, -7.8, -2.8};
-//float shield_right = -0.10;
-
 
 boolean collission_with_enemy = false;
 boolean collission_with_shield = false;
 boolean enemy_collide_with_shield = false;
 boolean enemy2_collide_with_shield = false;
 boolean collission_with_power = false;
-//boolean collision_with_coin = false;
 
 
 int hmove_count = 0;
@@ -92,8 +84,9 @@ boolean game_over = false;
 //Background shift value
 float x_bg = 0;
 
+
 // Game Level 
-int level = 0;
+int level = 1;
 
 // Player life
 int life = 1;
@@ -140,7 +133,6 @@ void setup() {
   startupImg = loadImage("./images/1.jpg");
   enemyOne = loadImage("./images/enemy1.png");
   enemyTwo = loadImage("./images/enemy2.png");
-  //enemyThree = loadImage("./images/enemy3.png");
   levelup = loadImage("./images/level.png");
   shieldOne = loadImage("./images/shield1.png");
   powerOne = loadImage("./images/heart.png");
@@ -198,16 +190,42 @@ void setup() {
   // endbox object
   endbox = new Box(3000, -10, 200, 600); 
 
+  // Function that creates Floors, Ceilings and Platforms
+  create_boxes(0);
+  
+  // Function that creates Standing Enemy in playarea
+  create_enemy_obj();
+  
+  // adding enemy2 to the playarea
+  create_enemy2_obj();
+  
+  // adding shields in playarea
+  create_shield_obj();
+  
+  // adding hearts in playarea
+  create_heart();
+  
+  // adding coins in playarea
+  create_coin();
+  
 
-  //gap that defines the platforms to occur after the screen width : Srijan 3rd March 2015
+  //Commented out the vertical surface : Srijan 7th March 2015
+  // Create the surface
+  verticalSurface = new Surface(0, 640, -10, 0);
+  verticalSurfaceRight = new Surface(0, 640, -10, 1);
+}
+
+// created separate function to create floors, ceilings and platforms
+void create_boxes(float shift){
+ //gap that defines the platforms to occur after the screen width : Srijan 3rd March 2015
   float platform_gap = 0;
   //Creating new platforms and adding to ArrayList : Srijan 3rd March 2015
-  for (float w=width; w<=width; w+=width) {
+  for (float w=width; w<=game_width; w+=width) {
     //float platform_x_pos = random(3,5);
     //float platform_y_pos = random(10,20);
-    platforms.add(new Box(platform_gap + 3*w/4, height-150, width/2-50, 10));
-    platforms.add(new Box(platform_gap + w/4, height-250, width/2-50, 10));
-    platforms.add(new Box(platform_gap + 5*w/4, height-200, width/2-50, 10));
+    platforms.add(new Box(shift+platform_gap + 3*w/4, height-150, width/2-50, 10));
+    platforms.add(new Box(shift+platform_gap + w/4, height-250, width/2-50, 10));
+    platforms.add(new Box(shift+platform_gap + 5*w/4, height-200, width/2-50, 10));
     platform_gap += width;
   }
   //Defines the gap between the floors : Srijan 3rd March 2015
@@ -219,7 +237,7 @@ void setup() {
   float ceiling_width = 0;
   //for (float w=0; w<game_width; w+=width/2) {
   for (float w=0; w<game_width; w+=width/2) {
-    floors.add(new Box(w+floor_gap, height-5, width/2, 10));
+    floors.add(new Box(shift+w+floor_gap, height-5, width/2, 10));
     floor_gap +=100;
     floor_width = w+floor_gap;
     if (floor_width >= game_width) {
@@ -228,45 +246,60 @@ void setup() {
   }
   //Create ceilings and adds to Arraylist : Srijan 3rd March 2015
   for (float w=0; w<game_width; w+=width) {  
-    ceilings.add(new Box(w+ceiling_gap, pad_top + 5, width, 10));
+    ceilings.add(new Box(shift+w+ceiling_gap, pad_top + 5, width, 10));
     ceiling_gap += 100;
-    //ceilings.add(new Box(0,5,width*2,10));
     ceiling_width = w+ceiling_gap;
     if (ceiling_width >= game_width) {
       break;
     }
-  }
-  //println("Ceilings", ceilings.size());
-  //println("Floors", floors.size());
+  } 
+}
 
-  // adding enemies to the playarea
+// Creates Enemy Object in Playarea
+void create_enemy_obj() {
+ // adding enemies to the playarea
   float enemy_gap = 0;
   for (float w=0; w<enemySize.length; w++) {
     enemy.add(new Enemy(enemy_gap+width*0.1, height*0.25, 8));
     //enemy.add(new Enemy(enemy_gap+width*0.3, height*0.45, 8));
     //enemy.add(new Enemy(enemy_gap+width*0.5, height*0.65, 8));
     enemy_gap += 512;
-  }
+  } 
+}
 
-  // adding enemy2 to the playarea
-  create_enemy2_obj(enemy2, 0.93, 0.65);
-  
-  // adding shields to the playarea
+/*
+ * TODO: make Use of this function for other enemy objects and shield object
+ * Enemy2 object create
+ * April 15 2015 : Srijan
+ *
+ */
+void create_enemy2_obj() {
+  float enemy2_gap = 0;
+  for (float w=0; w<enemy2Size.length; w++) {
+    enemy2.add(new Enemy2(enemy2_gap+width*0.65, height*0.93, 13));
+    enemy2_gap += 512;
+  }
+}
+
+void create_shield_obj() {
+   // adding shields to the playarea
   float shield_gap = 0;
   for (int w=0; w<shieldSize.length; w++) {
     if(shieldSize[w] == 1){
       if(w%2 == 0)
       {
-        shield1.add(new Shield(shield_gap+width*0.3, height*0.20, 16));
+        shield1.add(new Shield(shield_gap+width*1.5, height*0.20, 16));
       }
       else{
-        shield1.add(new Shield(shield_gap+width*0.3, height*0.50, 16));
+        shield1.add(new Shield(shield_gap+width*1.5, height*0.50, 16));
       }
-      shield_gap += 440;
+      shield_gap += 640;
     }
-  }
-  
-  // adding hearts and coins to the playarea , Srijan : 21st April 2015
+  } 
+}
+
+void create_heart() {
+   // adding hearts and coins to the playarea , Srijan : 21st April 2015
   // HEARTS
   float heart_gap = 0;
   for (int w=0; w<heartSize.length; w++) {
@@ -274,7 +307,10 @@ void setup() {
       heart.add(new Power(heart_gap+width*2, height*0.15, 8));
       heart_gap += 1200;
     }
-  }
+  } 
+}
+
+void create_coin() {
   // COINS
   float coin_gap = 0;
   for (int w=0; w<coinSize.length; w++) {
@@ -289,12 +325,6 @@ void setup() {
       coin_gap += 200;
     }
   }
-  
-
-  //Commented out the vertical surface : Srijan 7th March 2015
-  // Create the surface
-  verticalSurface = new Surface(0, 640, -10, 0);
-  verticalSurfaceRight = new Surface(0, 640, -10, 1);
 }
 
 void draw() {
@@ -358,7 +388,8 @@ void draw() {
       background(255, 204, 153);
       if (level == 0) {
         image(sky, 0, 0);
-      } else if (level == 1) {
+      } 
+      else if (level == 2) {
         image(nightsky, 0, 0);
       }
       // Background scrolling with repetition , Parallax scrolling implemented : Srijan 10th March 2015
@@ -419,16 +450,10 @@ void draw() {
           if(i%2 == 0){//Bouncing enemy implementation
            if (e.get_enemy2_pos("y") >333) {
             e.bounce(10);
-            //bounce_count++;
             }
-            //else if(bounce_count > 100 && bounce_count <=400) {
             else if (e.get_enemy2_pos("y") < 250) {
               e.bounce(-10);
-              //bounce_count++;
             } 
-            //else {
-            //  bounce_count = 0;
-            //}
           }
           else { //Crawling enemy implementation
             if(hmove_count <=100){
@@ -444,27 +469,6 @@ void draw() {
         }
       }
       
-      //for (Enemy2 e : enemy2) {
-      //  e.display(); 
-        /*
-         * Bouncing enemy 
-         */
-
-      /*  if (e.get_enemy2_pos("y") >333) {
-          e.bounce(10);
-          //bounce_count++;
-        }
-        //else if(bounce_count > 100 && bounce_count <=400) {
-        else if (e.get_enemy2_pos("y") < 250) {
-          e.bounce(-10);
-          //bounce_count++;
-        } 
-        //else {
-        //  bounce_count = 0;
-        //}
-      }*/
-      //ceiling1.display();
-      
       // Draw the ball
       if(got_shield){
         ball.display("shield");
@@ -479,7 +483,8 @@ void draw() {
       
       //Background for username and timer
       fill(50,50,50);
-      rect(0, 0, game_width, 60);      
+      rect(0, 0, game_width, 60);  
+      rect(0, 400, game_width, 60);    
       
       // Kill the enemy if it collides with shielded ball
       if(enemy_collide_with_shield == true) {
@@ -496,7 +501,7 @@ void draw() {
       
 
       //Kill the ball if ball goes through hole in floors or ceiling : Srijan 5th March 2015
-      if (ball.get_ball_pos("y") > height + 16 || ball.get_ball_pos("y") < -16 + pad_top  || collission_with_enemy == true) {
+      if (ball.get_ball_pos("y") > height + 16 || ball.get_ball_pos("y") < -16 + pad_top || collission_with_enemy == true) {
 
         ball.done(); 
         ball = new Ball(width*0.1, height*0.4, 10);
@@ -511,6 +516,7 @@ void draw() {
         destroy_enemy(enemy);
         destroy_enemy2(enemy2);
         destroy_shield(shield1);
+        
         //reset level to zero
         if(life > 0){
           life--;
@@ -520,6 +526,7 @@ void draw() {
         }
         //reset collision flag
         collission_with_enemy = false;
+        
       }
       
       // Hiding the acquired shield
@@ -528,7 +535,7 @@ void draw() {
          collission_with_shield = false; 
       }
       
-      // Hiding the acquired heart
+      // Hiding the acquired heart and coin
       if( collission_with_power == true) {
         if(heart.contains(acquired_power)){
            get_heart(acquired_power);
@@ -539,11 +546,6 @@ void draw() {
          collission_with_power = false; 
       }
       
-      // Hiding the acquired coin
-      //if( collission_with_coin == true) {
-      //   get_coin(acquired_coin);
-      //   collission_with_coin = false; 
-      //}
 
       //Scrolling effect when the ball is moved : Srijan 8th March 2015
       current_pos = ball.get_ball_pos("x");
@@ -553,7 +555,7 @@ void draw() {
 
         left_scroll_state = false;
         if (current_pos < 65) {
-          println(x_bg);
+          //println(x_bg);
           if (keyRight == true && keyUp == false) {
             ball.step(5, -10);
           } else if (keyRight == true && keyUp == true) {
@@ -563,7 +565,7 @@ void draw() {
           } else if (keyLeft == true && keyUp == true && x_bg < 0.25) {
             ball.step(-0.05, 10);
           } else if (keyLeft == true && keyUp == true && x_bg >= 0) {
-            println(x_bg);
+            //println(x_bg);
             ball.step(-5, 10);
           } 
 
@@ -660,11 +662,11 @@ void draw() {
                 destroy_power(heart);
                 destroy_power(coin);
                 /*
-                                TODO: Show Level up screen , Currently game over screen is used
+                 TODO: Show Level up screen , Currently game over screen is used
                  :Srijan 11th March 2015
                  */
                  
-                gameScreen = 4;
+                //gameScreen = 4;
               }
             }
           }
@@ -692,20 +694,6 @@ void draw() {
   default:
     {
     }
-  }
-}
-
-/*
- * TODO: make Use of this function for other enemy objects and shield object
- * Enemy2 object create
- * April 15 2015 : Srijan
- *
- */
-void create_enemy2_obj(ArrayList<Enemy2> enemy2, float vshift, float hshift) {
-  float enemy2_gap = 0;
-  for (float w=0; w<enemy2Size.length; w++) {
-    enemy2.add(new Enemy2(enemy2_gap+width*hshift, height*vshift, 13));
-    enemy2_gap += 512;
   }
 }
 
@@ -742,13 +730,7 @@ void destroy_enemy(ArrayList<Enemy> enemyobj) {
       }
     }
   }
- // if (destroy_enemy(enemy)) {
-    float enemy_gap = 0;
-    for (float w=0; w<enemySize.length; w++) {
-      enemy.add(new Enemy(enemy_gap+width*0.1, height*0.25, 8));
-      enemy_gap += 512;
-    }
-  //return true;
+   create_enemy_obj();
 }
 
 float enemy2_xpos = 0;
@@ -761,18 +743,12 @@ void destroy_enemy2(ArrayList<Enemy2> enemyobj) {
       Enemy2 e = enemyobj.get(i);
       enemy2_xpos = e.get_enemy2_pos("x");
       enemy2_ypos = e.get_enemy2_pos("y");
-      //b.update();
       if (e.kill()) {
         enemyobj.remove(i);
       }
     }
   }
-  float enemy2_gap = 0;
-    for (float w=0; w<enemy2Size.length; w++) {
-      enemy2.add(new Enemy2(enemy2_gap+width*0.65, height*0.93, 13));
-      enemy2_gap += 512;
-    }
-  //return true;
+  create_enemy2_obj();
 }
 
 // destroys shields  arrraylist in playarea
@@ -786,16 +762,7 @@ void destroy_shield(ArrayList<Shield> shieldobj) {
         }
       }
   }
-    float shield_gap = 0;
-    for (int w=0; w<shieldSize.length; w++) {
-        if(w%2==0){
-          shield1.add(new Shield(shield_gap+width*0.3, height*0.2, 16));
-        }
-        else{
-          shield1.add(new Shield(shield_gap+width*0.3, height*0.50, 16));
-      }
-        shield_gap += 440;
-    }
+  create_shield_obj();
 }
 
 // destroys powerups , Srijan : 21st April 2015
@@ -810,71 +777,20 @@ void destroy_power(ArrayList<Power> powerobj) {
       }
   }
   if(powerobj == heart){
-    float heart_gap = 0;
-    for (int w=0; w<heartSize.length; w++) {
-      heart.add(new Power(heart_gap+width*2, height*0.15, 8));
-      heart_gap += 1200;
-    }
+    create_heart();
   }
   else{
-    float coin_gap = 0;
-    for (int w=0; w<coinSize.length; w++) {
-        if(w%2==0){
-          coin.add(new Power(coin_gap+width*0.75, height*0.35, 8));
-        }
-        else{
-          coin.add(new Power(coin_gap+width*0.75, height*0.75, 8));
-      }
-        coin_gap += 200;
-    }
+    create_coin();
   }
 }
 
 //Scroll function to scroll the floor, ceilings and platforms : Srijan 5th March 2015
 void scroll(float value) {
   shift += value;
-  /*for (int i=0; i<platforms.size (); i++) {
-   Box b = platforms.get(i);
-   //b.update();
-   if (b.kill()) {
-   platforms.remove(i);
-   }
-   }*/
-  // scrolling the enemies in the playarea
+  
+  // shifting the box and the end of the each level
   endbox.kill();
   endbox = new Box(shift+3000, -10, 200, 600);
-  
-  
-  /* Commented out this code as it is used as separate function
-   *
-  if (destroy_enemy(enemy)) {
-    float enemy_gap = 0;
-    for (float w=width; w<=game_width; w+=width) {
-      enemy.add(new Enemy(shift+enemy_gap+width*0.1, height*0.25, 8));
-      //enemy.add(new Enemy(shift+enemy_gap+width*0.3, height*0.45, 8));
-      //enemy.add(new Enemy(shift+enemy_gap+width*0.5, height*0.65, 8));
-      enemy_gap += 512;
-    }
-  }*/
-  /*if (destroy_enemy2(enemy2)) {
-    float enemy2_gap = 0;
-    for (float w=width; w<=game_width; w+=width) {
-      //enemy2.add(new Enemy2(shift+enemy2_gap+width*0.65, enemy2_ypos, 13));
-      enemy2.add(new Enemy2(shift+enemy2_gap+width*0.65, height*0.93, 13));
-      //enemy.add(new Enemy(shift+enemy_gap+width*0.3, height*0.45, 8));
-      //enemy.add(new Enemy(shift+enemy_gap+width*0.5, height*0.65, 8));
-      enemy2_gap += 512;
-    }
-  }*/
-  
-  /*float shieldSize = shield1.size();
-  if (destroy_shield(shield1)) {
-    float shield_gap = 0;
-    for (int w=0; w<shieldSize; w++) {
-        shield1.add(new Shield(shift+shield_gap+width*0.3, height*0.2, 16));
-        shield_gap +=20;
-    }
-  }*/
   
   // TODO: make scroll_object functions which can be used by all the scrolling objects in playarea
   // Currently for loop used for individual object
@@ -925,54 +841,14 @@ void scroll(float value) {
      } 
    }
   
-  
-  if (destroy_box(platforms)) {
-    float platform_gap = 0;
-    for (float w=width; w<=game_width; w+=width) {
-      platforms.add(new Box(shift+platform_gap + 3*w/4, height-150, width/2-50, 10));
-      platforms.add(new Box(shift+platform_gap + w/4, height-250, width/2-50, 10));
-      platforms.add(new Box(shift+platform_gap + 5*w/4, height-200, width/2-50, 10));
-      platform_gap += width;
-    }
-  }
-
-  /*for (int i=0; i<floors.size (); i++) {
-   Box f = floors.get(i);
-   //f.update();
-   if (f.kill()) {
-   floors.remove(i);
+   // Shift Boxes  
+   if (destroy_box(floors)){
+     if(destroy_box(ceilings)){
+       if(destroy_box(platforms)){
+          create_boxes(shift);     
+       }
+     }
    }
-   }
-   for (int i=0; i<ceilings.size (); i++) {
-   Box c = ceilings.get(i);
-   //c.update();
-   if (c.kill()) {
-   ceilings.remove(i);
-   }
-   }*/
-  if (destroy_box(floors)) {
-    float floor_gap = 0;
-    for (float w=0; w<game_width; w+=width/2) {
-      floors.add(new Box(shift+w+floor_gap, height-5, width/2, 10));
-      floor_gap +=100;
-      floor_width = w+floor_gap;
-      if (floor_width >= game_width) {
-        break;
-      }
-    }
-  }
-  
-  if (destroy_box(ceilings)) {
-    float ceiling_gap = 0;
-    for (float w=0; w<game_width; w+=width) {  
-      ceilings.add(new Box(shift+w+ceiling_gap, pad_top + 5, width, 10));
-      ceiling_gap += 100;
-      ceiling_width = w+ceiling_gap;
-      if (ceiling_width >= game_width) {
-        break;
-      }
-    }
-  }
 }
 
 //float addT = 0;
