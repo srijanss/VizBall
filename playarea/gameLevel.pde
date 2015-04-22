@@ -23,6 +23,7 @@ class GameLevel{
     /*increase the game level*/
     void increaseLevel(){
           ++level;
+          gameLevel.setText("| Level : "+level);
      }
      /*Hide game level */
      void hideLevel(){

@@ -619,7 +619,8 @@ void draw() {
               //print(x_bg);
               if (x_bg <=-610) {
                 // Level up and Increase scroll speed
-                level +=1;
+                //level +=1;
+                gl.increaseLevel();
                 //fast_scroll +=1;
                 //slow_scroll +=1;
                 // Recreate the ball at the start for new level
