@@ -1,6 +1,6 @@
 /*
 *
-class defining the enemy
+class defining the shield
 16th April 2015 : Srijan
 *
 */
@@ -44,11 +44,11 @@ class Shield {
     //translate(pos.x,pos.y);
     translate(pos.x, pos.y);
     rotate(-a);
-    //noFill();
-    //noStroke();
-    fill(51,51,205);
-    stroke(0);
-    strokeWeight(1);
+    noFill();
+    noStroke();
+    //fill(51,51,205);
+    //stroke(0);
+    //strokeWeight(1);
     
     ellipse(0,0,r*2,r*2);
     image(shieldOne, -410, -200);
@@ -94,13 +94,13 @@ class Shield {
     //body.setAngularVelocity(random(-10,10));
   }
   
-  void hmove(float y) {
+  /*void hmove(float y) {
     body.setLinearVelocity(new Vec2(0, y));
-  }
+  }*/
   
-  void shiftBody(float x) {
+  /*void shiftBody(float x) {
    body.setLinearVelocity(new Vec2(x, 0)); 
-  }
+  }*/
  /* 
   void step(float xplus, float yplus){
     Vec2 pos = box2d.getBodyPixelCoord(body);
