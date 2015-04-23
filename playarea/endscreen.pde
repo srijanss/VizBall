@@ -38,7 +38,7 @@ class EndScreen{
                           ;
                           
        life_collected = cp5.addTextlabel("life_collected")
-                          .setText("Shield Collected "+shieldCollected)
+                          .setText("Life Collected "+shieldCollected)
                           .setPosition(160, 100)
                           .setColorValue(000)
                           .setFont(createFont("Georgia",20))
@@ -76,7 +76,8 @@ class EndScreen{
   void hideScoreBoard(){
        game_Lvl. setVisible(false);
        coins_collected.setVisible(false);        
-       shield_collected.setVisible(false);                   
+       shield_collected.setVisible(false);
+       life_collected.setVisible(false);       
        enemies_killed.setVisible(false);
        total_points.setVisible(false);                          
        highest_points.setVisible(false);

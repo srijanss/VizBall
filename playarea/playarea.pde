@@ -513,6 +513,7 @@ void draw() {
                 //Check if game is restarting : Srijan 8th March 2015 
                 if (game_over) {
                     displayGameOver.remove(); 
+                    endscreen.hideScoreBoard();
                     t.showTimer();
                     game_over = false;
                 }
