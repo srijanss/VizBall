@@ -1,10 +1,8 @@
 /* Game level countdown class - Bikram  
 */
 class GameLevel{
-  int level;
  /* Initialize the Game Level */
-   GameLevel(){
-             level = 1;
+   GameLevel(int level){
              gameLevel = cp5.addTextlabel("game_level")
                           .setPosition(70, 0)
                           .setValue(level)
@@ -21,7 +19,7 @@ class GameLevel{
           return level;
     }
     /*increase the game level*/
-    void increaseLevel(){
+    void increaseLevel(int level){
           ++level;
           gameLevel.setText("| Level : "+level);
      }

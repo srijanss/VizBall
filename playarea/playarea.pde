@@ -20,11 +20,11 @@ int gameScreen, isHelpDisplayed, gameStartupCount;
 ControlP5 cp5;
 Textfield targetField;
 Textlabel displayGreetings, displayNameOnLeft, displayGameOver, timerRight, gameLevel;
-Textlabel coins_collected, shield_collected, enemies_killed, plyr_Name, total_points, highest_points, game_Lvl;
+Textlabel coins_collected, shield_collected, enemies_killed, plyr_Name, total_points, highest_points, game_Lvl, life_collected;
 
 Textarea helpTextarea;
 String playerName, _reasonOfGameOver;
-int _gamelvl, _coinsCollected, _shieldCollected, _enemiesKilled, _totalScore, _highestScore;
+int _gamelvl, _coinsCollected, _shieldCollected, _enemiesKilled, _totalScore, _highestScore, _lifeCollected;
 Button bangButton, playButton;
 //Array list to hold box objects for floors, ceilings and platforms
 ArrayList<Box> platforms;
@@ -166,7 +166,7 @@ void setup() {
     shieldOne = loadImage("./images/shield1.png");
     powerOne = loadImage("./images/heart.png");
     powerTwo = loadImage("./images/coin.png");
-    scoreBoardBg = loadImage("./images/scoreboard.png");
+    //scoreBoardBg = loadImage("./images/scoreboard.png");
     smooth();
 
 
@@ -182,7 +182,7 @@ void setup() {
     isHelpDisplayed = 0;
     t.initializeTimer();
     // Initiliaze Game level
-    gl = new GameLevel();
+    gl = new GameLevel(level);
 
     // Initialize box2d physics and create the world
     box2d = new Box2DProcessing(this);
@@ -527,6 +527,8 @@ void draw() {
                 else                   
                     timerRight.setText(""+t.getTimerValue());
                 //Show Game Level
+                _totalScore = _coinsCollected * 100 + _enemiesKilled * 10;
+                
                 gl.showLevel();
                 gl.display();
 
@@ -859,7 +861,7 @@ void draw() {
                                 //print(x_bg);
                                 if (x_bg <=-610) {
                                     // Level up and Increase scroll speed
-                                    level +=1;
+                                    gl.increaseLevel(level);
                                     //fast_scroll +=1;
                                     //slow_scroll +=1;
                                     // Recreate the ball at the start for new level
@@ -936,8 +938,8 @@ TODO: Show Level up screen , Currently game over screen is used
                 //Show Game over to user : Srijan 8th March 2015
 
                 //scroll(-5);
-                endscreen.display(playerName, _reasonOfGameOver, _gamelvl, _coinsCollected, _shieldCollected, _enemiesKilled, _totalScore, _highestScore);
-                background(scoreBoardBg);
+                endscreen.display(playerName, _reasonOfGameOver, _gamelvl, _lifeCollected,  _coinsCollected, _shieldCollected, _enemiesKilled, _totalScore, _highestScore);
+                //background(scoreBoardBg);
                 gameScreen = 1;
 
                 // Reset Timer and Remove it; Bikram 14th March 015
@@ -1386,6 +1388,7 @@ public void restart() {
     bangButton.remove();
     game_over = true;
     gameScreen = 3;
+    //endscreen.hideScoreBoard();
 }
 
 // acquires the shield object that collides with ball 
@@ -1394,6 +1397,7 @@ boolean get_shield(Shield s) {
         if (shield1.get(i) == s) {
             println("shield removed from playarea");
             s.kill();
+            ++_shieldCollected;
             //if (s.kill()) {
             //  shield1.remove(i);
             //}
@@ -1424,6 +1428,7 @@ boolean get_heart(Power p) {
         if (heart.get(i) == p) {
             println("heart removed from playarea");
             p.kill();
+            ++_lifeCollected;
             heartSize[i] = 0;
             //got_shield = true;
 
@@ -1438,6 +1443,7 @@ boolean get_coin(Power p) {
         if (coin.get(i) == p) {
             println("coin removed from playarea");
             p.kill();
+            ++_coinsCollected;
             coinSize[i] = 0;
             //got_shield = true;
             for(int coin=0; coin<coinSize.length; coin++){
@@ -1497,6 +1503,7 @@ boolean kill_enemy(Enemy e) {
         if (enemy.get(i) == e) {
             println("enemy removed from playarea");
             e.kill();
+            ++_enemiesKilled;
             enemySize[i] = 0;
             //killed_enemy = true;
 
@@ -1511,6 +1518,7 @@ boolean kill_enemy2(Enemy2 e) {
         if (enemy2.get(i) == e) {
             println("enemy removed from playarea");
             e.kill();
+            ++_enemiesKilled;
             enemy2Size[i] = 0;
             //killed_enemy = true;
 
