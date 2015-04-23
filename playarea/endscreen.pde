@@ -11,7 +11,7 @@ class EndScreen{
        displayGameOver = cp5.addTextlabel("displayGameOver")
                           .setText("")
                           .setPosition(140,120)
-                          //.setColorValue(0xffffff00)
+                          .setColorValue(0xffffff00)
                           .setFont(createFont("Georgia",20))
                           ;
  
