@@ -1,7 +1,7 @@
 /*
 *
-class defining the bullet ups
-21st April 2015 : Srijan
+class defining the bullet
+23rd April 2015 : Srijan
 *
 */
 
