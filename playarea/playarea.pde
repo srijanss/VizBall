@@ -70,7 +70,8 @@ boolean got_ammo = false;
 
 // bullets
 ArrayList <Bullet> gunbullet;
-int total_gunbullet = 2;
+int total_gunbullet = 5;
+int remaining_gunbullet = total_gunbullet;
 int fired_gunbullet = 0;
 int[] gunbulletSize = {2,2,2,2,2}; // Unsed state , Used state will be {0,0,0,0,0} and full state will be {1,1,1,1,1}
 Bullet used_bullet;
@@ -139,6 +140,13 @@ boolean keyCtrl = false;
 boolean keyR = false;
 
 float pad_top = 30;
+
+// Scoreboard data
+int collected_coins = 0;
+int collected_heart = 0;
+int collected_shield = 0;
+int enemy_killed = 0;
+
 
 // An objects to store information about the surfaces
 //3rd March 2015: Srijan: Added ceiling surface
@@ -521,14 +529,14 @@ void draw() {
                 //Display Timer on right
                 //13/8/015: Bikram
                 if (t.isTimeOver()==true){
-                  _reasonOfGameOver = "timeout";  
-                  gameScreen = 4;
+                    _reasonOfGameOver = "timeout";  
+                    gameScreen = 4;
                 }
                 else                   
                     timerRight.setText(""+t.getTimerValue());
                 //Show Game Level
                 _totalScore = _coinsCollected * 100 + _enemiesKilled * 10;
-                
+
                 gl.showLevel();
                 gl.display();
 
@@ -678,12 +686,14 @@ void draw() {
 
                     kill_enemy(acquired_enemy);
                     if(enemy_collide_with_shield){
+                        println("Enemy Collide with shiel");
                         enemy_collide_with_shield = false;
+                        got_shield = false;
                     } 
                     if(enemy_collide_with_bullet){
                         enemy_collide_with_bullet = false;
                     } 
-                    got_shield = false;
+
 
                 }
 
@@ -692,11 +702,12 @@ void draw() {
                     kill_enemy2(acquired_enemy2);
                     if(enemy2_collide_with_shield){
                         enemy2_collide_with_shield = false;
+                        got_shield = false;
                     } 
                     if(enemy2_collide_with_bullet){
                         enemy2_collide_with_bullet = false;
                     } 
-                    got_shield = false;
+
                 }
 
 
@@ -1070,6 +1081,16 @@ void destroy_power(ArrayList<Power> powerobj, boolean levelStart) {
 
 }
 
+
+// destroy bullets objects
+void destroy_gunbullet() {
+    gunbullet = new ArrayList<Bullet>(); 
+    for(int gb=0; gb<gunbulletSize.length; gb++) {
+        gunbulletSize[gb] = 2;
+    }
+    fired_gunbullet = 0;
+}
+
 // destroys weapons , Srijan : 22nd April 2015
 void destroy_weapon(ArrayList<Weapon> weaponobj, boolean levelStart) {
     while (weaponobj.size () > 0) {
@@ -1209,32 +1230,58 @@ void keyPressed() {
         boolean bullet_fired_right = false;
         boolean bullet_fired_left = false;
         print("R pressed\n");
-        if(total_gunbullet != 0) {
-            if(fired_gunbullet < total_gunbullet){
+        print(remaining_gunbullet);
+        if(got_gun){
+            if(remaining_gunbullet != 0) {
+                remaining_gunbullet -= 1; // Decrease number of bullets fired
                 if(keyRight == true){
+                    println("Creating new bullet ");
                     create_bullet(ball.get_ball_pos("x")+30, ball.get_ball_pos("y"));
                     bullet_fired_right = true;
-                }
-                else if(keyLeft) {
+                    bullet_fired_left = false;
+                } else if(keyLeft) {
+                    println("Creating new bullet ");
                     create_bullet(ball.get_ball_pos("x")-30, ball.get_ball_pos("y"));
                     bullet_fired_left = true;
+                    bullet_fired_right = false;
                 }
                 if(bullet_fired_right || bullet_fired_left){
+                    println("Remaining bullets = ", remaining_gunbullet);                    
                     fired_gunbullet +=1;
+                    println("Fired Bullets = ", fired_gunbullet);
+
                     for(int gb=0; gb<fired_gunbullet; gb++){
-                        if(gunbulletSize[gb] != 0){
-                            if(bullet_fired_right){
-                                gunbulletSize[gb] = 1;
-                            }
-                            else if(bullet_fired_left){
-                                gunbulletSize[gb] = -1; 
-                            }
-                        } 
+                        if(bullet_fired_right && gunbulletSize[gb] == 2){
+                            gunbulletSize[gb] = 1;
+                        } else if(bullet_fired_left && gunbulletSize[gb] == 2){
+                            gunbulletSize[gb] = -1; 
+                        }
                     }
+                    println("Size of Bullet = ", gunbullet.size());
+                } 
+
+            }
+            if(remaining_gunbullet == 0){
+
+                boolean all_bullets_fired = true;
+                for(int fb=0; fb<gunbulletSize.length; fb++){
+                    println(gunbulletSize[fb]);
+                    if(gunbulletSize[fb] != 0){
+                        println("Inside remaining gunbullet == 0");
+                        all_bullets_fired = false;    
+                    } 
+                }
+                println(all_bullets_fired);
+                if(all_bullets_fired){
+                    println("All bullets fired");
+                    fired_gunbullet = 0;
+                    for(int rf=0; rf<gunbulletSize.length; rf++){
+                        gunbulletSize[rf] = 2;
+                    } 
+                    gunbullet.clear();
                 }
             }
         }
-
     }
     if (key == 'l' || key == 'L') {
         scroll(-0.5);
@@ -1411,11 +1458,13 @@ boolean get_shield(Shield s) {
 
 // acquires the bullet object that collides  
 boolean get_gunbullet(Bullet b) {
-    for (int i=0; i<fired_gunbullet; i++) {
+    for (int i=0; i<gunbullet.size(); i++) {
         if (gunbullet.get(i) == b) {
+            println("bullet number ", i);
             println("bullet removed from playarea");
-            b.kill();
-            gunbulletSize[i] = 0;
+            do{
+                gunbulletSize[i] = 0;
+            }while(!b.kill());
 
         }
     }
@@ -1487,11 +1536,18 @@ boolean get_laser(Weapon w) {
 boolean get_ammo(Weapon w) {
     for (int i=0; i<ammoSize.length; i++) {
         if (ammo.get(i) == w) {
-            println("laser removed from playarea");
+            println("ammo removed from playarea");
             w.kill();
             ammoSize[i] = 0;
             got_ammo = true;
-
+            remaining_gunbullet = 5; // Reload the gun with 5 bullets
+            fired_gunbullet = 0;
+            //println("Bullets count = ", remaining_gunbullet);
+            //fired_gunbullet = 0;
+            for(int rf=0; rf<gunbulletSize.length; rf++){
+                gunbulletSize[rf] = 2;
+            } 
+            gunbullet.clear();
         }
     }
     return true;
