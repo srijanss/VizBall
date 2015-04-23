@@ -23,7 +23,8 @@ Textlabel displayGreetings, displayNameOnLeft, displayGameOver, timerRight, game
 Textlabel coins_collected, shield_collected, enemies_killed, plyr_Name, total_points, highest_points, game_Lvl;
 
 Textarea helpTextarea;
-String playerName;
+String playerName, _reasonOfGameOver;
+int _gamelvl, _coinsCollected, _shieldCollected, _enemiesKilled, _totalScore, _highestScore;
 Button bangButton, playButton;
 //Array list to hold box objects for floors, ceilings and platforms
 ArrayList<Box> platforms;
@@ -519,8 +520,10 @@ void draw() {
                 playButton.remove();
                 //Display Timer on right
                 //13/8/015: Bikram
-                if (t.isTimeOver()==true)
-                    gameScreen = 4;
+                if (t.isTimeOver()==true){
+                  _reasonOfGameOver = "timeout";  
+                  gameScreen = 4;
+                }
                 else                   
                     timerRight.setText(""+t.getTimerValue());
                 //Show Game Level
@@ -722,6 +725,7 @@ void draw() {
 
                     if(life == 0) {
                         gameScreen = 4;
+                        _reasonOfGameOver = "killed"; 
                         //reset enemies and shields to initial position
                         destroy_enemy(enemy, true);
                         destroy_enemy2(enemy2, true);
@@ -932,9 +936,8 @@ TODO: Show Level up screen , Currently game over screen is used
                 //Show Game over to user : Srijan 8th March 2015
 
                 //scroll(-5);
-                endscreen.display();
+                endscreen.display(playerName, _reasonOfGameOver, _gamelvl, _coinsCollected, _shieldCollected, _enemiesKilled, _totalScore, _highestScore);
                 background(scoreBoardBg);
-                displayGameOver.setText("GAME OVER, " + playerName);
                 gameScreen = 1;
 
                 // Reset Timer and Remove it; Bikram 14th March 015
