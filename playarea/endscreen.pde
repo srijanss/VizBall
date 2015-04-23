@@ -86,9 +86,9 @@ class EndScreen{
   void resetScoreBoard(){ 
       _coinsCollected =0;
       _shieldCollected =0;
-      _enemies_killed =0;
+      _enemieskilled =0;
       _totalScore =0; 
-      _game_Lvl = 0;
+      _gamelvl = 0;
       _lifeCollected =0;
   }
   
