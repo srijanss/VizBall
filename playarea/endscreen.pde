@@ -83,5 +83,14 @@ class EndScreen{
        highest_points.setVisible(false);
   }
   
+  void resetScoreBoard(){
+      coins_collected =0;
+      shield_collected =0;
+      enemies_killed =0;
+      total_points =0; 
+      game_Lvl = 0;
+      life_collected =0;
+  }
+  
   
 }
