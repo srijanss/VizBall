@@ -214,7 +214,7 @@ void setup() {
     gun = new ArrayList<Weapon>();
     laser = new ArrayList<Weapon>();
     ammo = new ArrayList<Weapon>();
-    
+
     // create list of bullets
     gunbullet = new ArrayList<Bullet>();
     //laserbullet = new ArrayList<Bullet>();
@@ -317,7 +317,7 @@ void create_boxes(float shift){
 void create_enemy_obj() {
     // adding enemies to the playarea
     float enemy_gap = 0;
-    for (float w=0; w<enemySize.length; w++) {
+    for (int w=0; w<enemySize.length; w++) {
         if(level == 0){
             enemy.add(new Enemy(enemy_gap+width*0.5, height*0.25, 8));
         }
@@ -330,7 +330,11 @@ void create_enemy_obj() {
         //enemy.add(new Enemy(enemy_gap+width*0.3, height*0.45, 8));
         //enemy.add(new Enemy(enemy_gap+width*0.5, height*0.65, 8));
         enemy_gap += 512;
+        if(enemySize[w] == 0){
+            enemy.get(w).kill();   
+        }
     } 
+
 }
 
 /*
@@ -341,7 +345,7 @@ void create_enemy_obj() {
  */
 void create_enemy2_obj() {
     float enemy2_gap = 0;
-    for (float w=0; w<enemy2Size.length; w++) {
+    for (int w=0; w<enemy2Size.length; w++) {
         if(level == 0){
             enemy2.add(new Enemy2(enemy2_gap+width*0.65, height*0.93, 13));
         }
@@ -349,24 +353,32 @@ void create_enemy2_obj() {
             enemy2.add(new Enemy2(enemy2_gap+width*0.35, height*0.93, 13));
         }
         enemy2_gap += 512;
+        if(enemy2Size[w] == 0){
+            enemy2.get(w).kill();   
+        }
     }
+
 }
 
 void create_shield_obj() {
     // adding shields to the playarea
     float shield_gap = 0;
     for (int w=0; w<shieldSize.length; w++) {
-        if(shieldSize[w] == 1){
-            if(w%2 == 0)
-            {
-                shield1.add(new Shield(shield_gap+width*1.5, height*0.20, 16));
-            }
-            else{
-                shield1.add(new Shield(shield_gap+width*1.5, height*0.50, 16));
-            }
-            shield_gap += 640;
+        //    if(shieldSize[w] == 1){
+        if(w%2 == 0)
+        {
+            shield1.add(new Shield(shield_gap+width*1.5, height*0.20, 16));
         }
-    } 
+        else{
+            shield1.add(new Shield(shield_gap+width*1.5, height*0.50, 16));
+        }
+        shield_gap += 640;
+        if(shieldSize[w] == 0) {
+            shield1.get(w).kill();
+        }
+    }
+    //} 
+
 }
 
 void create_heart() {
@@ -374,28 +386,36 @@ void create_heart() {
     // HEARTS
     float heart_gap = 0;
     for (int w=0; w<heartSize.length; w++) {
-        if(heartSize[w] == 1){
-            heart.add(new Power(heart_gap+width*2, height*0.15, 8));
-            heart_gap += 1200;
+        //if(heartSize[w] == 1){
+        heart.add(new Power(heart_gap+width*2, height*0.15, 8));
+        heart_gap += 1200;
+        //}
+        if(heartSize[w] == 0) {
+            heart.get(w).kill();
         }
     } 
+
 }
 
 void create_coin() {
     // COINS
     float coin_gap = 0;
     for (int w=0; w<coinSize.length; w++) {
-        if(coinSize[w] == 1){
-            if(w%2 == 0)
-            {
-                coin.add(new Power(coin_gap+width*0.75, height*0.35, 8));
-            }
-            else{
-                coin.add(new Power(coin_gap+width*0.75, height*0.75, 8));
-            }
-            coin_gap += 200;
+        //if(coinSize[w] == 1){
+        if(w%2 == 0)
+        {
+            coin.add(new Power(coin_gap+width*0.75, height*0.35, 8));
+        }
+        else{
+            coin.add(new Power(coin_gap+width*0.75, height*0.75, 8));
+        }
+        coin_gap += 200;
+        //}
+        if(coinSize[w] == 0) {
+            coin.get(w).kill();
         }
     }
+
 }
 
 // GUNS
@@ -403,33 +423,46 @@ void create_gun() {
     // adding guns, lasers and ammos to the playarea , Srijan : 22nd April 2015
     float gun_gap = 0;
     for (int w=0; w<gunSize.length; w++) {
-        if(gunSize[w] == 1){
-            gun.add(new Weapon(gun_gap+width*0.43, height*0.53, 8));
-            gun_gap += 1200;
+        //if(gunSize[w] == 1){
+        gun.add(new Weapon(gun_gap+width*0.43, height*0.53, 8));
+        gun_gap += 1200;
+        //}
+        if(gunSize[w] == 0) {
+            gun.get(w).kill();
         }
     } 
+
 }
 
 // LASERS
 void create_laser() {
     float laser_gap = 0;
     for (int w=0; w<laserSize.length; w++) {
-        if(laserSize[w] == 1){
-            laser.add(new Weapon(laser_gap+width*1.43, height*0.53, 8));
-            laser_gap += 1200;
+        //if(laserSize[w] == 1){
+        laser.add(new Weapon(laser_gap+width*1.43, height*0.53, 8));
+        laser_gap += 1200;
+        //}
+        if(laserSize[w] == 0) {
+            laser.get(w).kill();
         }
     } 
+
 }
 
 // AMMOS Pack
 void create_ammo() {
     float ammo_gap = 0;
     for (int w=0; w<ammoSize.length; w++) {
-        if(ammoSize[w] == 1){
-            ammo.add(new Weapon(ammo_gap+width*2.5, height*0.53, 8));
-            ammo_gap += 1200;
+        //if(ammoSize[w] == 1){
+        ammo.add(new Weapon(ammo_gap+width*2.5, height*0.53, 8));
+        ammo_gap += 1200;
+        //}
+        if(ammoSize[w] == 0) {
+            ammo.get(w).kill();
         }
     } 
+
+
 }
 
 // Bullets
@@ -572,22 +605,22 @@ void draw() {
                         ammo.get(a).display("ammo");
                     } 
                 }
-                
+
                 // display moving bullets
                 if(fired_gunbullet != 0 ) {
-                 for(int gb=0; gb<fired_gunbullet; gb++){
-                   if(gunbulletSize[gb] == 1){ 
-                     gunbullet.get(gb).display();
-                     gunbullet.get(gb).shiftBody("l");
-                   }
-                   if(gunbulletSize[gb] == -1) {
-                     gunbullet.get(gb).display();
-                     gunbullet.get(gb).shiftBody("r");
-                   }
-                    
-                 } 
+                    for(int gb=0; gb<fired_gunbullet; gb++){
+                        if(gunbulletSize[gb] == 1){ 
+                            gunbullet.get(gb).display();
+                            gunbullet.get(gb).shiftBody("l");
+                        }
+                        if(gunbulletSize[gb] == -1) {
+                            gunbullet.get(gb).display();
+                            gunbullet.get(gb).shiftBody("r");
+                        }
+
+                    } 
                 }
-                
+
                 // display bouncing and crawling enemies
                 for(int i=0; i<enemy2.size(); i++){
                     if(enemy2Size[i] == 1){
@@ -637,23 +670,23 @@ void draw() {
 
                     kill_enemy(acquired_enemy);
                     if(enemy_collide_with_shield){
-                      enemy_collide_with_shield = false;
+                        enemy_collide_with_shield = false;
                     } 
                     if(enemy_collide_with_bullet){
-                      enemy_collide_with_bullet = false;
+                        enemy_collide_with_bullet = false;
                     } 
                     got_shield = false;
-                    
+
                 }
 
                 if(enemy2_collide_with_shield == true || enemy2_collide_with_bullet == true) {
 
                     kill_enemy2(acquired_enemy2);
                     if(enemy2_collide_with_shield){
-                      enemy2_collide_with_shield = false;
+                        enemy2_collide_with_shield = false;
                     } 
                     if(enemy2_collide_with_bullet){
-                      enemy2_collide_with_bullet = false;
+                        enemy2_collide_with_bullet = false;
                     } 
                     got_shield = false;
                 }
@@ -671,6 +704,15 @@ void draw() {
                     // reset the background scroll value
                     x_bg = 0;   
 
+                    //reset enemies and shields to initial position
+                    destroy_enemy(enemy, false);
+                    destroy_enemy2(enemy2, false);
+                    destroy_shield(shield1, false);
+                    destroy_power(heart, false);
+                    destroy_power(coin, false);
+                    destroy_weapon(gun, false);
+                    destroy_weapon(laser, false);
+                    destroy_weapon(ammo, false);
 
                     //reset collision flag
                     collission_with_enemy = false;
@@ -678,14 +720,15 @@ void draw() {
                     if(life == 0) {
                         gameScreen = 4;
                         //reset enemies and shields to initial position
-                        destroy_enemy(enemy);
-                        destroy_enemy2(enemy2);
-                        destroy_shield(shield1);
-                        destroy_power(heart);
-                        destroy_power(coin);
-                        destroy_weapon(gun);
-                        destroy_weapon(laser);
-                        destroy_weapon(ammo);
+                        destroy_enemy(enemy, true);
+                        destroy_enemy2(enemy2, true);
+                        destroy_shield(shield1, true);
+                        destroy_power(heart, true);
+                        destroy_power(coin, true);
+                        destroy_weapon(gun, true);
+                        destroy_weapon(laser, true);
+                        destroy_weapon(ammo, true);
+
                     }
 
                     //reset level to zero
@@ -702,7 +745,7 @@ void draw() {
                     get_shield(acquired_shield);
                     collission_with_shield = false; 
                 }
-                
+
                 // Hiding the hit bullet
                 if( collission_with_bullet == true) {
                     get_gunbullet(used_bullet);
@@ -858,14 +901,14 @@ void draw() {
                                     }
                                      */ 
                                     //reset enemies and shields to initial position
-                                    destroy_enemy(enemy);
-                                    destroy_enemy2(enemy2);
-                                    destroy_shield(shield1);
-                                    destroy_power(heart);
-                                    destroy_power(coin);
-                                    destroy_weapon(gun);
-                                    destroy_weapon(laser);
-                                    destroy_weapon(ammo);
+                                    destroy_enemy(enemy, true);
+                                    destroy_enemy2(enemy2, true);
+                                    destroy_shield(shield1, true);
+                                    destroy_power(heart, true);
+                                    destroy_power(coin, true);
+                                    destroy_weapon(gun, true);
+                                    destroy_weapon(laser, true);
+                                    destroy_weapon(ammo, true);
                                     /*
 TODO: Show Level up screen , Currently game over screen is used
 :Srijan 11th March 2015
@@ -925,7 +968,7 @@ boolean destroy_box(ArrayList<Box> boxobj) {
    April 13th 2015 : Srijan
    Created destroy box function to destroy the enemy objects in the box2d area
  */
-void destroy_enemy(ArrayList<Enemy> enemyobj) {
+void destroy_enemy(ArrayList<Enemy> enemyobj, boolean levelStart) {
     while (enemyobj.size () > 0) {
         for (int i=0; i<enemyobj.size(); i++) {
             Enemy e = enemyobj.get(i);
@@ -936,8 +979,10 @@ void destroy_enemy(ArrayList<Enemy> enemyobj) {
         }
     }
     // reset enemy positions
-    for(int e=0; e<enemySize.length; e++) {
-        enemySize[e] = 1;
+    if(levelStart) {
+        for(int e=0; e<enemySize.length; e++) {
+            enemySize[e] = 1;
+        }
     } 
     create_enemy_obj();
 }
@@ -946,7 +991,7 @@ float enemy2_xpos = 0;
 float enemy2_ypos = 0;
 
 // destroys enemy2 arraylist in playarea
-void destroy_enemy2(ArrayList<Enemy2> enemyobj) {
+void destroy_enemy2(ArrayList<Enemy2> enemyobj, boolean levelStart) {
     while (enemyobj.size () > 0) {
         for (int i=0; i<enemyobj.size (); i++) {
             Enemy2 e = enemyobj.get(i);
@@ -957,14 +1002,16 @@ void destroy_enemy2(ArrayList<Enemy2> enemyobj) {
             }
         }
     }
-    for(int e2=0; e2<enemy2Size.length; e2++) {
-        enemy2Size[e2] = 1;
+    if(levelStart) {
+        for(int e2=0; e2<enemy2Size.length; e2++) {
+            enemy2Size[e2] = 1;
+        }
     }
     create_enemy2_obj();
 }
 
 // destroys shields  arrraylist in playarea
-void destroy_shield(ArrayList<Shield> shieldobj) {
+void destroy_shield(ArrayList<Shield> shieldobj, boolean levelStart) {
     while (shieldobj.size () > 0) {
         for (int i=0; i<shieldobj.size (); i++) {
             Shield s = shieldobj.get(i);
@@ -975,14 +1022,16 @@ void destroy_shield(ArrayList<Shield> shieldobj) {
         }
     }
     // reset shieldSize array
-    for(int shield=0; shield<shieldSize.length; shield++) {
-        shieldSize[shield] = 1;
+    if(levelStart) {
+        for(int shield=0; shield<shieldSize.length; shield++) {
+            shieldSize[shield] = 1;
+        }
     }  
     create_shield_obj();
 }
 
 // destroys powerups , Srijan : 21st April 2015
-void destroy_power(ArrayList<Power> powerobj) {
+void destroy_power(ArrayList<Power> powerobj, boolean levelStart) {
     while (powerobj.size () > 0) {
         for (int i=0; i<powerobj.size(); i++) {
             Power p = powerobj.get(i);
@@ -994,15 +1043,19 @@ void destroy_power(ArrayList<Power> powerobj) {
     }
     if(powerobj == heart){
         // reset heartSize array
-        for(int h=0; h<heartSize.length; h++) {
-            heartSize[h] = 1;
+        if(levelStart) {
+            for(int h=0; h<heartSize.length; h++) {
+                heartSize[h] = 1;
+            }
         } 
         create_heart();
     }
     else if(powerobj == coin){
         // reset coinSize array
-        for(int c=0; c<coinSize.length; c++) {
-            coinSize[c] = 1;
+        if(levelStart) {
+            for(int c=0; c<coinSize.length; c++) {
+                coinSize[c] = 1;
+            }
         } 
         create_coin();
     }
@@ -1010,7 +1063,7 @@ void destroy_power(ArrayList<Power> powerobj) {
 }
 
 // destroys weapons , Srijan : 22nd April 2015
-void destroy_weapon(ArrayList<Weapon> weaponobj) {
+void destroy_weapon(ArrayList<Weapon> weaponobj, boolean levelStart) {
     while (weaponobj.size () > 0) {
         for (int i=0; i<weaponobj.size (); i++) {
             Weapon w = weaponobj.get(i);
@@ -1022,21 +1075,27 @@ void destroy_weapon(ArrayList<Weapon> weaponobj) {
     }
     if(weaponobj == gun){
         // reset gunSize array
-        for(int g=0; g<gunSize.length; g++) {
-            gunSize[g] = 1;
-        } 
+        if(levelStart) {
+            for(int g=0; g<gunSize.length; g++) {
+                gunSize[g] = 1;
+            } 
+        }
         create_gun();
     }
     else if(weaponobj == laser){
         // reset laserSize array
-        for(int l=0; l<laserSize.length; l++) {
-            laserSize[l] = 1;
+        if(levelStart) {
+            for(int l=0; l<laserSize.length; l++) {
+                laserSize[l] = 1;
+            }
         } 
         create_laser();
     }else if(weaponobj == ammo){
         // reset ammoSize array
-        for(int a=0; a<ammoSize.length; a++) {
-            ammoSize[a] = 1;
+        if(levelStart) {
+            for(int a=0; a<ammoSize.length; a++) {
+                ammoSize[a] = 1;
+            }
         } 
         create_ammo();
     }
@@ -1143,29 +1202,29 @@ void keyPressed() {
         boolean bullet_fired_left = false;
         print("R pressed\n");
         if(total_gunbullet != 0) {
-          if(fired_gunbullet < total_gunbullet){
-            if(keyRight == true){
-              create_bullet(ball.get_ball_pos("x")+30, ball.get_ball_pos("y"));
-              bullet_fired_right = true;
+            if(fired_gunbullet < total_gunbullet){
+                if(keyRight == true){
+                    create_bullet(ball.get_ball_pos("x")+30, ball.get_ball_pos("y"));
+                    bullet_fired_right = true;
+                }
+                else if(keyLeft) {
+                    create_bullet(ball.get_ball_pos("x")-30, ball.get_ball_pos("y"));
+                    bullet_fired_left = true;
+                }
+                if(bullet_fired_right || bullet_fired_left){
+                    fired_gunbullet +=1;
+                    for(int gb=0; gb<fired_gunbullet; gb++){
+                        if(gunbulletSize[gb] != 0){
+                            if(bullet_fired_right){
+                                gunbulletSize[gb] = 1;
+                            }
+                            else if(bullet_fired_left){
+                                gunbulletSize[gb] = -1; 
+                            }
+                        } 
+                    }
+                }
             }
-            else if(keyLeft) {
-              create_bullet(ball.get_ball_pos("x")-30, ball.get_ball_pos("y"));
-              bullet_fired_left = true;
-            }
-            if(bullet_fired_right || bullet_fired_left){
-              fired_gunbullet +=1;
-              for(int gb=0; gb<fired_gunbullet; gb++){
-                if(gunbulletSize[gb] != 0){
-                 if(bullet_fired_right){
-                   gunbulletSize[gb] = 1;
-                 }
-                 else if(bullet_fired_left){
-                  gunbulletSize[gb] = -1; 
-                 }
-                } 
-              }
-            }
-          }
         }
 
     }
@@ -1554,39 +1613,39 @@ void beginContact(Contact cp) {
         acquired_weapon = (Weapon) o1;
         collission_with_weapon = true;
     }
-    
+
     // check if enemy is hit by bullet 
     if (o1.getClass() == Bullet.class && (o2.getClass() == Enemy.class || o2.getClass() == Enemy2.class)) { 
         println("bullet hits enemy");
         if(o2.getClass() == Enemy.class){
-                acquired_enemy = (Enemy) o2;
-                enemy_collide_with_bullet = true; 
-            }
-            else{
-                acquired_enemy2 = (Enemy2) o2;
-                enemy2_collide_with_bullet = true;  
-            }
+            acquired_enemy = (Enemy) o2;
+            enemy_collide_with_bullet = true; 
+        }
+        else{
+            acquired_enemy2 = (Enemy2) o2;
+            enemy2_collide_with_bullet = true;  
+        }
         used_bullet = (Bullet) o1;
         collission_with_bullet = true;
     } else if (o2.getClass() == Bullet.class && (o1.getClass() == Enemy.class || o1.getClass() == Enemy2.class)) {
         println("bullet hits enemy");
         if(o1.getClass() == Enemy.class){
-                acquired_enemy = (Enemy) o1;
-                enemy_collide_with_bullet = true; 
-            }
-            else{
-                acquired_enemy2 = (Enemy2) o1;
-                enemy2_collide_with_bullet = true;  
-            }
+            acquired_enemy = (Enemy) o1;
+            enemy_collide_with_bullet = true; 
+        }
+        else{
+            acquired_enemy2 = (Enemy2) o1;
+            enemy2_collide_with_bullet = true;  
+        }
         used_bullet = (Bullet) o2;
         collission_with_bullet = true;
     } else if (o1.getClass() == Bullet.class &&  
-      (o2.getClass() == Box.class || o2.getClass() == Shield.class || o2.getClass() == Surface.class || o2.getClass() == Weapon.class || o2.getClass() == Bullet.class || o2.getClass() == Power.class)) { 
+            (o2.getClass() == Box.class || o2.getClass() == Shield.class || o2.getClass() == Surface.class || o2.getClass() == Weapon.class || o2.getClass() == Bullet.class || o2.getClass() == Power.class)) { 
         println("bullet used must disappear");
         used_bullet = (Bullet) o1;
         collission_with_bullet = true;
     } else if (o2.getClass() == Bullet.class && 
-    (o1.getClass() == Box.class || o1.getClass() == Shield.class || o1.getClass() == Surface.class || o1.getClass() == Weapon.class || o1.getClass() == Bullet.class || o1.getClass() == Power.class)) {
+            (o1.getClass() == Box.class || o1.getClass() == Shield.class || o1.getClass() == Surface.class || o1.getClass() == Weapon.class || o1.getClass() == Bullet.class || o1.getClass() == Power.class)) {
         println("bullet used must disappear");
         used_bullet = (Bullet) o2;
         collission_with_bullet = true;
