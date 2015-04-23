@@ -9,8 +9,7 @@ class EndScreen{
        
        if(_totalScore > _highestScore)
          _highestScore = _totalScore;
-       if(_totalScore == 0)
-          _highestScore = _totalScore;
+
        displayGameOver = cp5.addTextlabel("displayGameOver")
                           .setText("GAME OVER, " + player_name)
                           .setPosition(160,20)
