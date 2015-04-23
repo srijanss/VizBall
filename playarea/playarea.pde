@@ -681,7 +681,11 @@ void draw() {
                 //Background for username and timer
                 fill(50,50,50);
                 rect(0, 0, game_width, 60);  
-                rect(0, 400, game_width, 60);    
+                rect(0, 400, game_width, 60);   
+               
+               // images on the top bar
+                image(powerOne, 0, -69);
+                image(powerTwo, 60, -105); 
 
                 // Kill the enemy if it collides with shielded ball
                 if(enemy_collide_with_shield == true || enemy_collide_with_bullet == true) {
