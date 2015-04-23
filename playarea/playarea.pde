@@ -13,7 +13,7 @@ import controlP5.*;
 
 // A reference to our box2d world
 Box2DProcessing box2d;
-PImage sky, nightsky, bg, startupImg, enemyOne, enemyTwo, levelup, shieldOne, powerOne, powerTwo;
+PImage sky, nightsky, bg, startupImg, enemyOne, enemyTwo, levelup, shieldOne, powerOne, powerTwo, scoreBoardBg;
 int gameScreen, isHelpDisplayed, gameStartupCount;
 //ControlP5 Library used
 // 2nd March: Bikram: Added startup of Name Inquiry and greetings Screen.
@@ -163,6 +163,7 @@ void setup() {
     shieldOne = loadImage("./images/shield1.png");
     powerOne = loadImage("./images/heart.png");
     powerTwo = loadImage("./images/coin.png");
+    scoreBoardBg = loadImage("./images/scoreboard.png");
     smooth();
 
 
@@ -930,13 +931,13 @@ TODO: Show Level up screen , Currently game over screen is used
 
                 //scroll(-5);
                 endscreen.display();
+                background(scoreBoardBg);
                 displayGameOver.setText("GAME OVER, " + playerName);
                 gameScreen = 1;
 
                 // Reset Timer and Remove it; Bikram 14th March 015
                 t.resetTimer();
                 t.hideTimer();
-
                 break;
             }
         default:
