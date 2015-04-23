@@ -642,6 +642,7 @@ void draw() {
                     if(enemy_collide_with_bullet){
                       enemy_collide_with_bullet = false;
                     } 
+                    got_shield = false;
                     
                 }
 
@@ -654,6 +655,7 @@ void draw() {
                     if(enemy2_collide_with_bullet){
                       enemy2_collide_with_bullet = false;
                     } 
+                    got_shield = false;
                 }
 
 
