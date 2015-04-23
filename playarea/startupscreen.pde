@@ -28,14 +28,62 @@ class StartUpScreen{
                           .setPosition(20,0)
                           .setFont(createFont("Georgia",13))
                           ;
-     
-       bangButton      = cp5.addButton("play")
+     displayCoinsOnRight = cp5.addTextlabel("displayCoinsOnRight")   
+                          .setText("")
+                          .setVisible(true)
+                          .setPosition(440,0)
+                          .setFont(createFont("Georgia",13))
+                          ;
+     displayShieldOnRight = cp5.addTextlabel("displayShieldOnRight")
+                          .setText("")
+                          .setVisible(true)
+                          .setPosition(480,0)
+                          .setFont(createFont("Georgia",13))
+                          ;
+                          
+     displayLifeOnRight = cp5.addTextlabel("displayLifeOnRight")
+                          .setText("")
+                          .setVisible(true)
+                          .setPosition(520,0)
+                          .setFont(createFont("Georgia",13))
+                          ;
+     displayScoreOnRight = cp5.addTextlabel("displayScoreOnRight")
+                          .setText("")
+                          .setVisible(true)
+                          .setPosition(560,0)
+                          .setFont(createFont("Georgia",13))
+                          ;
+     bangButton      = cp5.addButton("play")
                            .setValue(128)
                            .setPosition(280,180)
                            .setImages(imgs)
                            .updateSize()
                              ; 
 }
+
+
+void updateScoresOnTop(int coins, int life, int shield, int score){
+      displayCoinsOnRight.setText(""+coins);
+      displayShieldOnRight.setText(""+shield);
+      displayLifeOnRight.setText(""+life);
+      displayScoreOnRight.setText(""+score);
+}
+
+void showScoreOnTop(){
+      displayCoinsOnRight.setVisible(true);
+      displayShieldOnRight.setVisible(true);
+      displayLifeOnRight.setVisible(true);
+      displayScoreOnRight.setVisible(true);
+}
+void hideScoresOnTop(){
+      displayCoinsOnRight.setVisible(false);
+      displayShieldOnRight.setVisible(false);
+      displayLifeOnRight.setVisible(false);
+      displayScoreOnRight.setVisible(false);
+
+}
+
+
 /* FUnction to display user Game story - Bikram*/
 void displayHelp(){      
       PImage[] imgs = {loadImage("./images/button1.jpg"),loadImage("./images/button1.jpg"),loadImage("./images/button1.jpg")};

@@ -6,12 +6,17 @@ class EndScreen{
  void display(String player_name, String reasonOfGameOver, int gamelvl, int lifeCollected, int coinsCollected, int shieldCollected, int enemiesKilled, int totalScore, int highestScore){
        PFont font = createFont("arial",20);
        PImage[] imgs = {loadImage("./images/button1.jpg"),loadImage("./images/button1.jpg"),loadImage("./images/button1.jpg")};
-       
+       String str;
+       if(reasonOfGameOver =="timeout"){
+            str = "Timeout ";
+       }else{
+            str = "Game Over ";
+       }
        if(_totalScore > _highestScore)
          _highestScore = _totalScore;
 
        displayGameOver = cp5.addTextlabel("displayGameOver")
-                          .setText("GAME OVER, " + player_name)
+                          .setText(str + player_name)
                           .setPosition(160,20)
                           .setColorValue(000)
                           .setFont(createFont("Georgia",20))
@@ -37,7 +42,7 @@ class EndScreen{
                           ;
                           
        life_collected = cp5.addTextlabel("life_collected")
-                          .setText("Life Collected "+shieldCollected)
+                          .setText("Life Collected "+lifeCollected)
                           .setPosition(160, 120)
                           .setColorValue(000)
                           .setFont(createFont("Georgia",20))

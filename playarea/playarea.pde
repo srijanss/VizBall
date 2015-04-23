@@ -19,7 +19,7 @@ int gameScreen, isHelpDisplayed, gameStartupCount;
 // 2nd March: Bikram: Added startup of Name Inquiry and greetings Screen.
 ControlP5 cp5;
 Textfield targetField;
-Textlabel displayGreetings, displayNameOnLeft, displayGameOver, timerRight, gameLevel;
+Textlabel displayGreetings, displayNameOnLeft, displayGameOver, timerRight, gameLevel, displayCoinsOnRight, displayShieldOnRight, displayLifeOnRight, displayScoreOnRight;
 Textlabel coins_collected, shield_collected, enemies_killed, plyr_Name, total_points, highest_points, game_Lvl, life_collected;
 
 Textarea helpTextarea;
@@ -520,7 +520,10 @@ void draw() {
                 }
                 //scroll(0.05);
                 //scroll(0);
-
+                //Update score on top 
+                println(_lifeCollected);
+                 s.updateScoresOnTop(_coinsCollected, _lifeCollected, _shieldCollected, _totalScore);
+                 s.showScoreOnTop();
                 //Display Username: left
                 //3/8/015: Bikram
                 displayNameOnLeft.setVisible(true);
@@ -954,7 +957,7 @@ TODO: Show Level up screen , Currently game over screen is used
                 endscreen.display(playerName, _reasonOfGameOver, _gamelvl, _lifeCollected,  _coinsCollected, _shieldCollected, _enemiesKilled, _totalScore, _highestScore);
                 //background(scoreBoardBg);
                 gameScreen = 1;
-
+                s.hideScoresOnTop();
                 // Reset Timer and Remove it; Bikram 14th March 015
                 t.resetTimer();
                 t.hideTimer();
