@@ -9,7 +9,7 @@ import org.jbox2d.common.*;
 import org.jbox2d.dynamics.*;
 import org.jbox2d.dynamics.contacts.*;
 import controlP5.*;
-import java.util.concurrent.TimeUnit;
+//import java.util.concurrent.TimeUnit;
 
 // A reference to our box2d world
 Box2DProcessing box2d;
@@ -53,11 +53,37 @@ Power acquired_power;
 ArrayList <Power> coin;
 int[] coinSize = {1,1,1,1,1,1,1,1,1,1};
 
+// weapons object
+ArrayList <Weapon> gun;
+int[] gunSize = {1};
+Weapon acquired_weapon;
+ArrayList <Weapon> laser;
+int[] laserSize = {1};
+ArrayList <Weapon> ammo;
+int[] ammoSize = {1,1};
+boolean got_gun = false;
+boolean got_laser = false;
+boolean got_ammo = false;
+
+// bullets
+ArrayList <Bullet> gunbullet;
+int total_gunbullet = 2;
+int fired_gunbullet = 0;
+int[] gunbulletSize = {2,2,2,2,2}; // Unsed state , Used state will be {0,0,0,0,0} and full state will be {1,1,1,1,1}
+Bullet used_bullet;
+//ArrayList <Bullet> laserbullet;
+//int[] laserbulletSize = {1,1,1,1,1};
+
+
 boolean collission_with_enemy = false;
 boolean collission_with_shield = false;
 boolean enemy_collide_with_shield = false;
 boolean enemy2_collide_with_shield = false;
 boolean collission_with_power = false;
+boolean collission_with_weapon = false;
+boolean collission_with_bullet = false;
+boolean enemy_collide_with_bullet = false;
+boolean enemy2_collide_with_bullet = false;
 
 
 int hmove_count = 0;
@@ -86,7 +112,7 @@ float x_bg = 0;
 
 
 // Game Level 
-int level = 1;
+int level = 0;
 
 // Player life
 int life = 1;
@@ -126,167 +152,189 @@ GameLevel gl;
 EndScreen endscreen;
 
 void setup() {
-  size(640, 360);
-  sky = loadImage("./images/sky.png");
-  nightsky = loadImage("./images/nightsky.png");
-  bg = loadImage("./images/mountain_trees.png");
-  startupImg = loadImage("./images/1.jpg");
-  enemyOne = loadImage("./images/enemy1.png");
-  enemyTwo = loadImage("./images/enemy2.png");
-  levelup = loadImage("./images/level.png");
-  shieldOne = loadImage("./images/shield1.png");
-  powerOne = loadImage("./images/heart.png");
-  powerTwo = loadImage("./images/coin.png");
-  smooth();
+    size(640, 360);
+    sky = loadImage("./images/sky.png");
+    nightsky = loadImage("./images/nightsky.png");
+    bg = loadImage("./images/mountain_trees.png");
+    startupImg = loadImage("./images/1.jpg");
+    enemyOne = loadImage("./images/enemy1.png");
+    enemyTwo = loadImage("./images/enemy2.png");
+    //levelup = loadImage("./images/level.png");
+    shieldOne = loadImage("./images/shield1.png");
+    powerOne = loadImage("./images/heart.png");
+    powerTwo = loadImage("./images/coin.png");
+    smooth();
 
 
-  cp5 = new ControlP5(this);
-  s = new StartUpScreen();
-  endscreen = new EndScreen();
-  t  =  new Timer();
+    cp5 = new ControlP5(this);
+    s = new StartUpScreen();
+    endscreen = new EndScreen();
+    t  =  new Timer();
 
-  s.display();
-  gameScreen = 1;
-  gameStartupCount = 5;
-  //Check if if help is displayed
-  isHelpDisplayed = 0;
-  t.initializeTimer();
-  // Initiliaze Game level
-  gl = new GameLevel();
+    s.display();
+    gameScreen = 1;
+    gameStartupCount = 5;
+    //Check if if help is displayed
+    isHelpDisplayed = 0;
+    t.initializeTimer();
+    // Initiliaze Game level
+    gl = new GameLevel();
 
-  // Initialize box2d physics and create the world
-  box2d = new Box2DProcessing(this);
-  box2d.createWorld();
-  // We are setting a custom gravity
-  box2d.setGravity(0, -20);
+    // Initialize box2d physics and create the world
+    box2d = new Box2DProcessing(this);
+    box2d.createWorld();
+    // We are setting a custom gravity
+    box2d.setGravity(0, -20);
 
-  /*
-   * Turn on collission listening
-   * April 15 2015 : Srijan
-   *
-   */
-  box2d.listenForCollisions();
+    /*
+     * Turn on collission listening
+     * April 15 2015 : Srijan
+     *
+     */
+    box2d.listenForCollisions();
 
-  //Create the empty list for surfaces
-  platforms = new ArrayList<Box>();
-  ceilings = new ArrayList<Box>();
-  floors = new ArrayList<Box>();
+    //Create the empty list for surfaces
+    platforms = new ArrayList<Box>();
+    ceilings = new ArrayList<Box>();
+    floors = new ArrayList<Box>();
 
-  // Create empty list for enemies
-  enemy = new ArrayList<Enemy>();
-  enemy2 = new ArrayList<Enemy2>();
-  
-  
-  // Create list of shields
-  shield1 = new ArrayList<Shield>();
-  
-  // create list of power i.e coins and hearts
-  heart = new ArrayList<Power>();
-  coin = new ArrayList<Power>();
+    // Create empty list for enemies
+    enemy = new ArrayList<Enemy>();
+    enemy2 = new ArrayList<Enemy2>();
 
-  //create a Ball with specified size and at given coordinates in screen
-  ball = new Ball(width*0.1, height*0.4, 10);
 
-  // endbox object
-  endbox = new Box(3000, -10, 200, 600); 
+    // Create list of shields
+    shield1 = new ArrayList<Shield>();
 
-  // Function that creates Floors, Ceilings and Platforms
-  create_boxes(0);
-  
-  // Function that creates Standing Enemy in playarea
-  create_enemy_obj();
-  
-  // adding enemy2 to the playarea
-  create_enemy2_obj();
-  
-  // adding shields in playarea
-  create_shield_obj();
-  
-  // adding hearts in playarea
-  create_heart();
-  
-  // adding coins in playarea
-  create_coin();
-  
+    // create list of power i.e coins and hearts
+    heart = new ArrayList<Power>();
+    coin = new ArrayList<Power>();
 
-  //Commented out the vertical surface : Srijan 7th March 2015
-  // Create the surface
-  verticalSurface = new Surface(0, 640, -10, 0);
-  verticalSurfaceRight = new Surface(0, 640, -10, 1);
+    // create list of weapons
+    gun = new ArrayList<Weapon>();
+    laser = new ArrayList<Weapon>();
+    ammo = new ArrayList<Weapon>();
+
+    // create list of bullets
+    gunbullet = new ArrayList<Bullet>();
+    //laserbullet = new ArrayList<Bullet>();
+
+    //create a Ball with specified size and at given coordinates in screen
+    ball = new Ball(width*0.1, height*0.4, 10);
+
+    // endbox object
+    endbox = new Box(3000, -10, 200, 600); 
+
+    // Function that creates Floors, Ceilings and Platforms
+    create_boxes(0);
+
+    // Function that creates Standing Enemy in playarea
+    create_enemy_obj();
+
+    // adding enemy2 to the playarea
+    create_enemy2_obj();
+
+    // adding shields in playarea
+    create_shield_obj();
+
+    // adding hearts in playarea
+    create_heart();
+
+    // adding coins in playarea
+    create_coin();
+
+    // adding guns
+    create_gun();
+
+    //adding lasers
+    create_laser();
+
+    //adding ammos
+    create_ammo();
+
+
+    //Commented out the vertical surface : Srijan 7th March 2015
+    // Create the surface
+    verticalSurface = new Surface(0, 640, -10, 0);
+    verticalSurfaceRight = new Surface(0, 640, -10, 1);
 }
 
 // created separate function to create floors, ceilings and platforms
 void create_boxes(float shift){
- //gap that defines the platforms to occur after the screen width : Srijan 3rd March 2015
-  float platform_gap = 0;
-  //Creating new platforms and adding to ArrayList : Srijan 3rd March 2015
-  for (float w=width; w<=game_width; w+=width) {
-    //float platform_x_pos = random(3,5);
-    //float platform_y_pos = random(10,20);
-    
-    if(level == 0){
-      platforms.add(new Box(shift+platform_gap + 3*w/4, height-150, width/2-50, 10));
-      platforms.add(new Box(shift+platform_gap + w/4, height-250, width/2-50, 10));
-      platforms.add(new Box(shift+platform_gap + 5*w/4, height-200, width/2-50, 10));
+    //gap that defines the platforms to occur after the screen width : Srijan 3rd March 2015
+    float platform_gap = 0;
+    //Creating new platforms and adding to ArrayList : Srijan 3rd March 2015
+    for (float w=width; w<=game_width; w+=width) {
+        //float platform_x_pos = random(3,5);
+        //float platform_y_pos = random(10,20);
+
+        if(level == 0){
+            platforms.add(new Box(shift+platform_gap + 3*w/4, height-150, width/2-50, 10));
+            platforms.add(new Box(shift+platform_gap + w/4, height-250, width/2-50, 10));
+            platforms.add(new Box(shift+platform_gap + 5*w/4, height-200, width/2-50, 10));
+        }
+        else if(level == 1) {
+            platforms.add(new Box(shift+platform_gap + 3*w/4, height-150, width/2-50, 10));
+            platforms.add(new Box(shift+platform_gap + w/4 + 100, height-250, 10, width/2-50));
+            platforms.add(new Box(shift+platform_gap + 5*w/4, height-200, width/2-50, 10));
+        }
+        else if (level > 1) {
+            platforms.add(new Box(shift+platform_gap + 3*w/4 + 100, height-150, 10, width/2-50));
+            platforms.add(new Box(shift+platform_gap + w/4, height-250, width/2-50, 10));
+            platforms.add(new Box(shift+platform_gap + 5*w/4 +100, height-200, 10, width/2-50)); 
+        }
+
+        platform_gap += width;
     }
-    else if(level == 1) {
-      platforms.add(new Box(shift+platform_gap + 3*w/4, height-150, width/2-50, 10));
-      platforms.add(new Box(shift+platform_gap + w/4 + 100, height-250, 10, width/2-50));
-      platforms.add(new Box(shift+platform_gap + 5*w/4, height-200, width/2-50, 10));
+    //Defines the gap between the floors : Srijan 3rd March 2015
+    float floor_gap = 0;
+    //Defines the gap between the ceilings : Srijan 3rd March 2015
+    float ceiling_gap = 0;
+    //Create floors and adds to Arraylist : Srijan 3rd March 2015
+    float floor_width = 0;
+    float ceiling_width = 0;
+    //for (float w=0; w<game_width; w+=width/2) {
+    for (float w=0; w<game_width; w+=width/2) {
+        floors.add(new Box(shift+w+floor_gap, height-5, width/2, 10));
+        floor_gap +=100;
+        floor_width = w+floor_gap;
+        if (floor_width >= game_width) {
+            break;
+        }
     }
-    else if (level == 2) {
-     platforms.add(new Box(shift+platform_gap + 3*w/4 + 100, height-150, 10, width/2-50));
-     platforms.add(new Box(shift+platform_gap + w/4, height-250, width/2-50, 10));
-     platforms.add(new Box(shift+platform_gap + 5*w/4 +100, height-200, 10, width/2-50)); 
-    }
-      
-    platform_gap += width;
-  }
-  //Defines the gap between the floors : Srijan 3rd March 2015
-  float floor_gap = 0;
-  //Defines the gap between the ceilings : Srijan 3rd March 2015
-  float ceiling_gap = 0;
-  //Create floors and adds to Arraylist : Srijan 3rd March 2015
-  float floor_width = 0;
-  float ceiling_width = 0;
-  //for (float w=0; w<game_width; w+=width/2) {
-  for (float w=0; w<game_width; w+=width/2) {
-    floors.add(new Box(shift+w+floor_gap, height-5, width/2, 10));
-    floor_gap +=100;
-    floor_width = w+floor_gap;
-    if (floor_width >= game_width) {
-      break;
-    }
-  }
-  //Create ceilings and adds to Arraylist : Srijan 3rd March 2015
-  for (float w=0; w<game_width; w+=width) {  
-    ceilings.add(new Box(shift+w+ceiling_gap, pad_top + 5, width, 10));
-    ceiling_gap += 100;
-    ceiling_width = w+ceiling_gap;
-    if (ceiling_width >= game_width) {
-      break;
-    }
-  } 
+    //Create ceilings and adds to Arraylist : Srijan 3rd March 2015
+    for (float w=0; w<game_width; w+=width) {  
+        ceilings.add(new Box(shift+w+ceiling_gap, pad_top + 5, width, 10));
+        ceiling_gap += 100;
+        ceiling_width = w+ceiling_gap;
+        if (ceiling_width >= game_width) {
+            break;
+        }
+    } 
 }
 
 // Creates Enemy Object in Playarea
 void create_enemy_obj() {
- // adding enemies to the playarea
-  float enemy_gap = 0;
-  for (float w=0; w<enemySize.length; w++) {
-    if(level == 0){
-      enemy.add(new Enemy(enemy_gap+width*0.5, height*0.25, 8));
-    }
-    else if(level == 1) {
-      enemy.add(new Enemy(enemy_gap+width*0.4, height*0.35, 8)); 
-    }
-    else if (level == 2) {
-     enemy.add(new Enemy(enemy_gap+width*0.6, height*0.45, 8)); 
-    }
-    //enemy.add(new Enemy(enemy_gap+width*0.3, height*0.45, 8));
-    //enemy.add(new Enemy(enemy_gap+width*0.5, height*0.65, 8));
-    enemy_gap += 512;
-  } 
+    // adding enemies to the playarea
+    float enemy_gap = 0;
+    for (int w=0; w<enemySize.length; w++) {
+        if(level == 0){
+            enemy.add(new Enemy(enemy_gap+width*0.5, height*0.25, 8));
+        }
+        else if(level == 1) {
+            enemy.add(new Enemy(enemy_gap+width*0.4, height*0.35, 8)); 
+        }
+        else if (level > 1) {
+            enemy.add(new Enemy(enemy_gap+width*0.6, height*0.45, 8)); 
+        }
+        //enemy.add(new Enemy(enemy_gap+width*0.3, height*0.45, 8));
+        //enemy.add(new Enemy(enemy_gap+width*0.5, height*0.65, 8));
+        enemy_gap += 512;
+        if(enemySize[w] == 0){
+            enemy.get(w).kill();   
+        }
+    } 
+
 }
 
 /*
@@ -296,763 +344,1070 @@ void create_enemy_obj() {
  *
  */
 void create_enemy2_obj() {
-  float enemy2_gap = 0;
-  for (float w=0; w<enemy2Size.length; w++) {
-    if(level == 0){
-      enemy2.add(new Enemy2(enemy2_gap+width*0.65, height*0.93, 13));
+    float enemy2_gap = 0;
+    for (int w=0; w<enemy2Size.length; w++) {
+        if(level == 0){
+            enemy2.add(new Enemy2(enemy2_gap+width*0.65, height*0.93, 13));
+        }
+        else if(level > 0) {
+            enemy2.add(new Enemy2(enemy2_gap+width*0.35, height*0.93, 13));
+        }
+        enemy2_gap += 512;
+        if(enemy2Size[w] == 0){
+            enemy2.get(w).kill();   
+        }
     }
-    else if(level > 0) {
-      enemy2.add(new Enemy2(enemy2_gap+width*0.35, height*0.93, 13));
-    }
-    enemy2_gap += 512;
-  }
+
 }
 
 void create_shield_obj() {
-   // adding shields to the playarea
-  float shield_gap = 0;
-  for (int w=0; w<shieldSize.length; w++) {
-    if(shieldSize[w] == 1){
-      if(w%2 == 0)
-      {
-        shield1.add(new Shield(shield_gap+width*1.5, height*0.20, 16));
-      }
-      else{
-        shield1.add(new Shield(shield_gap+width*1.5, height*0.50, 16));
-      }
-      shield_gap += 640;
+    // adding shields to the playarea
+    float shield_gap = 0;
+    for (int w=0; w<shieldSize.length; w++) {
+        //    if(shieldSize[w] == 1){
+        if(w%2 == 0)
+        {
+            shield1.add(new Shield(shield_gap+width*1.5, height*0.20, 16));
+        }
+        else{
+            shield1.add(new Shield(shield_gap+width*1.5, height*0.50, 16));
+        }
+        shield_gap += 640;
+        if(shieldSize[w] == 0) {
+            shield1.get(w).kill();
+        }
     }
-  } 
+    //} 
+
 }
 
 void create_heart() {
-   // adding hearts and coins to the playarea , Srijan : 21st April 2015
-  // HEARTS
-  float heart_gap = 0;
-  for (int w=0; w<heartSize.length; w++) {
-    if(heartSize[w] == 1){
-      heart.add(new Power(heart_gap+width*2, height*0.15, 8));
-      heart_gap += 1200;
-    }
-  } 
+    // adding hearts and coins to the playarea , Srijan : 21st April 2015
+    // HEARTS
+    float heart_gap = 0;
+    for (int w=0; w<heartSize.length; w++) {
+        //if(heartSize[w] == 1){
+        heart.add(new Power(heart_gap+width*2, height*0.15, 8));
+        heart_gap += 1200;
+        //}
+        if(heartSize[w] == 0) {
+            heart.get(w).kill();
+        }
+    } 
+
 }
 
 void create_coin() {
-  // COINS
-  float coin_gap = 0;
-  for (int w=0; w<coinSize.length; w++) {
-    if(coinSize[w] == 1){
-      if(w%2 == 0)
-      {
-        coin.add(new Power(coin_gap+width*0.75, height*0.35, 8));
-      }
-      else{
-        coin.add(new Power(coin_gap+width*0.75, height*0.75, 8));
-      }
-      coin_gap += 200;
+    // COINS
+    float coin_gap = 0;
+    for (int w=0; w<coinSize.length; w++) {
+        //if(coinSize[w] == 1){
+        if(w%2 == 0)
+        {
+            coin.add(new Power(coin_gap+width*0.75, height*0.35, 8));
+        }
+        else{
+            coin.add(new Power(coin_gap+width*0.75, height*0.75, 8));
+        }
+        coin_gap += 200;
+        //}
+        if(coinSize[w] == 0) {
+            coin.get(w).kill();
+        }
     }
-  }
+
+}
+
+// GUNS
+void create_gun() {
+    // adding guns, lasers and ammos to the playarea , Srijan : 22nd April 2015
+    float gun_gap = 0;
+    for (int w=0; w<gunSize.length; w++) {
+        //if(gunSize[w] == 1){
+        gun.add(new Weapon(gun_gap+width*0.43, height*0.53, 8));
+        gun_gap += 1200;
+        //}
+        if(gunSize[w] == 0) {
+            gun.get(w).kill();
+        }
+    } 
+
+}
+
+// LASERS
+void create_laser() {
+    float laser_gap = 0;
+    for (int w=0; w<laserSize.length; w++) {
+        //if(laserSize[w] == 1){
+        laser.add(new Weapon(laser_gap+width*1.43, height*0.53, 8));
+        laser_gap += 1200;
+        //}
+        if(laserSize[w] == 0) {
+            laser.get(w).kill();
+        }
+    } 
+
+}
+
+// AMMOS Pack
+void create_ammo() {
+    float ammo_gap = 0;
+    for (int w=0; w<ammoSize.length; w++) {
+        //if(ammoSize[w] == 1){
+        ammo.add(new Weapon(ammo_gap+width*2.5, height*0.53, 8));
+        ammo_gap += 1200;
+        //}
+        if(ammoSize[w] == 0) {
+            ammo.get(w).kill();
+        }
+    } 
+
+
+}
+
+// Bullets
+void create_bullet(float x_pos, float y_pos) {
+    gunbullet.add(new Bullet(x_pos, y_pos, 8));
 }
 
 void draw() {
-  switch (gameScreen) {
-  case 1:
-    {
-      /*Show Homepage Name Input Screen*/
-      background(startupImg);
-      break;
-    }
-  case 2:
-    {
-      /*Show Greetings, Help and Play buttons*/
-      //1/8/015: Bikram
-      displayGreetings.setText("Welcome " + playerName); 
-      background(startupImg);
-
-
-      if (isHelpDisplayed == 0) {
-        /* Removing GUI */
-        targetField.remove();
-        bangButton.remove();
-        s.displayHelp();
-        gameScreen = 2;
-        isHelpDisplayed =1;
-      }
-      break;
-    }
-  case 3:
-    {
-      //Check if game is restarting : Srijan 8th March 2015 
-      if (game_over) {
-        displayGameOver.remove(); 
-        t.showTimer();
-        game_over = false;
-      }
-      //scroll(0.05);
-      //scroll(0);
- 
-      //Display Username: left
-      //3/8/015: Bikram
-      displayNameOnLeft.setVisible(true);
-      displayGreetings.remove();
-      displayNameOnLeft.setText(playerName);
-      helpTextarea.remove();
-      playButton.remove();
-      //Display Timer on right
-      //13/8/015: Bikram
-      if (t.isTimeOver()==true)
-        gameScreen = 4;
-      else                   
-        timerRight.setText(""+t.getTimerValue());
-      //Show Game Level
-      gl.showLevel();
-      gl.display();
-
-
-      // We must always step through time!
-      box2d.step();
-
-      background(255, 204, 153);
-      if (level == 0) {
-        image(sky, 0, 0);
-      } 
-      else if (level == 2) {
-        image(nightsky, 0, 0);
-      }
-      // Background scrolling with repetition , Parallax scrolling implemented : Srijan 10th March 2015
-      for (int i=0; i<game_width; i+=width) {
-        image(bg, x_bg + i, 0);
-      }
-
-      //Display platforms, floors, ceilings in the Array list : Srijan 3th March 2015
-      for (Box b : platforms) {
-        b.display();
-      }
-      for (Box b : floors) {
-        b.display();
-      }
-      for (Box b : ceilings) {
-        b.display();
-      }
-      // display enemies listed in ArrayList
-      //for (Enemy e : enemy) {
-      //  e.display();
-      //}
-      for(int e=0; e<enemySize.length; e++){
-         if(enemySize[e] == 1){
-           enemy.get(e).display();
-         } 
-      }
-      
-      //display hearts
-      for(int h=0; h<heartSize.length; h++){
-         if(heartSize[h] == 1){
-             heart.get(h).display("heart");
-         } 
-      }
-      
-      // display coin
-      for(int c=0; c<coinSize.length; c++){
-         if(coinSize[c] == 1){
-             coin.get(c).display("coin");
-         } 
-      }
-      
-      //display shield
-      //for(Shield s: shield1) {
-      //     s.display();
-      //}
-      for(int shield=0; shield<shieldSize.length; shield++){
-         if(shieldSize[shield] == 1){
-             shield1.get(shield).display();
-         } 
-      }
-      
-      
-      // display bouncing and crawling enemies
-      for(int i=0; i<enemy2.size(); i++){
-        if(enemy2Size[i] == 1){
-          Enemy2 e = enemy2.get(i);
-          e.display();
-          if(i%2 == 0){//Bouncing enemy implementation
-           if (e.get_enemy2_pos("y") >333) {
-            e.bounce(10);
+    switch (gameScreen) {
+        case 1:
+            {
+                /*Show Homepage Name Input Screen*/
+                background(startupImg);
+                break;
             }
-            else if (e.get_enemy2_pos("y") < 250) {
-              e.bounce(-10);
-            } 
-          }
-          else { //Crawling enemy implementation
-            if(hmove_count <=100){
-              e.crawl(10);
-              hmove_count++;
-            }else if(hmove_count > 100 && hmove_count <= 200){
-              e.crawl(-10);
-              hmove_count++; 
-            }else {
-              hmove_count = 0; 
-            }
-          }
-        }
-      }
-      
-      // Draw the ball
-      if(got_shield){
-        ball.display("shield");
-      }else if(collission_with_enemy){
-         ball.display("dead");
-      }else {
-         ball.display("normal"); 
-      }
-      //box.display();
-
-      endbox.display();
-      
-      //Background for username and timer
-      fill(50,50,50);
-      rect(0, 0, game_width, 60);  
-      rect(0, 400, game_width, 60);    
-      
-      // Kill the enemy if it collides with shielded ball
-      if(enemy_collide_with_shield == true) {
-         
-         kill_enemy(acquired_enemy);
-         enemy_collide_with_shield = false; 
-      }
-      
-      if(enemy2_collide_with_shield == true) {
-         
-         kill_enemy2(acquired_enemy2);
-         enemy2_collide_with_shield = false; 
-      }
-      
-
-      //Kill the ball if ball goes through hole in floors or ceiling : Srijan 5th March 2015
-      if (ball.get_ball_pos("y") > height + 16 || ball.get_ball_pos("y") < -16 + pad_top || collission_with_enemy == true) {
-
-        ball.done(); 
-        ball = new Ball(width*0.1, height*0.4, 10);
-        gameScreen = 4;
-        // reset the shift value
-        shift = 0;
-        // create the floors, platforms, ceilings for new level
-        scroll(0);
-        // reset the background scroll value
-        x_bg = 0;   
-        //reset enemies and shields to initial position
-        destroy_enemy(enemy);
-        destroy_enemy2(enemy2);
-        destroy_shield(shield1);
-        
-        //reset level to zero
-        if(life > 0){
-          life--;
-        }
-        else {
-          level = 0;
-        }
-        //reset collision flag
-        collission_with_enemy = false;
-        
-      }
-      
-      // Hiding the acquired shield
-      if( collission_with_shield == true) {
-         get_shield(acquired_shield);
-         collission_with_shield = false; 
-      }
-      
-      // Hiding the acquired heart and coin
-      if( collission_with_power == true) {
-        if(heart.contains(acquired_power)){
-           get_heart(acquired_power);
-        }
-        else if(coin.contains(acquired_power)){
-           get_coin(acquired_power); 
-        }
-         collission_with_power = false; 
-      }
-      
-
-      //Scrolling effect when the ball is moved : Srijan 8th March 2015
-      current_pos = ball.get_ball_pos("x");
+        case 2:
+            {
+                /*Show Greetings, Help and Play buttons*/
+                //1/8/015: Bikram
+                displayGreetings.setText("Welcome " + playerName); 
+                background(startupImg);
 
 
-      if (old_pos != current_pos) {
-
-        left_scroll_state = false;
-        if (current_pos < 65) {
-          //println(x_bg);
-          if (keyRight == true && keyUp == false) {
-            ball.step(5, -10);
-          } else if (keyRight == true && keyUp == true) {
-            ball.step(5, 10);
-          } else if (keyLeft == true && keyUp == false) {
-            ball.step(-0.05, -10);
-          } else if (keyLeft == true && keyUp == true && x_bg < 0.25) {
-            ball.step(-0.05, 10);
-          } else if (keyLeft == true && keyUp == true && x_bg >= 0) {
-            //println(x_bg);
-            ball.step(-5, 10);
-          } 
-
-          left_scroll_state = true;
-          if (old_pos > current_pos) {
-            /* 
-             monitoring background scrolling to disable scrolling left at level start
-             :Srijan 11th March 2015
-             */
-            if (x_bg <=0) {
-              //Calculate left displacement of the ball
-              float left_displacement = old_pos - current_pos;
-              if (left_displacement > 0.15) {
-                scroll(fast_scroll);
-                x_bg += 0.5;
-              } else {
-                scroll(slow_scroll);
-                x_bg += 0.25;
-              }
-            }
-          }
-        }
-        if (x_bg > -640) {
-          right_scroll_state = false;
-          if (current_pos >525) {
-            if (keyLeft == true && keyUp == false) {
-              ball.step(-5, -10);
-            } else if (keyLeft == true && keyUp == true) {
-              ball.step(-5, 10);
-            } else if (keyRight == true && keyUp == false) {
-              ball.step(0.05, -10);
-            } else if (keyRight == true && keyUp == true) {
-              ball.step(0.05, 10);
-            }
-            right_scroll_state = true;
-            if (old_pos < current_pos) {
-              /* 
-               monitoring background scrolling to disable scrolling more that level width
-               :Srijan 11th March 2015
-               */
-              if (x_bg >= -640 * 3) {
-                //Calculating right displacement of the ball : Srijan 11th March 2015
-                float right_displacement = current_pos - old_pos;
-                if (right_displacement > 0.15) {
-                  scroll(-fast_scroll);
-                  x_bg -= 0.5;
-                } else {
-                  scroll(-slow_scroll);
-                  x_bg -= 0.25;
+                if (isHelpDisplayed == 0) {
+                    /* Removing GUI */
+                    targetField.remove();
+                    bangButton.remove();
+                    s.displayHelp();
+                    gameScreen = 2;
+                    isHelpDisplayed =1;
                 }
-              }
-              //Check for end of level : Srijan 11th March 2015
-              //print(x_bg);
-              if (x_bg <=-610) {
-                // Level up and Increase scroll speed
-                //level +=1;
-                gl.increaseLevel();
-                //fast_scroll +=1;
-                //slow_scroll +=1;
-                // Recreate the ball at the start for new level
-                ball.done();
-                ball = new Ball(width*0.1, height*0.4, 10);
-                // reset the shift value
-                shift = 0;
-                // create the floors, platforms, ceilings for new level
-                scroll(0);
-                // reset the background scroll value
-                x_bg = 0;
-               
-                // TODO: Currently resetting when level up
-                //  Need to set different placement in the playarea for different level
-                // reset shieldSize array
-                for(int shield=0; shield<shieldSize.length; shield++) {
-                    shieldSize[shield] = 1;
-                }  
-                // reset heartSize array
-                for(int h=0; h<heartSize.length; h++) {
-                    heartSize[h] = 1;
-                } 
-                // reset coinSize array
-                for(int c=0; c<coinSize.length; c++) {
-                    coinSize[c] = 1;
-                } 
-                // reset enemy positions
-                for(int e=0; e<enemySize.length; e++) {
-                    enemySize[e] = 1;
-                } 
-                for(int e2=0; e2<enemy2Size.length; e2++) {
-                    enemy2Size[e2] = 1;
-                }  
-                //reset enemies and shields to initial position
-                destroy_enemy(enemy);
-                destroy_enemy2(enemy2);
-                destroy_shield(shield1);
-                destroy_power(heart);
-                destroy_power(coin);
-                /*
-                 TODO: Show Level up screen , Currently game over screen is used
-                 :Srijan 11th March 2015
-                 */
-                 
-                //gameScreen = 4;
-              }
+                break;
             }
-          }
-        }
-        old_pos = current_pos;
-      }
+        case 3:
+            {
+                //Check if game is restarting : Srijan 8th March 2015 
+                if (game_over) {
+                    displayGameOver.remove(); 
+                    t.showTimer();
+                    game_over = false;
+                }
+                //scroll(0.05);
+                //scroll(0);
 
-      break;
+                //Display Username: left
+                //3/8/015: Bikram
+                displayNameOnLeft.setVisible(true);
+                displayGreetings.remove();
+                displayNameOnLeft.setText(playerName);
+                helpTextarea.remove();
+                playButton.remove();
+                //Display Timer on right
+                //13/8/015: Bikram
+                if (t.isTimeOver()==true)
+                    gameScreen = 4;
+                else                   
+                    timerRight.setText(""+t.getTimerValue());
+                //Show Game Level
+                gl.showLevel();
+                gl.display();
+
+
+                // We must always step through time!
+                box2d.step();
+
+                background(255, 204, 153);
+                if (level == 0) {
+                    image(sky, 0, 0);
+                } 
+                else if (level == 2) {
+                    image(nightsky, 0, 0);
+                }
+                // Background scrolling with repetition , Parallax scrolling implemented : Srijan 10th March 2015
+                for (int i=0; i<game_width; i+=width) {
+                    image(bg, x_bg + i, 0);
+                }
+
+                //Display platforms, floors, ceilings in the Array list : Srijan 3th March 2015
+                for (Box b : platforms) {
+                    b.display();
+                }
+                for (Box b : floors) {
+                    b.display();
+                }
+                for (Box b : ceilings) {
+                    b.display();
+                }
+                // display enemies listed in ArrayList
+                //for (Enemy e : enemy) {
+                //  e.display();
+                //}
+                for(int e=0; e<enemySize.length; e++){
+                    if(enemySize[e] == 1){
+                        enemy.get(e).display();
+                    } 
+                }
+
+                //display hearts
+                for(int h=0; h<heartSize.length; h++){
+                    if(heartSize[h] == 1){
+                        heart.get(h).display("heart");
+                    } 
+                }
+
+                // display coin
+                for(int c=0; c<coinSize.length; c++){
+                    if(coinSize[c] == 1){
+                        //println("index " + c + "element " + coinSize[c]);
+                        coin.get(c).display("coin");
+                    } 
+                }
+
+                //display shield
+                //for(Shield s: shield1) {
+                //     s.display();
+                //}
+                for(int shield=0; shield<shieldSize.length; shield++){
+                    if(shieldSize[shield] == 1){
+                        shield1.get(shield).display();
+                    } 
+                }
+
+                //display guns
+                for(int g=0; g<gunSize.length; g++){
+                    if(gunSize[g] == 1){
+                        gun.get(g).display("gun");
+                    } 
+                }
+
+                //display lasers
+                for(int l=0; l<laserSize.length; l++){
+                    if(laserSize[l] == 1){
+                        laser.get(l).display("laser");
+                    } 
+                }
+
+                //display ammos
+                for(int a=0; a<ammoSize.length; a++){
+                    if(ammoSize[a] == 1){
+                        ammo.get(a).display("ammo");
+                    } 
+                }
+
+                // display moving bullets
+                if(fired_gunbullet != 0 ) {
+                    for(int gb=0; gb<fired_gunbullet; gb++){
+                        if(gunbulletSize[gb] == 1){ 
+                            gunbullet.get(gb).display();
+                            gunbullet.get(gb).shiftBody("l");
+                        }
+                        if(gunbulletSize[gb] == -1) {
+                            gunbullet.get(gb).display();
+                            gunbullet.get(gb).shiftBody("r");
+                        }
+
+                    } 
+                }
+
+                // display bouncing and crawling enemies
+                for(int i=0; i<enemy2.size(); i++){
+                    if(enemy2Size[i] == 1){
+                        Enemy2 e = enemy2.get(i);
+                        e.display();
+                        if(i%2 == 0){//Bouncing enemy implementation
+                            if (e.get_enemy2_pos("y") >333) {
+                                e.bounce(10);
+                            }
+                            else if (e.get_enemy2_pos("y") < 250) {
+                                e.bounce(-10);
+                            } 
+                        }
+                        else { //Crawling enemy implementation
+                            if(hmove_count <=100){
+                                e.crawl(10);
+                                hmove_count++;
+                            }else if(hmove_count > 100 && hmove_count <= 200){
+                                e.crawl(-10);
+                                hmove_count++; 
+                            }else {
+                                hmove_count = 0; 
+                            }
+                        }
+                    }
+                }
+
+                // Draw the ball
+                if(got_shield){
+                    ball.display("shield");
+                }else if(collission_with_enemy){
+                    ball.display("dead");
+                }else {
+                    ball.display("normal"); 
+                }
+                //box.display();
+
+                endbox.display();
+
+                //Background for username and timer
+                fill(50,50,50);
+                rect(0, 0, game_width, 60);  
+                rect(0, 400, game_width, 60);    
+
+                // Kill the enemy if it collides with shielded ball
+                if(enemy_collide_with_shield == true || enemy_collide_with_bullet == true) {
+
+                    kill_enemy(acquired_enemy);
+                    if(enemy_collide_with_shield){
+                        enemy_collide_with_shield = false;
+                    } 
+                    if(enemy_collide_with_bullet){
+                        enemy_collide_with_bullet = false;
+                    } 
+                    got_shield = false;
+
+                }
+
+                if(enemy2_collide_with_shield == true || enemy2_collide_with_bullet == true) {
+
+                    kill_enemy2(acquired_enemy2);
+                    if(enemy2_collide_with_shield){
+                        enemy2_collide_with_shield = false;
+                    } 
+                    if(enemy2_collide_with_bullet){
+                        enemy2_collide_with_bullet = false;
+                    } 
+                    got_shield = false;
+                }
+
+
+                //Kill the ball if ball goes through hole in floors or ceiling : Srijan 5th March 2015
+                if (ball.get_ball_pos("y") > height + 16 || ball.get_ball_pos("y") < -16 + pad_top || collission_with_enemy == true) {
+
+                    ball.done(); 
+                    ball = new Ball(width*0.1, height*0.4, 10);
+                    // reset the shift value
+                    shift = 0;
+                    // create the floors, platforms, ceilings for new level
+                    scroll(0);
+                    // reset the background scroll value
+                    x_bg = 0;   
+
+                    //reset enemies and shields to initial position
+                    destroy_enemy(enemy, false);
+                    destroy_enemy2(enemy2, false);
+                    destroy_shield(shield1, false);
+                    destroy_power(heart, false);
+                    destroy_power(coin, false);
+                    destroy_weapon(gun, false);
+                    destroy_weapon(laser, false);
+                    destroy_weapon(ammo, false);
+
+                    //reset collision flag
+                    collission_with_enemy = false;
+
+                    if(life == 0) {
+                        gameScreen = 4;
+                        //reset enemies and shields to initial position
+                        destroy_enemy(enemy, true);
+                        destroy_enemy2(enemy2, true);
+                        destroy_shield(shield1, true);
+                        destroy_power(heart, true);
+                        destroy_power(coin, true);
+                        destroy_weapon(gun, true);
+                        destroy_weapon(laser, true);
+                        destroy_weapon(ammo, true);
+
+                    }
+
+                    //reset level to zero
+                    if(life > 0){
+                        life--;
+                    }
+                    else {
+                        level = 0;
+                    }
+                }
+
+                // Hiding the acquired shield
+                if( collission_with_shield == true) {
+                    get_shield(acquired_shield);
+                    collission_with_shield = false; 
+                }
+
+                // Hiding the hit bullet
+                if( collission_with_bullet == true) {
+                    get_gunbullet(used_bullet);
+                    collission_with_bullet = false; 
+                }
+
+                // Hiding the acquired heart and coin
+                if( collission_with_power == true) {
+                    if(heart.contains(acquired_power)){
+                        get_heart(acquired_power);
+                    }
+                    else if(coin.contains(acquired_power)){
+                        get_coin(acquired_power); 
+                    }
+                    collission_with_power = false; 
+                }
+
+                // Hiding the acquired gun, laser and ammo
+                if( collission_with_weapon == true) {
+                    if(gun.contains(acquired_weapon)){
+                        get_gun(acquired_weapon);
+                    }
+                    else if(laser.contains(acquired_weapon)){
+                        get_laser(acquired_weapon); 
+                    }
+                    else if(ammo.contains(acquired_weapon)){
+                        get_ammo(acquired_weapon); 
+                    }
+                    collission_with_weapon = false; 
+                }
+
+
+                //Scrolling effect when the ball is moved : Srijan 8th March 2015
+                current_pos = ball.get_ball_pos("x");
+
+
+                if (old_pos != current_pos) {
+
+                    left_scroll_state = false;
+                    if (current_pos < 65) {
+                        //println(x_bg);
+                        if (keyRight == true && keyUp == false) {
+                            ball.step(5, -10);
+                        } else if (keyRight == true && keyUp == true) {
+                            ball.step(5, 10);
+                        } else if (keyLeft == true && keyUp == false) {
+                            ball.step(-0.05, -10);
+                        } else if (keyLeft == true && keyUp == true && x_bg < 0.25) {
+                            ball.step(-0.05, 10);
+                        } else if (keyLeft == true && keyUp == true && x_bg >= 0) {
+                            //println(x_bg);
+                            ball.step(-5, 10);
+                        } 
+
+                        left_scroll_state = true;
+                        if (old_pos > current_pos) {
+                            /* 
+                               monitoring background scrolling to disable scrolling left at level start
+                               :Srijan 11th March 2015
+                             */
+                            if (x_bg <=0) {
+                                //Calculate left displacement of the ball
+                                float left_displacement = old_pos - current_pos;
+                                if (left_displacement > 0.15) {
+                                    scroll(fast_scroll);
+                                    x_bg += 0.5;
+                                } else {
+                                    scroll(slow_scroll);
+                                    x_bg += 0.25;
+                                }
+                            }
+                        }
+                    }
+                    if (x_bg > -640) {
+                        right_scroll_state = false;
+                        if (current_pos >525) {
+                            if (keyLeft == true && keyUp == false) {
+                                ball.step(-5, -10);
+                            } else if (keyLeft == true && keyUp == true) {
+                                ball.step(-5, 10);
+                            } else if (keyRight == true && keyUp == false) {
+                                ball.step(0.05, -10);
+                            } else if (keyRight == true && keyUp == true) {
+                                ball.step(0.05, 10);
+                            }
+                            right_scroll_state = true;
+                            if (old_pos < current_pos) {
+                                /* 
+                                   monitoring background scrolling to disable scrolling more that level width
+                                   :Srijan 11th March 2015
+                                 */
+                                if (x_bg >= -640 * 3) {
+                                    //Calculating right displacement of the ball : Srijan 11th March 2015
+                                    float right_displacement = current_pos - old_pos;
+                                    if (right_displacement > 0.15) {
+                                        scroll(-fast_scroll);
+                                        x_bg -= 0.5;
+                                    } else {
+                                        scroll(-slow_scroll);
+                                        x_bg -= 0.25;
+                                    }
+                                }
+                                //Check for end of level : Srijan 11th March 2015
+                                //print(x_bg);
+                                if (x_bg <=-610) {
+                                    // Level up and Increase scroll speed
+                                    level +=1;
+                                    //fast_scroll +=1;
+                                    //slow_scroll +=1;
+                                    // Recreate the ball at the start for new level
+                                    ball.done();
+                                    ball = new Ball(width*0.1, height*0.4, 10);
+                                    // reset the shift value
+                                    shift = 0;
+                                    // create the floors, platforms, ceilings for new level
+                                    scroll(0);
+                                    // reset the background scroll value
+                                    x_bg = 0;
+
+                                    // TODO: Currently resetting when level up
+                                    //  Need to set different placement in the playarea for different level
+                                    // reset shieldSize array
+                                    /* COMMENTED OUT & USED in destroy_object Functions
+                                       for(int shield=0; shield<shieldSize.length; shield++) {
+                                       shieldSize[shield] = 1;
+                                       }  
+                                    // reset heartSize array
+                                    for(int h=0; h<heartSize.length; h++) {
+                                    heartSize[h] = 1;
+                                    } 
+                                    // reset coinSize array
+                                    for(int c=0; c<coinSize.length; c++) {
+                                    coinSize[c] = 1;
+                                    } 
+                                    // reset gunSize array
+                                    for(int g=0; g<gunSize.length; g++) {
+                                    gunSize[g] = 1;
+                                    } 
+                                    // reset laserSize array
+                                    for(int l=0; l<laserSize.length; l++) {
+                                    laserSize[l] = 1;
+                                    } 
+                                    // reset ammoSize array
+                                    for(int a=0; a<ammoSize.length; a++) {
+                                    ammoSize[a] = 1;
+                                    } 
+                                    // reset enemy positions
+                                    for(int e=0; e<enemySize.length; e++) {
+                                    enemySize[e] = 1;
+                                    } 
+                                    for(int e2=0; e2<enemy2Size.length; e2++) {
+                                    enemy2Size[e2] = 1;
+                                    }
+                                     */ 
+                                    //reset enemies and shields to initial position
+                                    destroy_enemy(enemy, true);
+                                    destroy_enemy2(enemy2, true);
+                                    destroy_shield(shield1, true);
+                                    destroy_power(heart, true);
+                                    destroy_power(coin, true);
+                                    destroy_weapon(gun, true);
+                                    destroy_weapon(laser, true);
+                                    destroy_weapon(ammo, true);
+                                    /*
+TODO: Show Level up screen , Currently game over screen is used
+:Srijan 11th March 2015
+                                     */
+
+                                    //gameScreen = 4;
+                                }
+                            }
+                        }
+                    }
+                    old_pos = current_pos;
+                }
+
+                break;
+            }
+        case 4:
+            {
+                //Show Game over to user : Srijan 8th March 2015
+
+                //scroll(-5);
+                endscreen.display();
+                displayGameOver.setText("GAME OVER, " + playerName);
+                gameScreen = 1;
+
+                // Reset Timer and Remove it; Bikram 14th March 015
+                t.resetTimer();
+                t.hideTimer();
+
+                break;
+            }
+        default:
+            {
+            }
     }
-  case 4:
-    {
-      //Show Game over to user : Srijan 8th March 2015
-
-      //scroll(-5);
-      endscreen.display();
-      displayGameOver.setText("GAME OVER, " + playerName);
-      gameScreen = 1;
-
-      // Reset Timer and Remove it; Bikram 14th March 015
-      t.resetTimer();
-      t.hideTimer();
-
-      break;
-    }
-  default:
-    {
-    }
-  }
 }
 
 
 
 /* 
- April 1st 2015 : Srijan
- Created destroy box function to destroy the box objects inthe box2d area
+   April 1st 2015 : Srijan
+   Created destroy box function to destroy the box objects inthe box2d area
  */
 boolean destroy_box(ArrayList<Box> boxobj) {
-  while (boxobj.size () > 0) {
-    for (int i=0; i<boxobj.size (); i++) {
-      Box b = boxobj.get(i);
-      //b.update();
-      if (b.kill()) {
-        boxobj.remove(i);
-      }
+    while (boxobj.size () > 0) {
+        for (int i=0; i<boxobj.size (); i++) {
+            Box b = boxobj.get(i);
+            //b.update();
+            if (b.kill()) {
+                boxobj.remove(i);
+            }
+        }
     }
-  }
-  return true;
+    return true;
 }
 
 /* 
- April 13th 2015 : Srijan
- Created destroy box function to destroy the enemy objects in the box2d area
+   April 13th 2015 : Srijan
+   Created destroy box function to destroy the enemy objects in the box2d area
  */
-void destroy_enemy(ArrayList<Enemy> enemyobj) {
-  while (enemyobj.size () > 0) {
-    for (int i=0; i<enemyobj.size (); i++) {
-      Enemy e = enemyobj.get(i);
-      //b.update();
-      if (e.kill()) {
-        enemyobj.remove(i);
-      }
+void destroy_enemy(ArrayList<Enemy> enemyobj, boolean levelStart) {
+    while (enemyobj.size () > 0) {
+        for (int i=0; i<enemyobj.size(); i++) {
+            Enemy e = enemyobj.get(i);
+            //b.update();
+            if (e.kill()) {
+                enemyobj.remove(i);
+            }
+        }
     }
-  }
-   create_enemy_obj();
+    // reset enemy positions
+    if(levelStart) {
+        for(int e=0; e<enemySize.length; e++) {
+            enemySize[e] = 1;
+        }
+    } 
+    create_enemy_obj();
 }
 
 float enemy2_xpos = 0;
 float enemy2_ypos = 0;
 
 // destroys enemy2 arraylist in playarea
-void destroy_enemy2(ArrayList<Enemy2> enemyobj) {
-  while (enemyobj.size () > 0) {
-    for (int i=0; i<enemyobj.size (); i++) {
-      Enemy2 e = enemyobj.get(i);
-      enemy2_xpos = e.get_enemy2_pos("x");
-      enemy2_ypos = e.get_enemy2_pos("y");
-      if (e.kill()) {
-        enemyobj.remove(i);
-      }
+void destroy_enemy2(ArrayList<Enemy2> enemyobj, boolean levelStart) {
+    while (enemyobj.size () > 0) {
+        for (int i=0; i<enemyobj.size (); i++) {
+            Enemy2 e = enemyobj.get(i);
+            enemy2_xpos = e.get_enemy2_pos("x");
+            enemy2_ypos = e.get_enemy2_pos("y");
+            if (e.kill()) {
+                enemyobj.remove(i);
+            }
+        }
     }
-  }
-  create_enemy2_obj();
+    if(levelStart) {
+        for(int e2=0; e2<enemy2Size.length; e2++) {
+            enemy2Size[e2] = 1;
+        }
+    }
+    create_enemy2_obj();
 }
 
 // destroys shields  arrraylist in playarea
-void destroy_shield(ArrayList<Shield> shieldobj) {
-  while (shieldobj.size () > 0) {
-    for (int i=0; i<shieldobj.size (); i++) {
-      Shield s = shieldobj.get(i);
-      //b.update();
-        if (s.kill()) {
-          shieldobj.remove(i);
+void destroy_shield(ArrayList<Shield> shieldobj, boolean levelStart) {
+    while (shieldobj.size () > 0) {
+        for (int i=0; i<shieldobj.size (); i++) {
+            Shield s = shieldobj.get(i);
+            //b.update();
+            if (s.kill()) {
+                shieldobj.remove(i);
+            }
         }
-      }
-  }
-  create_shield_obj();
+    }
+    // reset shieldSize array
+    if(levelStart) {
+        for(int shield=0; shield<shieldSize.length; shield++) {
+            shieldSize[shield] = 1;
+        }
+    }  
+    create_shield_obj();
 }
 
 // destroys powerups , Srijan : 21st April 2015
-void destroy_power(ArrayList<Power> powerobj) {
-  while (powerobj.size () > 0) {
-    for (int i=0; i<powerobj.size (); i++) {
-      Power p = powerobj.get(i);
-      //b.update();
-        if (p.kill()) {
-          powerobj.remove(i);
+void destroy_power(ArrayList<Power> powerobj, boolean levelStart) {
+    while (powerobj.size () > 0) {
+        for (int i=0; i<powerobj.size(); i++) {
+            Power p = powerobj.get(i);
+            //b.update();
+            if (p.kill()) {
+                powerobj.remove(i);
+            }
         }
-      }
-  }
-  if(powerobj == heart){
-    create_heart();
-  }
-  else{
-    create_coin();
-  }
+    }
+    if(powerobj == heart){
+        // reset heartSize array
+        if(levelStart) {
+            for(int h=0; h<heartSize.length; h++) {
+                heartSize[h] = 1;
+            }
+        } 
+        create_heart();
+    }
+    else if(powerobj == coin){
+        // reset coinSize array
+        if(levelStart) {
+            for(int c=0; c<coinSize.length; c++) {
+                coinSize[c] = 1;
+            }
+        } 
+        create_coin();
+    }
+
+}
+
+// destroys weapons , Srijan : 22nd April 2015
+void destroy_weapon(ArrayList<Weapon> weaponobj, boolean levelStart) {
+    while (weaponobj.size () > 0) {
+        for (int i=0; i<weaponobj.size (); i++) {
+            Weapon w = weaponobj.get(i);
+            //b.update();
+            if (w.kill()) {
+                weaponobj.remove(i);
+            }
+        }
+    }
+    if(weaponobj == gun){
+        // reset gunSize array
+        if(levelStart) {
+            for(int g=0; g<gunSize.length; g++) {
+                gunSize[g] = 1;
+            } 
+        }
+        create_gun();
+    }
+    else if(weaponobj == laser){
+        // reset laserSize array
+        if(levelStart) {
+            for(int l=0; l<laserSize.length; l++) {
+                laserSize[l] = 1;
+            }
+        } 
+        create_laser();
+    }else if(weaponobj == ammo){
+        // reset ammoSize array
+        if(levelStart) {
+            for(int a=0; a<ammoSize.length; a++) {
+                ammoSize[a] = 1;
+            }
+        } 
+        create_ammo();
+    }
 }
 
 //Scroll function to scroll the floor, ceilings and platforms : Srijan 5th March 2015
 void scroll(float value) {
-  shift += value;
-  
-  // shifting the box and the end of the each level
-  endbox.kill();
-  endbox = new Box(shift+3000, -10, 200, 600);
-  
-  // TODO: make scroll_object functions which can be used by all the scrolling objects in playarea
-  // Currently for loop used for individual object
-  int i=0;
-  for(i=0; i<enemy.size(); i++) {
-   if(left_scroll_state == true){
-    enemy.get(i).shiftBody("l");
-   } 
-   else if(right_scroll_state == true) {
-     enemy.get(i).shiftBody("r");
-   }
-  }
-  
-  
-  for(i=0; i<enemy2.size(); i++) {
-   if(left_scroll_state == true){
-    enemy2.get(i).shiftBody("l");
-   } 
-   else if(right_scroll_state == true) {
-     enemy2.get(i).shiftBody("r");
-   }
-  }
-  
-   for(i=0; i<shield1.size(); i++){
-    if(left_scroll_state == true){ 
-     shield1.get(i).shiftBody("l");
-     }
-     else if(right_scroll_state == true) {
-     shield1.get(i).shiftBody("r");
-     } 
-   }
-   
-   for(i=0; i<heart.size(); i++){
-    if(left_scroll_state == true){ 
-     heart.get(i).shiftBody("l");
-     }
-     else if(right_scroll_state == true) {
-     heart.get(i).shiftBody("r");
-     } 
-   }
-   
-   for(i=0; i<coin.size(); i++){
-    if(left_scroll_state == true){ 
-     coin.get(i).shiftBody("l");
-     }
-     else if(right_scroll_state == true) {
-     coin.get(i).shiftBody("r");
-     } 
-   }
-  
-   // Shift Boxes  
-   if (destroy_box(floors)){
-     if(destroy_box(ceilings)){
-       if(destroy_box(platforms)){
-          create_boxes(shift);     
-       }
-     }
-   }
+    shift += value;
+
+    // shifting the box and the end of the each level
+    endbox.kill();
+    endbox = new Box(shift+3000, -10, 200, 600);
+
+    // TODO: make scroll_object functions which can be used by all the scrolling objects in playarea
+    // Currently for loop used for individual object
+    int i=0;
+    for(i=0; i<enemy.size(); i++) {
+        if(left_scroll_state == true){
+            enemy.get(i).shiftBody("l");
+        } 
+        else if(right_scroll_state == true) {
+            enemy.get(i).shiftBody("r");
+        }
+    }
+
+
+    for(i=0; i<enemy2.size(); i++) {
+        if(left_scroll_state == true){
+            enemy2.get(i).shiftBody("l");
+        } 
+        else if(right_scroll_state == true) {
+            enemy2.get(i).shiftBody("r");
+        }
+    }
+
+    for(i=0; i<shield1.size(); i++){
+        if(left_scroll_state == true){ 
+            shield1.get(i).shiftBody("l");
+        }
+        else if(right_scroll_state == true) {
+            shield1.get(i).shiftBody("r");
+        } 
+    }
+
+    for(i=0; i<heart.size(); i++){
+        if(left_scroll_state == true){ 
+            heart.get(i).shiftBody("l");
+        }
+        else if(right_scroll_state == true) {
+            heart.get(i).shiftBody("r");
+        } 
+    }
+
+    for(i=0; i<coin.size(); i++){
+        if(left_scroll_state == true){ 
+            coin.get(i).shiftBody("l");
+        }
+        else if(right_scroll_state == true) {
+            coin.get(i).shiftBody("r");
+        } 
+    }
+
+    for(i=0; i<ammo.size(); i++){
+        if(left_scroll_state == true){ 
+            ammo.get(i).shiftBody("l");
+        }
+        else if(right_scroll_state == true) {
+            ammo.get(i).shiftBody("r");
+        } 
+    }
+
+    for(i=0; i<gun.size(); i++){
+        if(left_scroll_state == true){ 
+            gun.get(i).shiftBody("l");
+        }
+        else if(right_scroll_state == true) {
+            gun.get(i).shiftBody("r");
+        } 
+    }
+
+    for(i=0; i<laser.size(); i++){
+        if(left_scroll_state == true){ 
+            laser.get(i).shiftBody("l");
+        }
+        else if(right_scroll_state == true) {
+            laser.get(i).shiftBody("r");
+        } 
+    }
+
+    // Shift Boxes  
+    if (destroy_box(floors)){
+        if(destroy_box(ceilings)){
+            if(destroy_box(platforms)){
+                create_boxes(shift);     
+            }
+        }
+    }
 }
 
 //float addT = 0;
 void keyPressed() {
-  if (key == 'r' || key == 'R') {
-    
-    print("R pressed\n");
-    
-  }
-  if (key == 'l' || key == 'L') {
-    scroll(-0.5);
-  }
-  if (key == CODED) {
-    if (keyCode == CONTROL) {
-      keyCtrl = true;
-    }
-    if (keyCode == UP) {
-      keyUp = true;
-      //ball.step(0,10);
-    } 
-    if (keyCode == DOWN) {
-      keyDown = true;
-      //ball.step(0,-30);
-    } 
-    if (keyCode == RIGHT) {
-      keyRight = true;
-      //ball.step(30,-2);
-      //redraw();
-    }
-    if (keyCode == LEFT) {
-      keyLeft = true;
-      //ball.step(-30,-2);
-      //redraw();
-    }
-    if (keyCtrl == true && keyUp == true) {
-      box2d.setGravity(0, 5); 
-      //keyCtrl = false;
-    } else if (keyCtrl == true && keyDown == true) {
-      box2d.setGravity(0, -20);
-      //keyCtrl = false;
-    } else if (keyUp == true && keyRight == true) {
-      if (left_scroll_state == true) {
-        ball.step(0.1, 10);
-      } else {
-        ball.step(5, 10);
-      }
-    } else if (keyUp == true && keyLeft == true) {
-      if (right_scroll_state == true && x_bg > -640) {
-        ball.step(-0.1, 10);
-      } else {
-        ball.step(-5, 10);
-      }
-    } else if (keyUp == true && keyRight == false && keyLeft == false) {
+    if (key == 'r' || key == 'R') { // Shoot bullet by Pressing 'R' KEY : Srijan : 23rd April 2015
+        boolean bullet_fired_right = false;
+        boolean bullet_fired_left = false;
+        print("R pressed\n");
+        if(total_gunbullet != 0) {
+            if(fired_gunbullet < total_gunbullet){
+                if(keyRight == true){
+                    create_bullet(ball.get_ball_pos("x")+30, ball.get_ball_pos("y"));
+                    bullet_fired_right = true;
+                }
+                else if(keyLeft) {
+                    create_bullet(ball.get_ball_pos("x")-30, ball.get_ball_pos("y"));
+                    bullet_fired_left = true;
+                }
+                if(bullet_fired_right || bullet_fired_left){
+                    fired_gunbullet +=1;
+                    for(int gb=0; gb<fired_gunbullet; gb++){
+                        if(gunbulletSize[gb] != 0){
+                            if(bullet_fired_right){
+                                gunbulletSize[gb] = 1;
+                            }
+                            else if(bullet_fired_left){
+                                gunbulletSize[gb] = -1; 
+                            }
+                        } 
+                    }
+                }
+            }
+        }
 
-      ball.step(0, 10);
-    } else if (keyUp == false && keyRight == false && keyLeft == false) {
+    }
+    if (key == 'l' || key == 'L') {
+        scroll(-0.5);
+    }
+    if (key == CODED) {
+        if (keyCode == CONTROL) {
+            keyCtrl = true;
+        }
+        if (keyCode == UP) {
+            keyUp = true;
+            //ball.step(0,10);
+        } 
+        if (keyCode == DOWN) {
+            keyDown = true;
+            //ball.step(0,-30);
+        } 
+        if (keyCode == RIGHT) {
+            keyRight = true;
+            //ball.step(30,-2);
+            //redraw();
+        }
+        if (keyCode == LEFT) {
+            keyLeft = true;
+            //ball.step(-30,-2);
+            //redraw();
+        }
+        if (keyCtrl == true && keyUp == true) {
+            box2d.setGravity(0, 5); 
+            //keyCtrl = false;
+        } else if (keyCtrl == true && keyDown == true) {
+            box2d.setGravity(0, -20);
+            //keyCtrl = false;
+        } else if (keyUp == true && keyRight == true) {
+            if (left_scroll_state == true) {
+                ball.step(0.1, 10);
+            } else {
+                ball.step(5, 10);
+            }
+        } else if (keyUp == true && keyLeft == true) {
+            if (right_scroll_state == true && x_bg > -640) {
+                ball.step(-0.1, 10);
+            } else {
+                ball.step(-5, 10);
+            }
+        } else if (keyUp == true && keyRight == false && keyLeft == false) {
 
-      ball.step(0, 0);
-    } else if (keyUp == true) {
-      ball.step(0, 10);
-      moveLeft = 0;
-      moveRight = 0;
+            ball.step(0, 10);
+        } else if (keyUp == false && keyRight == false && keyLeft == false) {
+
+            ball.step(0, 0);
+        } else if (keyUp == true) {
+            ball.step(0, 10);
+            moveLeft = 0;
+            moveRight = 0;
+        }
+        /*else if(keyDown == true && keyRight == true) {
+          ball.step(5, -15); 
+          }
+          else if(keyDown == true && keyLeft == true) {
+          ball.step(-5, -15);
+          }*/
+        else if (keyDown == true) {
+            //ball.step(0, -30);
+            moveLeft = 0;
+            moveRight = 0;
+        } else if (keyRight == true) {
+            float y_mov = 0;
+            if (ball.get_ball_pos("y") > 333.9) {
+                y_mov = 0;
+            } else {
+                y_mov = 10;
+            }
+            if (left_scroll_state == true) {  
+                ball.step(0.05 + moveRight, -y_mov);
+                if (moveRight < 3 && moveRight < 4) {
+                    moveRight += 0.1;
+                }
+                moveLeft = 0;
+            } else {
+                ball.step(1 + moveRight, -y_mov);
+                if (moveRight < 5 && moveRight < 4) {
+                    moveRight += 1;
+                }
+                moveLeft = 0;
+            }
+        } else if (keyLeft == true) {
+            float y_mov = 0;
+            if (ball.get_ball_pos("y") > 333.9) {
+                y_mov = 0;
+            } else {
+                y_mov = 10;
+            }
+            if (right_scroll_state == true) {  
+                ball.step(-0.05 + moveLeft, -y_mov);
+                if (moveLeft > -5 && moveLeft > -6) {
+                    moveLeft -= 0.1;
+                }
+                moveRight = 0;
+            } else {
+                ball.step(-1 + moveLeft, -y_mov);
+                if (moveLeft > -6 && moveLeft > -5) {
+                    moveLeft -= 1;
+                }
+                moveRight = 0;
+            }
+        }
     }
-    /*else if(keyDown == true && keyRight == true) {
-     ball.step(5, -15); 
-     }
-     else if(keyDown == true && keyLeft == true) {
-     ball.step(-5, -15);
-     }*/
-    else if (keyDown == true) {
-      //ball.step(0, -30);
-      moveLeft = 0;
-      moveRight = 0;
-    } else if (keyRight == true) {
-      float y_mov = 0;
-      if (ball.get_ball_pos("y") > 333.9) {
-        y_mov = 0;
-      } else {
-        y_mov = 10;
-      }
-      if (left_scroll_state == true) {  
-        ball.step(0.05 + moveRight, -y_mov);
-        if (moveRight < 3 && moveRight < 4) {
-          moveRight += 0.1;
-        }
-        moveLeft = 0;
-      } else {
-        ball.step(1 + moveRight, -y_mov);
-        if (moveRight < 5 && moveRight < 4) {
-          moveRight += 1;
-        }
-        moveLeft = 0;
-      }
-    } else if (keyLeft == true) {
-      float y_mov = 0;
-      if (ball.get_ball_pos("y") > 333.9) {
-        y_mov = 0;
-      } else {
-        y_mov = 10;
-      }
-      if (right_scroll_state == true) {  
-        ball.step(-0.05 + moveLeft, -y_mov);
-        if (moveLeft > -5 && moveLeft > -6) {
-          moveLeft -= 0.1;
-        }
-        moveRight = 0;
-      } else {
-        ball.step(-1 + moveLeft, -y_mov);
-        if (moveLeft > -6 && moveLeft > -5) {
-          moveLeft -= 1;
-        }
-        moveRight = 0;
-      }
-    }
-  }
 }
 
 void keyReleased() {
-  if (key == CODED) {
-    if (keyCode == UP) {
-      keyUp = false;
+    if (key == CODED) {
+        if (keyCode == UP) {
+            keyUp = false;
+        }
+        if (keyCode == DOWN) {
+            keyDown = false;
+        }
+        if (keyCode == RIGHT) {
+            keyRight = false;
+            //moveRight = 0;
+        }
+        if (keyCode == LEFT) {
+            keyLeft = false;
+            //moveLeft = 0;
+        }
+        if (keyCode == CONTROL) {
+            keyCtrl = false;
+            //moveLeft = 0;
+        }
     }
-    if (keyCode == DOWN) {
-      keyDown = false;
-    }
-    if (keyCode == RIGHT) {
-      keyRight = false;
-      //moveRight = 0;
-    }
-    if (keyCode == LEFT) {
-      keyLeft = false;
-      //moveLeft = 0;
-    }
-    if (keyCode == CONTROL) {
-      keyCtrl = false;
-      //moveLeft = 0;
-    }
-  }
 }
 
 //Play button click event
 public void play() {
-  playerName = targetField.getText();
-  if (playerName!="") {
-    gameScreen = 2;
-  }
+    playerName = targetField.getText();
+    if (playerName!="") {
+        gameScreen = 2;
+    }
 }
 
 //OkPlay button click event
 public void play_Game() {
-  gameScreen = 3;
+    gameScreen = 3;
 }
 
 
 //Restart button 
 public void restart() {
-  displayNameOnLeft.setVisible(false);
-  gl.hideLevel();
-  bangButton.remove();
-  game_over = true;
-  gameScreen = 3;
+    displayNameOnLeft.setVisible(false);
+    gl.hideLevel();
+    bangButton.remove();
+    game_over = true;
+    gameScreen = 3;
 }
 
 // acquires the shield object that collides with ball 
 boolean get_shield(Shield s) {
     for (int i=0; i<shieldSize.length; i++) {
-      if (shield1.get(i) == s) {
-        println("shield removed from playarea");
-        s.kill();
-        //if (s.kill()) {
-        //  shield1.remove(i);
-        //}
-        shieldSize[i] = 0;
-        got_shield = true;
-        
-      }
+        if (shield1.get(i) == s) {
+            println("shield removed from playarea");
+            s.kill();
+            //if (s.kill()) {
+            //  shield1.remove(i);
+            //}
+            shieldSize[i] = 0;
+            got_shield = true;
+
+        }
+    }
+    return true;
+}
+
+// acquires the bullet object that collides  
+boolean get_gunbullet(Bullet b) {
+    for (int i=0; i<fired_gunbullet; i++) {
+        if (gunbullet.get(i) == b) {
+            println("bullet removed from playarea");
+            b.kill();
+            gunbulletSize[i] = 0;
+
+        }
     }
     return true;
 }
@@ -1060,33 +1415,72 @@ boolean get_shield(Shield s) {
 // acquires the heart that collides with shielded ball , Srijan : 21st April 2015 
 boolean get_heart(Power p) {
     for (int i=0; i<heartSize.length; i++) {
-      if (heart.get(i) == p) {
-        println("heart removed from playarea");
-        p.kill();
-        //if (s.kill()) {
-        //  shield1.remove(i);
-        //}
-        heartSize[i] = 0;
-        //got_shield = true;
-        
-      }
+        if (heart.get(i) == p) {
+            println("heart removed from playarea");
+            p.kill();
+            heartSize[i] = 0;
+            //got_shield = true;
+
+        }
     }
     return true;
 }
 
-// acquires the coin that collides with shielded ball, Srijan : 21st April 2015
+// acquires the coin that collides with ball, Srijan : 21st April 2015
 boolean get_coin(Power p) {
     for (int i=0; i<coinSize.length; i++) {
-      if (coin.get(i) == p) {
-        println("coin removed from playarea");
-        p.kill();
-        //if (s.kill()) {
-        //  shield1.remove(i);
-        //}
-        coinSize[i] = 0;
-        //got_shield = true;
-        
-      }
+        if (coin.get(i) == p) {
+            println("coin removed from playarea");
+            p.kill();
+            coinSize[i] = 0;
+            //got_shield = true;
+            for(int coin=0; coin<coinSize.length; coin++){
+                //println(coinSize[coin]);
+                //println(coinSize.length); 
+            }
+
+        }
+    }
+    return true;
+}
+
+// acquires the gun that collides with ball, Srijan : 22nd April 2015
+boolean get_gun(Weapon w) {
+    for (int i=0; i<gunSize.length; i++) {
+        if (gun.get(i) == w) {
+            println("gun removed from playarea");
+            w.kill();
+            gunSize[i] = 0;
+            got_gun = true;
+        }
+    }
+    return true;
+}
+
+// acquires the laser that collides with ball, Srijan : 22nd April 2015
+boolean get_laser(Weapon w) {
+    for (int i=0; i<laserSize.length; i++) {
+        if (laser.get(i) == w) {
+            println("laser removed from playarea");
+            w.kill();
+            laserSize[i] = 0;
+            got_laser = true;
+
+        }
+    }
+    return true;
+}
+
+// acquires the laser that collides with ball, Srijan : 22nd April 2015
+boolean get_ammo(Weapon w) {
+    for (int i=0; i<ammoSize.length; i++) {
+        if (ammo.get(i) == w) {
+            println("laser removed from playarea");
+            w.kill();
+            ammoSize[i] = 0;
+            got_ammo = true;
+
+        }
     }
     return true;
 }
@@ -1094,13 +1488,13 @@ boolean get_coin(Power p) {
 // kill the enemy that collides with shielded ball
 boolean kill_enemy(Enemy e) {
     for (int i=0; i<enemySize.length; i++) {
-      if (enemy.get(i) == e) {
-        println("enemy removed from playarea");
-        e.kill();
-        enemySize[i] = 0;
-        //killed_enemy = true;
-        
-      }
+        if (enemy.get(i) == e) {
+            println("enemy removed from playarea");
+            e.kill();
+            enemySize[i] = 0;
+            //killed_enemy = true;
+
+        }
     }
     return true;
 }
@@ -1108,19 +1502,19 @@ boolean kill_enemy(Enemy e) {
 // kill the enemy2 that collides with shielded ball
 boolean kill_enemy2(Enemy2 e) {
     for (int i=0; i<enemy2Size.length; i++) {
-      if (enemy2.get(i) == e) {
-        println("enemy removed from playarea");
-        e.kill();
-        enemy2Size[i] = 0;
-        //killed_enemy = true;
-        
-      }
+        if (enemy2.get(i) == e) {
+            println("enemy removed from playarea");
+            e.kill();
+            enemy2Size[i] = 0;
+            //killed_enemy = true;
+
+        }
     }
     return true;
 }
 
 /*
-   * Collission event listener
+ * Collission event listener
  * Check if Ball collides with Enemy
  * If Ball collides with Enemy kill ball 
  * April 15 2015 : Srijan
@@ -1128,98 +1522,144 @@ boolean kill_enemy2(Enemy2 e) {
  */
 void beginContact(Contact cp) {
 
-  // Get both fixtures
-  Fixture f1 = cp.getFixtureA();
-  Fixture f2 = cp.getFixtureB();
-  // Get both bodies
-  Body b1 = f1.getBody();
-  Body b2 = f2.getBody();
+    // Get both fixtures
+    Fixture f1 = cp.getFixtureA();
+    Fixture f2 = cp.getFixtureB();
+    // Get both bodies
+    Body b1 = f1.getBody();
+    Body b2 = f2.getBody();
 
-  // Get our objects that reference these bodies
-  Object o1 = b1.getUserData();
-  Object o2 = b2.getUserData();
+    // Get our objects that reference these bodies
+    Object o1 = b1.getUserData();
+    Object o2 = b2.getUserData();
 
-/* Srijan : 21st April 2015
- *
- * Commented out this code as I addes setUserdata for surfaces as well 
- * Now there is no exception when ball hits surfaces
- *
-*/
-//<<<<<<< Updated upstream
-//  if (o1 != null && o2 != null) {
-//    if ((o1.getClass() == Ball.class && (o2.getClass() == Enemy.class || o2.getClass() == Enemy2.class) )) {
-//      println("collided with enemy");
-//      collission_with_enemy = true;
-//    } else if ((o2.getClass() == Ball.class && (o1.getClass() == Enemy.class || o1.getClass() == Enemy2.class))) {
-//      println("collided with enemy");
-//      collission_with_enemy = true;
-//    }
-//=======
+    /* Srijan : 21st April 2015
+     *
+     * Commented out this code as I addes setUserdata for surfaces as well 
+     * Now there is no exception when ball hits surfaces
+     *
+     */
+    //<<<<<<< Updated upstream
+    //  if (o1 != null && o2 != null) {
+    //    if ((o1.getClass() == Ball.class && (o2.getClass() == Enemy.class || o2.getClass() == Enemy2.class) )) {
+    //      println("collided with enemy");
+    //      collission_with_enemy = true;
+    //    } else if ((o2.getClass() == Ball.class && (o1.getClass() == Enemy.class || o1.getClass() == Enemy2.class))) {
+    //      println("collided with enemy");
+    //      collission_with_enemy = true;
+    //    }
+    //=======
 
-// Check if the Ball hits other objects in the playarea
-  if ((o1.getClass() == Ball.class && (o2.getClass() == Enemy.class || o2.getClass() == Enemy2.class) )) {
-    println("collided with enemy");
-    if(got_shield == false){
-      collission_with_enemy = true;
-    }else {
-      if(o2.getClass() == Enemy.class){
-        acquired_enemy = (Enemy) o2;
-        enemy_collide_with_shield = true; 
-      }
-      else{
-        acquired_enemy2 = (Enemy2) o2;
-        enemy2_collide_with_shield = true;  
-      }
-      //enemy_collide_with_shield = true; 
+    // Check if the Ball hits other objects in the playarea
+    if ((o1.getClass() == Ball.class && (o2.getClass() == Enemy.class || o2.getClass() == Enemy2.class) )) {
+        println("collided with enemy");
+        if(got_shield == false){
+            collission_with_enemy = true;
+        }else {
+            if(o2.getClass() == Enemy.class){
+                acquired_enemy = (Enemy) o2;
+                enemy_collide_with_shield = true; 
+            }
+            else{
+                acquired_enemy2 = (Enemy2) o2;
+                enemy2_collide_with_shield = true;  
+            }
+            //enemy_collide_with_shield = true; 
+        }
+    } else if ((o2.getClass() == Ball.class && (o1.getClass() == Enemy.class || o1.getClass() == Enemy2.class))) {
+        println("collided with enemy");
+        if(got_shield == false){
+            collission_with_enemy = true;
+        }else {
+            if(o1.getClass() == Enemy.class){
+                acquired_enemy = (Enemy) o1;
+                enemy_collide_with_shield = true; 
+            }
+            else{
+                acquired_enemy2 = (Enemy2) o1;
+                enemy2_collide_with_shield = true;  
+            }
+            //enemy_collide_with_shield = true; 
+        }
+    } else if (o1.getClass() == Ball.class && o2.getClass() == Shield.class) { // Checks if the ball hits the shield object
+        println("collided with shield");
+        acquired_shield = (Shield) o2;
+        //get_shield(s);
+        collission_with_shield = true;
+    } else if (o2.getClass() == Ball.class && o1.getClass() == Shield.class) {
+        println("collided with shield");
+        Shield s = (Shield) o1;
+        //get_shield(s);
+        acquired_shield = s;
+        collission_with_shield = true;
+    } else if (o1.getClass() == Ball.class && o2.getClass() == Power.class) { // Checks if ball hits the power ups , Srijan : 21st April 2015
+        println("collided with power");
+        acquired_power = (Power) o2;
+        //get_shield(s);
+        collission_with_power = true;
+    } else if (o2.getClass() == Ball.class && o1.getClass() == Power.class) {
+        println("collided with power");
+        Power p = (Power) o1;
+        //get_shield(s);
+        acquired_power = p;
+        collission_with_power = true;
+    } else if (o1.getClass() == Ball.class && o2.getClass() == Weapon.class) { // Checks if ball hits the weapons , Srijan : 22nd April 2015
+        println("collided with weapon");
+        acquired_weapon = (Weapon) o2;
+        //get_shield(s);
+        collission_with_weapon = true;
+    } else if (o2.getClass() == Ball.class && o1.getClass() == Weapon.class) {
+        println("collided with weapon");
+        acquired_weapon = (Weapon) o1;
+        collission_with_weapon = true;
     }
-  } else if ((o2.getClass() == Ball.class && (o1.getClass() == Enemy.class || o1.getClass() == Enemy2.class))) {
-    println("collided with enemy");
-    if(got_shield == false){
-      collission_with_enemy = true;
-    }else {
-      if(o1.getClass() == Enemy.class){
-        acquired_enemy = (Enemy) o1;
-        enemy_collide_with_shield = true; 
-      }
-      else{
-        acquired_enemy2 = (Enemy2) o1;
-        enemy2_collide_with_shield = true;  
-      }
-      //enemy_collide_with_shield = true; 
+
+    // check if enemy is hit by bullet 
+    if (o1.getClass() == Bullet.class && (o2.getClass() == Enemy.class || o2.getClass() == Enemy2.class)) { 
+        println("bullet hits enemy");
+        if(o2.getClass() == Enemy.class){
+            acquired_enemy = (Enemy) o2;
+            enemy_collide_with_bullet = true; 
+        }
+        else{
+            acquired_enemy2 = (Enemy2) o2;
+            enemy2_collide_with_bullet = true;  
+        }
+        used_bullet = (Bullet) o1;
+        collission_with_bullet = true;
+    } else if (o2.getClass() == Bullet.class && (o1.getClass() == Enemy.class || o1.getClass() == Enemy2.class)) {
+        println("bullet hits enemy");
+        if(o1.getClass() == Enemy.class){
+            acquired_enemy = (Enemy) o1;
+            enemy_collide_with_bullet = true; 
+        }
+        else{
+            acquired_enemy2 = (Enemy2) o1;
+            enemy2_collide_with_bullet = true;  
+        }
+        used_bullet = (Bullet) o2;
+        collission_with_bullet = true;
+    } else if (o1.getClass() == Bullet.class &&  
+            (o2.getClass() == Box.class || o2.getClass() == Shield.class || o2.getClass() == Surface.class || o2.getClass() == Weapon.class || o2.getClass() == Bullet.class || o2.getClass() == Power.class)) { 
+        println("bullet used must disappear");
+        used_bullet = (Bullet) o1;
+        collission_with_bullet = true;
+    } else if (o2.getClass() == Bullet.class && 
+            (o1.getClass() == Box.class || o1.getClass() == Shield.class || o1.getClass() == Surface.class || o1.getClass() == Weapon.class || o1.getClass() == Bullet.class || o1.getClass() == Power.class)) {
+        println("bullet used must disappear");
+        used_bullet = (Bullet) o2;
+        collission_with_bullet = true;
     }
-  } else if (o1.getClass() == Ball.class && o2.getClass() == Shield.class) { // Checks if the ball hits the shield object
-    println("collided with shield");
-    acquired_shield = (Shield) o2;
-    //get_shield(s);
-    collission_with_shield = true;
-  } else if (o2.getClass() == Ball.class && o1.getClass() == Shield.class) {
-    println("collided with shield");
-    Shield s = (Shield) o1;
-    //get_shield(s);
-    acquired_shield = s;
-    collission_with_shield = true;
-  } else if (o1.getClass() == Ball.class && o2.getClass() == Power.class) { // Checks if ball hits the power ups , Srijan : 21st April 2015
-    println("collided with power");
-    acquired_power = (Power) o2;
-    //get_shield(s);
-    collission_with_power = true;
-  } else if (o2.getClass() == Ball.class && o1.getClass() == Power.class) {
-    println("collided with power");
-    Power p = (Power) o1;
-    //get_shield(s);
-    acquired_power = p;
-    collission_with_power = true;
-  }
-  
-  /*
-  else if ((o1.getClass() == Ball.class && o2.getClass() == Box.class) ) {
-   println("collided with box");
-   }
-   else if ((o2.getClass() == Ball.class && o1.getClass() == Box.class)) {
-   println("collided with box");
-   
-   }
-   */
+
+    /*
+       else if ((o1.getClass() == Ball.class && o2.getClass() == Box.class) ) {
+       println("collided with box");
+       }
+       else if ((o2.getClass() == Ball.class && o1.getClass() == Box.class)) {
+       println("collided with box");
+
+       }
+     */
 }
 
 void endContact(Contact cp) {
