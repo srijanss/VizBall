@@ -9,7 +9,7 @@ import org.jbox2d.common.*;
 import org.jbox2d.dynamics.*;
 import org.jbox2d.dynamics.contacts.*;
 import controlP5.*;
-import java.util.concurrent.TimeUnit;
+//import java.util.concurrent.TimeUnit;
 
 // A reference to our box2d world
 Box2DProcessing box2d;
@@ -61,6 +61,18 @@ ArrayList <Weapon> laser;
 int[] laserSize = {1};
 ArrayList <Weapon> ammo;
 int[] ammoSize = {1,1};
+boolean got_gun = false;
+boolean got_laser = false;
+boolean got_ammo = false;
+
+// bullets
+ArrayList <Bullet> gunbullet;
+int total_gunbullet = 2;
+int fired_gunbullet = 0;
+int[] gunbulletSize = {2,2,2,2,2}; // Unsed state , Used state will be {0,0,0,0,0} and full state will be {1,1,1,1,1}
+Bullet used_bullet;
+//ArrayList <Bullet> laserbullet;
+//int[] laserbulletSize = {1,1,1,1,1};
 
 
 boolean collission_with_enemy = false;
@@ -69,6 +81,9 @@ boolean enemy_collide_with_shield = false;
 boolean enemy2_collide_with_shield = false;
 boolean collission_with_power = false;
 boolean collission_with_weapon = false;
+boolean collission_with_bullet = false;
+boolean enemy_collide_with_bullet = false;
+boolean enemy2_collide_with_bullet = false;
 
 
 int hmove_count = 0;
@@ -199,6 +214,10 @@ void setup() {
     gun = new ArrayList<Weapon>();
     laser = new ArrayList<Weapon>();
     ammo = new ArrayList<Weapon>();
+    
+    // create list of bullets
+    gunbullet = new ArrayList<Bullet>();
+    //laserbullet = new ArrayList<Bullet>();
 
     //create a Ball with specified size and at given coordinates in screen
     ball = new Ball(width*0.1, height*0.4, 10);
@@ -402,7 +421,7 @@ void create_laser() {
     } 
 }
 
-// AMMOS
+// AMMOS Pack
 void create_ammo() {
     float ammo_gap = 0;
     for (int w=0; w<ammoSize.length; w++) {
@@ -411,6 +430,11 @@ void create_ammo() {
             ammo_gap += 1200;
         }
     } 
+}
+
+// Bullets
+void create_bullet(float x_pos, float y_pos) {
+    gunbullet.add(new Bullet(x_pos, y_pos, 8));
 }
 
 void draw() {
@@ -548,7 +572,22 @@ void draw() {
                         ammo.get(a).display("ammo");
                     } 
                 }
-
+                
+                // display moving bullets
+                if(fired_gunbullet != 0 ) {
+                 for(int gb=0; gb<fired_gunbullet; gb++){
+                   if(gunbulletSize[gb] == 1){ 
+                     gunbullet.get(gb).display();
+                     gunbullet.get(gb).shiftBody("l");
+                   }
+                   if(gunbulletSize[gb] == -1) {
+                     gunbullet.get(gb).display();
+                     gunbullet.get(gb).shiftBody("r");
+                   }
+                    
+                 } 
+                }
+                
                 // display bouncing and crawling enemies
                 for(int i=0; i<enemy2.size(); i++){
                     if(enemy2Size[i] == 1){
@@ -594,16 +633,27 @@ void draw() {
                 rect(0, 400, game_width, 60);    
 
                 // Kill the enemy if it collides with shielded ball
-                if(enemy_collide_with_shield == true) {
+                if(enemy_collide_with_shield == true || enemy_collide_with_bullet == true) {
 
                     kill_enemy(acquired_enemy);
-                    enemy_collide_with_shield = false; 
+                    if(enemy_collide_with_shield){
+                      enemy_collide_with_shield = false;
+                    } 
+                    if(enemy_collide_with_bullet){
+                      enemy_collide_with_bullet = false;
+                    } 
+                    
                 }
 
-                if(enemy2_collide_with_shield == true) {
+                if(enemy2_collide_with_shield == true || enemy2_collide_with_bullet == true) {
 
                     kill_enemy2(acquired_enemy2);
-                    enemy2_collide_with_shield = false; 
+                    if(enemy2_collide_with_shield){
+                      enemy2_collide_with_shield = false;
+                    } 
+                    if(enemy2_collide_with_bullet){
+                      enemy2_collide_with_bullet = false;
+                    } 
                 }
 
 
@@ -649,6 +699,12 @@ void draw() {
                 if( collission_with_shield == true) {
                     get_shield(acquired_shield);
                     collission_with_shield = false; 
+                }
+                
+                // Hiding the hit bullet
+                if( collission_with_bullet == true) {
+                    get_gunbullet(used_bullet);
+                    collission_with_bullet = false; 
                 }
 
                 // Hiding the acquired heart and coin
@@ -1080,9 +1136,35 @@ void scroll(float value) {
 
 //float addT = 0;
 void keyPressed() {
-    if (key == 'r' || key == 'R') {
-
+    if (key == 'r' || key == 'R') { // Shoot bullet by Pressing 'R' KEY : Srijan : 23rd April 2015
+        boolean bullet_fired_right = false;
+        boolean bullet_fired_left = false;
         print("R pressed\n");
+        if(total_gunbullet != 0) {
+          if(fired_gunbullet < total_gunbullet){
+            if(keyRight == true){
+              create_bullet(ball.get_ball_pos("x")+30, ball.get_ball_pos("y"));
+              bullet_fired_right = true;
+            }
+            else if(keyLeft) {
+              create_bullet(ball.get_ball_pos("x")-30, ball.get_ball_pos("y"));
+              bullet_fired_left = true;
+            }
+            if(bullet_fired_right || bullet_fired_left){
+              fired_gunbullet +=1;
+              for(int gb=0; gb<fired_gunbullet; gb++){
+                if(gunbulletSize[gb] != 0){
+                 if(bullet_fired_right){
+                   gunbulletSize[gb] = 1;
+                 }
+                 else if(bullet_fired_left){
+                  gunbulletSize[gb] = -1; 
+                 }
+                } 
+              }
+            }
+          }
+        }
 
     }
     if (key == 'l' || key == 'L') {
@@ -1256,6 +1338,19 @@ boolean get_shield(Shield s) {
     return true;
 }
 
+// acquires the bullet object that collides  
+boolean get_gunbullet(Bullet b) {
+    for (int i=0; i<fired_gunbullet; i++) {
+        if (gunbullet.get(i) == b) {
+            println("bullet removed from playarea");
+            b.kill();
+            gunbulletSize[i] = 0;
+
+        }
+    }
+    return true;
+}
+
 // acquires the heart that collides with shielded ball , Srijan : 21st April 2015 
 boolean get_heart(Power p) {
     for (int i=0; i<heartSize.length; i++) {
@@ -1295,8 +1390,7 @@ boolean get_gun(Weapon w) {
             println("gun removed from playarea");
             w.kill();
             gunSize[i] = 0;
-            //got_shield = true;
-
+            got_gun = true;
         }
     }
     return true;
@@ -1309,7 +1403,7 @@ boolean get_laser(Weapon w) {
             println("laser removed from playarea");
             w.kill();
             laserSize[i] = 0;
-            //got_shield = true;
+            got_laser = true;
 
         }
     }
@@ -1323,7 +1417,7 @@ boolean get_ammo(Weapon w) {
             println("laser removed from playarea");
             w.kill();
             ammoSize[i] = 0;
-            //got_shield = true;
+            got_ammo = true;
 
         }
     }
@@ -1457,6 +1551,43 @@ void beginContact(Contact cp) {
         println("collided with weapon");
         acquired_weapon = (Weapon) o1;
         collission_with_weapon = true;
+    }
+    
+    // check if enemy is hit by bullet 
+    if (o1.getClass() == Bullet.class && (o2.getClass() == Enemy.class || o2.getClass() == Enemy2.class)) { 
+        println("bullet hits enemy");
+        if(o2.getClass() == Enemy.class){
+                acquired_enemy = (Enemy) o2;
+                enemy_collide_with_bullet = true; 
+            }
+            else{
+                acquired_enemy2 = (Enemy2) o2;
+                enemy2_collide_with_bullet = true;  
+            }
+        used_bullet = (Bullet) o1;
+        collission_with_bullet = true;
+    } else if (o2.getClass() == Bullet.class && (o1.getClass() == Enemy.class || o1.getClass() == Enemy2.class)) {
+        println("bullet hits enemy");
+        if(o1.getClass() == Enemy.class){
+                acquired_enemy = (Enemy) o1;
+                enemy_collide_with_bullet = true; 
+            }
+            else{
+                acquired_enemy2 = (Enemy2) o1;
+                enemy2_collide_with_bullet = true;  
+            }
+        used_bullet = (Bullet) o2;
+        collission_with_bullet = true;
+    } else if (o1.getClass() == Bullet.class &&  
+      (o2.getClass() == Box.class || o2.getClass() == Shield.class || o2.getClass() == Surface.class || o2.getClass() == Weapon.class || o2.getClass() == Bullet.class || o2.getClass() == Power.class)) { 
+        println("bullet used must disappear");
+        used_bullet = (Bullet) o1;
+        collission_with_bullet = true;
+    } else if (o2.getClass() == Bullet.class && 
+    (o1.getClass() == Box.class || o1.getClass() == Shield.class || o1.getClass() == Surface.class || o1.getClass() == Weapon.class || o1.getClass() == Bullet.class || o1.getClass() == Power.class)) {
+        println("bullet used must disappear");
+        used_bullet = (Bullet) o2;
+        collission_with_bullet = true;
     }
 
     /*
