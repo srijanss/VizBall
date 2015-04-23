@@ -39,27 +39,27 @@ class EndScreen{
                           
        life_collected = cp5.addTextlabel("life_collected")
                           .setText("Life Collected "+shieldCollected)
-                          .setPosition(160, 100)
+                          .setPosition(160, 120)
                           .setColorValue(000)
                           .setFont(createFont("Georgia",20))
                           ;
        enemies_killed = cp5.addTextlabel("enemies_killed")
                           .setText("Enemies Killed "+enemiesKilled)
-                          .setPosition(160,120)
+                          .setPosition(160,140)
                           .setColorValue(000)
                           .setFont(createFont("Georgia",20))
                           ;
                           
        total_points = cp5.addTextlabel("total_points")
                           .setText("Total Points "+totalScore)
-                          .setPosition(160,140)
+                          .setPosition(160,160)
                           .setColorValue(000)
                           .setFont(createFont("Georgia",20))
                           ;
                           
        highest_points = cp5.addTextlabel("highest_points")
                           .setText("Highest Points "+_highestScore)
-                          .setPosition(160,160)
+                          .setPosition(160,180)
                           .setColorValue(000)
                           .setFont(createFont("Georgia",20))
                           ;
@@ -67,7 +67,7 @@ class EndScreen{
 
        bangButton      =  cp5.addButton("restart")
                            .setValue(128)
-                           .setPosition(160,200)
+                           .setPosition(160,220)
                            .setImages(imgs)
                            .updateSize()
                            ;
@@ -83,13 +83,13 @@ class EndScreen{
        highest_points.setVisible(false);
   }
   
-  void resetScoreBoard(){
-      coins_collected =0;
-      shield_collected =0;
-      enemies_killed =0;
-      total_points =0; 
-      game_Lvl = 0;
-      life_collected =0;
+  void resetScoreBoard(){ 
+      _coinsCollected =0;
+      _shieldCollected =0;
+      _enemies_killed =0;
+      _totalScore =0; 
+      _game_Lvl = 0;
+      _lifeCollected =0;
   }
   
   
