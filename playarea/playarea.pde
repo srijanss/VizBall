@@ -20,6 +20,8 @@ int gameScreen, isHelpDisplayed, gameStartupCount;
 ControlP5 cp5;
 Textfield targetField;
 Textlabel displayGreetings, displayNameOnLeft, displayGameOver, timerRight, gameLevel;
+Textlabel coins_collected, shield_collected, enemies_killed, plyr_Name, total_points, highest_points, game_Lvl;
+
 Textarea helpTextarea;
 String playerName;
 Button bangButton, playButton;
