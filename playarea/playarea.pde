@@ -684,7 +684,11 @@ void draw() {
                 //Background for username and timer
                 fill(50,50,50);
                 rect(0, 0, game_width, 60);  
-                rect(0, 400, game_width, 60);    
+                rect(0, 400, game_width, 60);   
+               
+               // images on the top bar
+                image(powerOne, 0, -69);
+                image(powerTwo, 60, -105); 
 
                 // Kill the enemy if it collides with shielded ball
                 if(enemy_collide_with_shield == true || enemy_collide_with_bullet == true) {
@@ -718,7 +722,7 @@ void draw() {
 
                 //Kill the ball if ball goes through hole in floors or ceiling : Srijan 5th March 2015
                 if (ball.get_ball_pos("y") > height + 16 || ball.get_ball_pos("y") < -16 + pad_top || collission_with_enemy == true) {
-
+                    life--;
                     ball.done(); 
                     ball = new Ball(width*0.1, height*0.4, 10);
                     // reset the shift value
@@ -726,7 +730,9 @@ void draw() {
                     // create the floors, platforms, ceilings for new level
                     scroll(0);
                     // reset the background scroll value
-                    x_bg = 0;   
+                    x_bg = 0;
+                    // reset got_shield flag
+                    got_shield = false;
 
                     //reset enemies and shields to initial position
                     destroy_enemy(enemy, false);
@@ -757,10 +763,7 @@ void draw() {
                     }
 
                     //reset level to zero
-                    if(life > 0){
-                        life--;
-                    }
-                    else {
+                    if(life <= 0){
                         level = 0;
                     }
                 }
@@ -889,6 +892,8 @@ void draw() {
                                     scroll(0);
                                     // reset the background scroll value
                                     x_bg = 0;
+                                    // reset got_shield flag
+                                    got_shield = false;
 
                                     // TODO: Currently resetting when level up
                                     //  Need to set different placement in the playarea for different level
@@ -951,6 +956,7 @@ TODO: Show Level up screen , Currently game over screen is used
             }
         case 4:
             {
+                life = 1;
                 //Show Game over to user : Srijan 8th March 2015
 
                 //scroll(-5);
@@ -1483,6 +1489,7 @@ boolean get_heart(Power p) {
             println("heart removed from playarea");
             p.kill();
             ++_lifeCollected;
+            life++;
             heartSize[i] = 0;
             //got_shield = true;
 
