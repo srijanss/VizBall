@@ -183,8 +183,8 @@ void setup() {
     shieldOnesmall = loadImage("./images/shield_small.png");
     gunmedium = loadImage("./images/gun_medium.png");
     gunsmall = loadImage("./images/gun_small.png");
-    lasermedium = loadImage("./images/laser_medium.png");
-    lasersmall = loadImage("./images/laser_gun.png");
+    //lasermedium = loadImage("./images/laser_medium.png");
+    //lasersmall = loadImage("./images/laser_gun.png");
     ammomedium = loadImage("./images/ammo_medium.png");
     ammosmall = loadImage("./images/ammo_icon.png");
     smooth();
@@ -718,7 +718,11 @@ void draw() {
                     image(shieldOnesmall, 270, -81); 
                 }
                 if(got_gun) {
-                   image(gunsmall, 485, 4); 
+                   image(gunsmall, 485, 4);
+                   if(remaining_gunbullet != 0){
+                    got_ammo = true;
+                   } 
+                   else { got_ammo = false; }
                 }
                 if(got_ammo) {
                    image(ammosmall, 515, 4); 
