@@ -25,32 +25,32 @@ class StartUpScreen{
                           ;
       displayNameOnLeft = cp5.addTextlabel("displayUsernameOnLeft")
                           .setText("")
-                          .setPosition(20,0)
+                          .setPosition(20,5)
                           .setFont(createFont("Georgia",13))
                           ;
      displayCoinsOnRight = cp5.addTextlabel("displayCoinsOnRight")   
                           .setText("")
                           .setVisible(true)
-                          .setPosition(440,0)
+                          .setPosition(320,5)
                           .setFont(createFont("Georgia",13))
                           ;
      displayShieldOnRight = cp5.addTextlabel("displayShieldOnRight")
                           .setText("")
                           .setVisible(true)
-                          .setPosition(480,0)
+                          .setPosition(320,5)
                           .setFont(createFont("Georgia",13))
                           ;
                           
      displayLifeOnRight = cp5.addTextlabel("displayLifeOnRight")
                           .setText("")
                           .setVisible(true)
-                          .setPosition(520,0)
+                          .setPosition(230,5)
                           .setFont(createFont("Georgia",13))
                           ;
      displayScoreOnRight = cp5.addTextlabel("displayScoreOnRight")
                           .setText("")
                           .setVisible(true)
-                          .setPosition(560,0)
+                          .setPosition(380,5)
                           .setFont(createFont("Georgia",13))
                           ;
      bangButton      = cp5.addButton("play")
@@ -64,9 +64,9 @@ class StartUpScreen{
 
 void updateScoresOnTop(int coins, int life, int shield, int score){
       displayCoinsOnRight.setText(""+coins);
-      displayShieldOnRight.setText(""+shield);
+      displayShieldOnRight.setText("");
       displayLifeOnRight.setText(""+life);
-      displayScoreOnRight.setText(""+score);
+      displayScoreOnRight.setText("Score: "+score);
 }
 
 void showScoreOnTop(){

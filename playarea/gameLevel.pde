@@ -4,7 +4,7 @@ class GameLevel{
  /* Initialize the Game Level */
    GameLevel(int level){
              gameLevel = cp5.addTextlabel("game_level")
-                          .setPosition(70, 0)
+                          .setPosition(70, 5)
                           .setValue(level)
                           .setFont(createFont("Georgia",14))
                           ;
