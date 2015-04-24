@@ -1,8 +1,9 @@
 /**
 Class that defines the Game Over Screen
+BIkram : 20:04:2015
 **/
 class EndScreen{  
- 
+ //FUnction to display top labels of score, life, coins collected et.
  void display(String player_name, String reasonOfGameOver, int gamelvl, int lifeCollected, int coinsCollected, int shieldCollected, int enemiesKilled, int totalScore, int highestScore){
        PFont font = createFont("arial",20);
        PImage[] imgs = {loadImage("./images/button1.jpg"),loadImage("./images/button1.jpg"),loadImage("./images/button1.jpg")};
@@ -77,6 +78,9 @@ class EndScreen{
                            ;
  
   }
+  
+  
+  //Hide the top socre information 
   void hideScoreBoard(){
        game_Lvl. setVisible(false);
        coins_collected.setVisible(false);        
@@ -86,7 +90,7 @@ class EndScreen{
        total_points.setVisible(false);                          
        highest_points.setVisible(false);
   }
-  
+  // REset the scoreboard
   void resetScoreBoard(){ 
       _coinsCollected =0;
       _shieldCollected =0;

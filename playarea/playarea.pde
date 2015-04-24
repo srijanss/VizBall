@@ -528,7 +528,6 @@ void draw() {
                 //scroll(0.05);
                 //scroll(0);
                 //Update score on top 
-                println(_lifeCollected);
                  s.updateScoresOnTop(_coinsCollected, _lifeCollected, _shieldCollected, _totalScore);
                  s.showScoreOnTop();
                 //Display Username: left
@@ -1504,8 +1503,8 @@ boolean get_heart(Power p) {
         if (heart.get(i) == p) {
             println("heart removed from playarea");
             p.kill();
-            ++_lifeCollected;
             life++;
+            _lifeCollected = life;
             heartSize[i] = 0;
             //got_shield = true;
 

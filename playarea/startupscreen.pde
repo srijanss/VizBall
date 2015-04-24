@@ -61,20 +61,22 @@ class StartUpScreen{
                              ; 
 }
 
-
+// FUnction to update Score on top bar
 void updateScoresOnTop(int coins, int life, int shield, int score){
       displayCoinsOnRight.setText(""+coins);
       displayShieldOnRight.setText("");
       displayLifeOnRight.setText(""+life);
       displayScoreOnRight.setText("Score: "+score);
 }
-
+//Function to show scores on top bar
 void showScoreOnTop(){
       displayCoinsOnRight.setVisible(true);
       displayShieldOnRight.setVisible(true);
       displayLifeOnRight.setVisible(true);
       displayScoreOnRight.setVisible(true);
 }
+
+//Function hide scores on top Bar.
 void hideScoresOnTop(){
       displayCoinsOnRight.setVisible(false);
       displayShieldOnRight.setVisible(false);
