@@ -50,16 +50,20 @@ class Weapon {
     if(weapon == "gun") {
       //fill(51,51,205);
       noFill();
-      stroke(51,51,205);
+      //stroke(51,51,205);
+      noStroke();
+      image(gunmedium, -17, -18);
     } else if(weapon == "laser") {
       noFill(); 
-      stroke(204);
+      noStroke();
+      image(lasermedium, -17, -18);
     } else if(weapon == "ammo") {
       noFill();
-      stroke(0);
+      noStroke();
+      image(ammomedium, -17, -18);
     }
     
-    strokeWeight(4);
+    //strokeWeight(4);
     
     ellipse(0,0,r*2,r*2);
     // Let's add a line so we can see the rotation

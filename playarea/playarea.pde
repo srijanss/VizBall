@@ -13,7 +13,7 @@ import controlP5.*;
 
 // A reference to our box2d world
 Box2DProcessing box2d;
-PImage sky, nightsky, bg, startupImg, enemyOne, enemyTwo, levelup, shieldOne, powerOne, powerTwo, scoreBoardBg;
+PImage sky, nightsky, bg, startupImg, enemyOne, enemyTwo, levelup, shieldOne, powerOne, powerTwo, scoreBoardBg, shieldOnesmall, gunmedium, gunsmall, lasermedium, lasersmall, ammomedium, ammosmall;
 int gameScreen, isHelpDisplayed, gameStartupCount;
 //ControlP5 Library used
 // 2nd March: Bikram: Added startup of Name Inquiry and greetings Screen.
@@ -175,6 +175,13 @@ void setup() {
     powerOne = loadImage("./images/heart.png");
     powerTwo = loadImage("./images/coin.png");
     //scoreBoardBg = loadImage("./images/scoreboard.png");
+    shieldOnesmall = loadImage("./images/shield_small.png");
+    gunmedium = loadImage("./images/gun_medium.png");
+    gunsmall = loadImage("./images/gun_small.png");
+    lasermedium = loadImage("./images/laser_medium.png");
+    lasersmall = loadImage("./images/laser_gun.png");
+    ammomedium = loadImage("./images/ammo_medium.png");
+    ammosmall = loadImage("./images/ammo_icon.png");
     smooth();
 
 
@@ -436,7 +443,7 @@ void create_gun() {
     float gun_gap = 0;
     for (int w=0; w<gunSize.length; w++) {
         //if(gunSize[w] == 1){
-        gun.add(new Weapon(gun_gap+width*0.43, height*0.53, 8));
+        gun.add(new Weapon(gun_gap+width*0.43, height*0.53, 13));
         gun_gap += 1200;
         //}
         if(gunSize[w] == 0) {
@@ -451,7 +458,7 @@ void create_laser() {
     float laser_gap = 0;
     for (int w=0; w<laserSize.length; w++) {
         //if(laserSize[w] == 1){
-        laser.add(new Weapon(laser_gap+width*1.43, height*0.53, 8));
+        laser.add(new Weapon(laser_gap+width*1.43, height*0.53, 15));
         laser_gap += 1200;
         //}
         if(laserSize[w] == 0) {
@@ -466,7 +473,7 @@ void create_ammo() {
     float ammo_gap = 0;
     for (int w=0; w<ammoSize.length; w++) {
         //if(ammoSize[w] == 1){
-        ammo.add(new Weapon(ammo_gap+width*2.5, height*0.53, 8));
+        ammo.add(new Weapon(ammo_gap+width*2.5, height*0.53, 14));
         ammo_gap += 1200;
         //}
         if(ammoSize[w] == 0) {
@@ -689,6 +696,15 @@ void draw() {
                // images on the top bar
                 image(powerOne, 0, -69);
                 image(powerTwo, 60, -105); 
+                if(got_shield){
+                    image(shieldOnesmall, 270, -81); 
+                }
+                if(got_gun) {
+                   image(gunsmall, 485, 4); 
+                }
+                if(got_ammo) {
+                   image(ammosmall, 515, 4); 
+                }
 
                 // Kill the enemy if it collides with shielded ball
                 if(enemy_collide_with_shield == true || enemy_collide_with_bullet == true) {
