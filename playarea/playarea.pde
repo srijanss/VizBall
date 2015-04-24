@@ -540,6 +540,7 @@ void draw() {
                 //Display Timer on right
                 //13/8/015: Bikram
                 if (t.isTimeOver()==true){
+                    t.resetTimer();
                     _reasonOfGameOver = "timeout";  
                     gameScreen = 4;
                 }
