@@ -10,6 +10,10 @@ import org.jbox2d.dynamics.*;
 import org.jbox2d.dynamics.contacts.*;
 import controlP5.*;
 //import java.util.concurrent.TimeUnit;
+import ddf.minim.*;
+// For background audio 
+AudioPlayer player;
+Minim minim;//audio context
 
 // A reference to our box2d world
 Box2DProcessing box2d;
@@ -189,7 +193,11 @@ void setup() {
     s = new StartUpScreen();
     endscreen = new EndScreen();
     t  =  new Timer();
-
+    
+    // Plyaer object - BIkram 10/05/015
+    minim = new Minim(this);
+    player = minim.loadFile("./media/bg.mp3", 2048);
+    
     s.display();
     gameScreen = 1;
     gameStartupCount = 5;
@@ -517,6 +525,8 @@ void draw() {
             }
         case 3:
             {
+                //Play audio - Bikram 
+                player.play();
                 //Check if game is restarting : Srijan 8th March 2015 
                 if (game_over) {
                     displayGameOver.remove(); 
