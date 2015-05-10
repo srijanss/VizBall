@@ -29,7 +29,7 @@ Textlabel coins_collected, shield_collected, enemies_killed, plyr_Name, total_po
 Textarea helpTextarea;
 String playerName, _reasonOfGameOver;
 int _gamelvl, _coinsCollected, _shieldCollected, _enemiesKilled, _totalScore, _highestScore, _lifeCollected;
-Button bangButton, playButton;
+Button bangButton, playButton, quitButton;
 //Array list to hold box objects for floors, ceilings and platforms
 ArrayList<Box> platforms;
 ArrayList<Box> ceilings;
@@ -196,7 +196,7 @@ void setup() {
     
     // Plyaer object - BIkram 10/05/015
     minim = new Minim(this);
-    player = minim.loadFile("./media/bg.mp3", 2048);
+    player = minim.loadFile("./media/bg.mp3");
     
     s.display();
     gameScreen = 1;
@@ -529,6 +529,10 @@ void draw() {
                 player.play();
                 //Check if game is restarting : Srijan 8th March 2015 
                 if (game_over) {
+                    player.pause();
+                    player.close();
+                    minim.stop();
+                    super.stop();
                     displayGameOver.remove(); 
                     endscreen.resetScoreBoard();
                     endscreen.hideScoreBoard();
@@ -1462,6 +1466,12 @@ public void play() {
 //OkPlay button click event
 public void play_Game() {
     gameScreen = 3;
+}
+
+//Quit BUtton 
+public void quitGame(){
+  //
+  //exit();
 }
 
 

@@ -7,6 +7,7 @@ class EndScreen{
  void display(String player_name, String reasonOfGameOver, int gamelvl, int lifeCollected, int coinsCollected, int shieldCollected, int enemiesKilled, int totalScore, int highestScore){
        PFont font = createFont("arial",20);
        PImage[] imgs = {loadImage("./images/button1.jpg"),loadImage("./images/button1.jpg"),loadImage("./images/button1.jpg")};
+       PImage[] imgs2 = {loadImage("./images/button1.jpg"),loadImage("./images/button1.jpg"),loadImage("./images/button1.jpg")};
        String str;
        if(reasonOfGameOver =="timeout"){
             str = "Timeout ";
@@ -76,7 +77,12 @@ class EndScreen{
                            .setImages(imgs)
                            .updateSize()
                            ;
- 
+      quitButton       =  cp5.addButton("quitGame")
+                           .setValue(128)
+                           .setPosition(350,220)
+                           .setImages(imgs2)
+                           .updateSize()
+                           ;
   }
   
   
