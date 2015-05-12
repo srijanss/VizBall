@@ -529,10 +529,6 @@ void draw() {
                 player.play();
                 //Check if game is restarting : Srijan 8th March 2015 
                 if (game_over) {
-                    player.pause();
-                    player.close();
-                    minim.stop();
-                    super.stop();
                     displayGameOver.remove(); 
                     endscreen.resetScoreBoard();
                     endscreen.hideScoreBoard();
@@ -1778,6 +1774,13 @@ void beginContact(Contact cp) {
 
        }
      */
+}
+
+void close_bgMusic(){
+     player.pause();
+     player.close();
+     minim.stop();
+     super.stop();
 }
 
 void endContact(Contact cp) {
