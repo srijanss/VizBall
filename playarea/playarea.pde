@@ -12,8 +12,9 @@ import controlP5.*;
 //import java.util.concurrent.TimeUnit;
 import ddf.minim.*;
 // For background audio 
-AudioPlayer player;
-Minim minim;//audio context
+AudioPlayer player, shootSound, coinCollectedSound, weaponCollected;
+Minim minim1, minim2, minim3, minim4;//audio context
+
 
 // A reference to our box2d world
 Box2DProcessing box2d;
@@ -195,8 +196,15 @@ void setup() {
     t  =  new Timer();
     
     // Plyaer object - BIkram 10/05/015
-    minim = new Minim(this);
-    player = minim.loadFile("./media/bg.mp3");
+    minim1 = new Minim(this);
+    player = minim1.loadFile("./media/bg.mp3");
+    minim2 = new Minim(this);
+    shootSound = minim2.loadFile("media/shoot.mp3");
+    minim3 = new Minim(this);
+    coinCollectedSound = minim3.loadFile("media/colectCoin.mp3");  
+    minim4 = new Minim(this);
+    weaponCollected = minim4.loadFile("media/collectweapon.mp3");
+    
     
     s.display();
     gameScreen = 1;
@@ -1476,6 +1484,7 @@ public void restart() {
     displayNameOnLeft.setVisible(false);
     gl.hideLevel();
     bangButton.remove();
+    quitButton.remove();
     game_over = true;
     gameScreen = 3;
     //endscreen.hideScoreBoard();
@@ -1535,6 +1544,7 @@ boolean get_coin(Power p) {
     for (int i=0; i<coinSize.length; i++) {
         if (coin.get(i) == p) {
             println("coin removed from playarea");
+            coin_collectedSound();
             p.kill();
             ++_coinsCollected;
             coinSize[i] = 0;
@@ -1554,6 +1564,7 @@ boolean get_gun(Weapon w) {
     for (int i=0; i<gunSize.length; i++) {
         if (gun.get(i) == w) {
             println("gun removed from playarea");
+            play_weaponCollected();
             w.kill();
             gunSize[i] = 0;
             got_gun = true;
@@ -1779,8 +1790,31 @@ void beginContact(Contact cp) {
 void close_bgMusic(){
      player.pause();
      player.close();
-     minim.stop();
+     minim1.stop();
      super.stop();
+}
+
+void play_shootSound(){
+     shootSound.play();
+     shootSound.rewind();
+}
+
+void coin_collectedSound(){
+     coinCollectedSound.play();
+     coinCollectedSound.rewind();
+     //minim3.stop(); 
+     //super.stop(); 
+}
+
+void play_ShootSound(){
+     shootSound.play();
+     
+}
+
+
+void play_weaponCollected(){
+    weaponCollected.play();
+    weaponCollected.rewind();
 }
 
 void endContact(Contact cp) {
