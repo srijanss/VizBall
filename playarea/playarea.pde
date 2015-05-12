@@ -125,7 +125,7 @@ float x_bg = 0;
 int level = 0;
 
 // Player life
-int life = 0;
+int life = 1;
 
 // Scroll value
 float fast_scroll = 2;
@@ -558,6 +558,7 @@ void draw() {
                     endscreen.resetScoreBoard();
                     endscreen.hideScoreBoard();
                     t.showTimer();
+                    _lifeCollected = 1;
                     game_over = false;
                 }
                 //scroll(0.05);
@@ -575,7 +576,10 @@ void draw() {
                 //Display Timer on right
                 //13/8/015: Bikram
                 if (t.isTimeOver()==true){
-                    
+                    if(life > 0){
+                       life--; 
+                       _lifeCollected = life;
+                    }
                     t.resetTimer();
                     _reasonOfGameOver = "timeout";  
                                       // Reset objects on timeout
@@ -610,10 +614,7 @@ void draw() {
                     gameScreen = 4;
                     }
                                       
-                    if(life > 0){
-                       life--; 
-                       _lifeCollected = life;
-                    }
+                    
                     
                 }
                 else                   
@@ -833,8 +834,18 @@ void draw() {
 
                     //reset collision flag
                     collission_with_enemy = false;
-
+                    
+                    if(life > 0){
+                       life--; 
+                       _lifeCollected = life;
+                    }
+                    //reset level to zero
+                    if(life <= 0){
+                        level = 0;
+                    }
                     if(life == 0) {
+                        life = 1;
+                        _lifeCollected = life;
                         gameScreen = 4;
                         _reasonOfGameOver = "killed"; 
                         //reset enemies and shields to initial position
@@ -865,15 +876,6 @@ void draw() {
                       destroy_weapon(ammo, false); 
                     }
                     
-                    if(life > 0){
-                       life--; 
-                       _lifeCollected = life;
-                    }
-
-                    //reset level to zero
-                    if(life <= 0){
-                        level = 0;
-                    }
                 }
 
                 // Hiding the acquired shield
@@ -1075,7 +1077,7 @@ TODO: Show Level up screen , Currently game over screen is used
             }
         case 4:
             {
-                life = 0;
+                
                 //Show Game over to user : Srijan 8th March 2015
 
                 //scroll(-5);
