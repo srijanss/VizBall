@@ -35,6 +35,7 @@ Button bangButton, playButton, quitButton;
 ArrayList<Box> platforms;
 ArrayList<Box> ceilings;
 ArrayList<Box> floors;
+boolean box_destroyed = false;
 
 //endbox at the end of each level
 Box endbox;
@@ -124,7 +125,7 @@ float x_bg = 0;
 int level = 0;
 
 // Player life
-int life = 1;
+int life = 0;
 
 // Scroll value
 float fast_scroll = 2;
@@ -292,12 +293,22 @@ void setup() {
     // Create the surface
     verticalSurface = new Surface(0, 640, -10, 0);
     verticalSurfaceRight = new Surface(0, 640, -10, 1);
+    
+    // set lifeCollected equals to life
+    _lifeCollected = life;
 }
 
 // created separate function to create floors, ceilings and platforms
 void create_boxes(float shift){
+   create_platforms(shift);
+   create_floors(shift);
+   create_ceilings(shift); 
+}
+
+void create_platforms(float shift) {
     //gap that defines the platforms to occur after the screen width : Srijan 3rd March 2015
     float platform_gap = 0;
+    //platforms.add(new Box(320, 150, width/2-50, 10));
     //Creating new platforms and adding to ArrayList : Srijan 3rd March 2015
     for (float w=width; w<=game_width; w+=width) {
         //float platform_x_pos = random(3,5);
@@ -321,13 +332,13 @@ void create_boxes(float shift){
 
         platform_gap += width;
     }
+}
+
+void create_floors(float shift) {
     //Defines the gap between the floors : Srijan 3rd March 2015
     float floor_gap = 0;
-    //Defines the gap between the ceilings : Srijan 3rd March 2015
-    float ceiling_gap = 0;
     //Create floors and adds to Arraylist : Srijan 3rd March 2015
     float floor_width = 0;
-    float ceiling_width = 0;
     //for (float w=0; w<game_width; w+=width/2) {
     for (float w=0; w<game_width; w+=width/2) {
         floors.add(new Box(shift+w+floor_gap, height-5, width/2, 10));
@@ -337,15 +348,21 @@ void create_boxes(float shift){
             break;
         }
     }
-    //Create ceilings and adds to Arraylist : Srijan 3rd March 2015
-    for (float w=0; w<game_width; w+=width) {  
+}
+
+void create_ceilings(float shift) {
+      //Defines the gap between the ceilings : Srijan 3rd March 2015
+      float ceiling_gap = 0;
+      float ceiling_width = 0;
+      //Create ceilings and adds to Arraylist : Srijan 3rd March 2015
+      for (float w=0; w<game_width; w+=width) {  
         ceilings.add(new Box(shift+w+ceiling_gap, pad_top + 5, width, 10));
         ceiling_gap += 100;
         ceiling_width = w+ceiling_gap;
         if (ceiling_width >= game_width) {
             break;
         }
-    } 
+    }
 }
 
 // Creates Enemy Object in Playarea
@@ -558,9 +575,46 @@ void draw() {
                 //Display Timer on right
                 //13/8/015: Bikram
                 if (t.isTimeOver()==true){
+                    
                     t.resetTimer();
                     _reasonOfGameOver = "timeout";  
+                                      // Reset objects on timeout
+                                      ball.done();
+                                      ball = new Ball(width*0.1, height*0.4, 10);
+                                      // reset the shift value
+                                      shift = 0;
+                                      // create the floors, platforms, ceilings for new level
+                                      scroll(0);
+                                      // reset the background scroll value
+                                      x_bg = 0;
+                                      // reset got_shield flag
+                                      got_shield = false;
+                                      // reset got_gun flag
+                                      got_gun = false;
+                                      got_ammo = false;
+
+                                     
+                                    //reset enemies and shields to initial position
+                                      destroy_floors();
+                                      destroy_platforms();
+                                      destroy_ceilings();
+                                      destroy_enemy(enemy, true);
+                                      destroy_enemy2(enemy2, true);
+                                      destroy_shield(shield1, true);
+                                      destroy_power(heart, true);
+                                      destroy_power(coin, true);
+                                      destroy_weapon(gun, true);
+                                      destroy_weapon(laser, true);
+                                      destroy_weapon(ammo, true);
+                    if(life <= 0){
                     gameScreen = 4;
+                    }
+                                      
+                    if(life > 0){
+                       life--; 
+                       _lifeCollected = life;
+                    }
+                    
                 }
                 else                   
                     timerRight.setText(""+t.getTimerValue());
@@ -578,7 +632,7 @@ void draw() {
                 if (level == 0) {
                     image(sky, 0, 0);
                 } 
-                else if (level == 2) {
+                else if (level == 1) {
                     image(nightsky, 0, 0);
                 }
                 // Background scrolling with repetition , Parallax scrolling implemented : Srijan 10th March 2015
@@ -760,7 +814,7 @@ void draw() {
 
                 //Kill the ball if ball goes through hole in floors or ceiling : Srijan 5th March 2015
                 if (ball.get_ball_pos("y") > height + 16 || ball.get_ball_pos("y") < -16 + pad_top || collission_with_enemy == true) {
-                    life--;
+                    
                     ball.done(); 
                     ball = new Ball(width*0.1, height*0.4, 10);
                     // reset the shift value
@@ -771,16 +825,11 @@ void draw() {
                     x_bg = 0;
                     // reset got_shield flag
                     got_shield = false;
+                    // reset got_gun flag
+                    got_gun = false;
+                    got_ammo = false;
 
-                    //reset enemies and shields to initial position
-                    destroy_enemy(enemy, false);
-                    destroy_enemy2(enemy2, false);
-                    destroy_shield(shield1, false);
-                    destroy_power(heart, false);
-                    destroy_power(coin, false);
-                    destroy_weapon(gun, false);
-                    destroy_weapon(laser, false);
-                    destroy_weapon(ammo, false);
+                    
 
                     //reset collision flag
                     collission_with_enemy = false;
@@ -789,6 +838,9 @@ void draw() {
                         gameScreen = 4;
                         _reasonOfGameOver = "killed"; 
                         //reset enemies and shields to initial position
+                        destroy_floors();
+                        destroy_platforms();
+                        destroy_ceilings();
                         destroy_enemy(enemy, true);
                         destroy_enemy2(enemy2, true);
                         destroy_shield(shield1, true);
@@ -798,6 +850,24 @@ void draw() {
                         destroy_weapon(laser, true);
                         destroy_weapon(ammo, true);
 
+                    } else {
+                     //reset enemies and shields to initial position
+                      destroy_floors();
+                      destroy_platforms();
+                      destroy_ceilings();
+                      destroy_enemy(enemy, false);
+                      destroy_enemy2(enemy2, false);
+                      destroy_shield(shield1, false);
+                      destroy_power(heart, false);
+                      destroy_power(coin, false);
+                      destroy_weapon(gun, false);
+                      destroy_weapon(laser, false);
+                      destroy_weapon(ammo, false); 
+                    }
+                    
+                    if(life > 0){
+                       life--; 
+                       _lifeCollected = life;
                     }
 
                     //reset level to zero
@@ -917,21 +987,28 @@ void draw() {
                                 //Check for end of level : Srijan 11th March 2015
                                 //print(x_bg);
                                 if (x_bg <=-610) {
-                                    // Level up and Increase scroll speed
-                                    gl.increaseLevel(level);
-                                    //fast_scroll +=1;
-                                    //slow_scroll +=1;
-                                    // Recreate the ball at the start for new level
-                                    ball.done();
-                                    ball = new Ball(width*0.1, height*0.4, 10);
-                                    // reset the shift value
-                                    shift = 0;
-                                    // create the floors, platforms, ceilings for new level
-                                    scroll(0);
-                                    // reset the background scroll value
-                                    x_bg = 0;
-                                    // reset got_shield flag
-                                    got_shield = false;
+                                    
+                                    if(_totalScore > 500){
+                                      // Level up and Increase scroll speed
+                                      level++;
+                                      gl.increaseLevel(level);
+                                      t.resetTimer();
+                                      //fast_scroll +=1;
+                                      //slow_scroll +=1;
+                                      // Recreate the ball at the start for new level
+                                      ball.done();
+                                      ball = new Ball(width*0.1, height*0.4, 10);
+                                      // reset the shift value
+                                      shift = 0;
+                                      // create the floors, platforms, ceilings for new level
+                                      scroll(0);
+                                      // reset the background scroll value
+                                      x_bg = 0;
+                                      // reset got_shield flag
+                                      got_shield = false;
+                                      // reset got_gun flag
+                                      got_gun = false;
+                                      got_ammo = false;
 
                                     // TODO: Currently resetting when level up
                                     //  Need to set different placement in the playarea for different level
@@ -969,20 +1046,24 @@ void draw() {
                                     }
                                      */ 
                                     //reset enemies and shields to initial position
-                                    destroy_enemy(enemy, true);
-                                    destroy_enemy2(enemy2, true);
-                                    destroy_shield(shield1, true);
-                                    destroy_power(heart, true);
-                                    destroy_power(coin, true);
-                                    destroy_weapon(gun, true);
-                                    destroy_weapon(laser, true);
-                                    destroy_weapon(ammo, true);
+                                      destroy_floors();
+                                      destroy_platforms();
+                                      destroy_ceilings();
+                                      destroy_enemy(enemy, true);
+                                      destroy_enemy2(enemy2, true);
+                                      destroy_shield(shield1, true);
+                                      destroy_power(heart, true);
+                                      destroy_power(coin, true);
+                                      destroy_weapon(gun, true);
+                                      destroy_weapon(laser, true);
+                                      destroy_weapon(ammo, true);
                                     /*
 TODO: Show Level up screen , Currently game over screen is used
 :Srijan 11th March 2015
                                      */
 
                                     //gameScreen = 4;
+                                    }
                                 }
                             }
                         }
@@ -994,7 +1075,7 @@ TODO: Show Level up screen , Currently game over screen is used
             }
         case 4:
             {
-                life = 1;
+                life = 0;
                 //Show Game over to user : Srijan 8th March 2015
 
                 //scroll(-5);
@@ -1019,17 +1100,46 @@ TODO: Show Level up screen , Currently game over screen is used
    April 1st 2015 : Srijan
    Created destroy box function to destroy the box objects inthe box2d area
  */
-boolean destroy_box(ArrayList<Box> boxobj) {
-    while (boxobj.size () > 0) {
-        for (int i=0; i<boxobj.size (); i++) {
-            Box b = boxobj.get(i);
+void destroy_floors() {
+    while (floors.size () > 0) {
+        for (int i=0; i<floors.size (); i++) {
+            Box b = floors.get(i);
             //b.update();
             if (b.kill()) {
-                boxobj.remove(i);
+                floors.remove(i);
             }
         }
     }
-    return true;
+   // return true;
+   create_floors(0);
+}
+
+void destroy_ceilings() {
+    while (ceilings.size () > 0) {
+        for (int i=0; i<ceilings.size (); i++) {
+            Box b = ceilings.get(i);
+            //b.update();
+            if (b.kill()) {
+                ceilings.remove(i);
+            }
+        }
+    }
+   // return true;
+   create_ceilings(0);
+}
+
+void destroy_platforms() {
+    while (platforms.size () > 0) {
+        for (int i=0; i<platforms.size (); i++) {
+            Box b = platforms.get(i);
+            //b.update();
+            if (b.kill()) {
+                platforms.remove(i);
+            }
+        }
+    }
+   // return true;
+   create_platforms(0);
 }
 
 /* 
@@ -1262,7 +1372,35 @@ void scroll(float value) {
             laser.get(i).shiftBody("r");
         } 
     }
-
+    
+    for(i=0; i<floors.size(); i++){
+        if(left_scroll_state == true){ 
+            floors.get(i).shiftBody("l");
+        }
+        else if(right_scroll_state == true) {
+            floors.get(i).shiftBody("r");
+        } 
+    }
+    
+    for(i=0; i<ceilings.size(); i++){
+        if(left_scroll_state == true){ 
+            ceilings.get(i).shiftBody("l");
+        }
+        else if(right_scroll_state == true) {
+            ceilings.get(i).shiftBody("r");
+        } 
+    }
+    
+    for(i=0; i<platforms.size(); i++){
+        if(left_scroll_state == true){ 
+            platforms.get(i).shiftBody("l");
+        }
+        else if(right_scroll_state == true) {
+            platforms.get(i).shiftBody("r");
+        } 
+    }
+    
+    /*
     // Shift Boxes  
     if (destroy_box(floors)){
         if(destroy_box(ceilings)){
@@ -1271,6 +1409,7 @@ void scroll(float value) {
             }
         }
     }
+    */
 }
 
 //float addT = 0;
