@@ -19,18 +19,22 @@ Minim minim1, minim2, minim3, minim4;//audio context
 // A reference to our box2d world
 Box2DProcessing box2d;
 PImage sky, nightsky, bg, startupImg, enemyOne, enemyTwo, levelup, shieldOne, powerOne, powerTwo, scoreBoardBg, shieldOnesmall, gunmedium, gunsmall, lasermedium, lasersmall, ammomedium, ammosmall;
-int gameScreen, isHelpDisplayed, gameStartupCount;
+int gameScreen, isHelpDisplayed, isEndScreenDisplayed, gameStartupCount;
 //ControlP5 Library used
 // 2nd March: Bikram: Added startup of Name Inquiry and greetings Screen.
 ControlP5 cp5;
 Textfield targetField;
-Textlabel displayGreetings, displayNameOnLeft, displayGameOver, timerRight, gameLevel, displayCoinsOnRight, displayShieldOnRight, displayLifeOnRight, displayScoreOnRight;
+Textlabel displayGreetings = null;
+Textlabel displayNameOnLeft, displayGameOver, timerRight, gameLevel, displayCoinsOnRight, displayShieldOnRight, displayLifeOnRight, displayScoreOnRight;
 Textlabel coins_collected, shield_collected, enemies_killed, plyr_Name, total_points, highest_points, game_Lvl, life_collected;
 
-Textarea helpTextarea;
+Textarea helpTextarea = null;
 String playerName, _reasonOfGameOver;
 int _gamelvl, _coinsCollected, _shieldCollected, _enemiesKilled, _totalScore, _highestScore, _lifeCollected;
-Button bangButton, playButton, quitButton;
+Button checkNameButton = null;
+Button playButton = null;
+Button restartButton = null;
+Button quitButton = null;
 //Array list to hold box objects for floors, ceilings and platforms
 ArrayList<Box> platforms;
 ArrayList<Box> ceilings;
@@ -206,12 +210,12 @@ void setup() {
     minim4 = new Minim(this);
     weaponCollected = minim4.loadFile("media/collectweapon.mp3");
     
-    
     s.display();
     gameScreen = 1;
     gameStartupCount = 5;
     //Check if if help is displayed
     isHelpDisplayed = 0;
+    isEndScreenDisplayed = 0;
     t.initializeTimer();
     // Initiliaze Game level
     gl = new GameLevel(level);
@@ -534,17 +538,18 @@ void draw() {
             {
                 /*Show Greetings, Help and Play buttons*/
                 //1/8/015: Bikram
+                s.displayGreetings();
                 displayGreetings.setText("Welcome " + playerName); 
                 background(startupImg);
 
 
                 if (isHelpDisplayed == 0) {
+                    isHelpDisplayed = 1;
                     /* Removing GUI */
                     targetField.remove();
-                    bangButton.remove();
                     s.displayHelp();
                     gameScreen = 2;
-                    isHelpDisplayed =1;
+                    
                 }
                 break;
             }
@@ -554,7 +559,6 @@ void draw() {
                 player.play();
                 //Check if game is restarting : Srijan 8th March 2015 
                 if (game_over) {
-                    displayGameOver.remove(); 
                     endscreen.resetScoreBoard();
                     endscreen.hideScoreBoard();
                     t.showTimer();
@@ -569,10 +573,10 @@ void draw() {
                 //Display Username: left
                 //3/8/015: Bikram
                 displayNameOnLeft.setVisible(true);
-                displayGreetings.remove();
+                s.hideGreetings();
                 displayNameOnLeft.setText(playerName);
-                helpTextarea.remove();
-                playButton.remove();
+                
+                s.hideHelp();
                 //Display Timer on right
                 //13/8/015: Bikram
                 if (t.isTimeOver()==true){
@@ -1077,18 +1081,22 @@ TODO: Show Level up screen , Currently game over screen is used
             }
         case 4:
             {
-                
-                //Show Game over to user : Srijan 8th March 2015
-
-                //scroll(-5);
-                endscreen.display(playerName, _reasonOfGameOver, _gamelvl, _lifeCollected,  _coinsCollected, _shieldCollected, _enemiesKilled, _totalScore, _highestScore);
-                //background(scoreBoardBg);
-                gameScreen = 1;
+              background(startupImg);
+              
+              if (isEndScreenDisplayed == 0) {
+                isEndScreenDisplayed = 1;
+                  
+                displayNameOnLeft.setVisible(false);   
+                gameLevel.setVisible(false);  
                 s.hideScoresOnTop();
                 // Reset Timer and Remove it; Bikram 14th March 015
                 t.resetTimer();
-                t.hideTimer();
-                break;
+                t.hideTimer();  
+                
+                //Show Game over to user : Srijan 8th March 2015
+                endscreen.display(playerName, _reasonOfGameOver, _gamelvl, _lifeCollected,  _coinsCollected, _shieldCollected, _enemiesKilled, _totalScore, _highestScore);
+              }
+              break;
             }
         default:
             {
@@ -1605,34 +1613,35 @@ void keyReleased() {
 }
 
 //Play button click event
-public void play() {
-    playerName = targetField.getText();
-    if (playerName!="") {
+public void checkName() {
+    playerName = trim(targetField.getText());
+    if (playerName.length() != 0) {
         gameScreen = 2;
+        checkNameButton.setVisible(false);
     }
 }
 
 //OkPlay button click event
-public void play_Game() {
+public void playGame() {
     gameScreen = 3;
+    playButton.setVisible(false);
+    helpTextarea.setVisible(false);
 }
 
-//Quit BUtton 
+//Quit Button 
 public void quitGame(){
-  //
-  //exit();
+    exit();
 }
-
 
 //Restart button 
-public void restart() {
+public void restartGame() {
+    println("Restarting game!");
+    endscreen.hideScoreBoard();
     displayNameOnLeft.setVisible(false);
     gl.hideLevel();
-    bangButton.remove();
-    quitButton.remove();
     game_over = true;
     gameScreen = 3;
-    //endscreen.hideScoreBoard();
+    isEndScreenDisplayed = 0;
 }
 
 // acquires the shield object that collides with ball 
