@@ -531,6 +531,7 @@ void create_ammo() {
 // Bullets
 void create_bullet(float x_pos, float y_pos) {
     gunbullet.add(new Bullet(x_pos, y_pos, 8));
+    play_shootSound();
 }
 
 void draw() {
