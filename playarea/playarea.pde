@@ -12,8 +12,8 @@ import controlP5.*;
 //import java.util.concurrent.TimeUnit;
 import ddf.minim.*;
 // For background audio 
-AudioPlayer player, shootSound, coinCollectedSound, weaponCollected;
-Minim minim1, minim2, minim3, minim4;//audio context
+AudioPlayer player, shootSound, coinCollectedSound, weaponCollected, GameEnd, heartCollected, enemyKilled, shieldCollected;
+Minim minim1, minim2, minim3, minim4, minim5, minim6, minim7, minim8;//audio context
 
 
 // A reference to our box2d world
@@ -209,7 +209,14 @@ void setup() {
     coinCollectedSound = minim3.loadFile("media/colectCoin.mp3");  
     minim4 = new Minim(this);
     weaponCollected = minim4.loadFile("media/collectweapon.mp3");
-    
+    minim5 = new Minim(this);
+    GameEnd = minim5.loadFile("media/GameEnd.mp3");
+    minim6 = new Minim(this);
+    heartCollected = minim6.loadFile("media/heartCollected.mp3");
+    minim7 = new Minim(this);
+    enemyKilled = minim7.loadFile("media/destroyed.mp3");
+    minim8 = new Minim(this);
+    shieldCollected = minim8.loadFile("media/shieldCollected.mp3");
     s.display();
     gameScreen = 1;
     gameStartupCount = 5;
@@ -1095,6 +1102,8 @@ TODO: Show Level up screen , Currently game over screen is used
                 
                 //Show Game over to user : Srijan 8th March 2015
                 endscreen.display(playerName, _reasonOfGameOver, _gamelvl, _lifeCollected,  _coinsCollected, _shieldCollected, _enemiesKilled, _totalScore, _highestScore);
+                close_bgMusic();
+                play_GameEnd();
               }
               break;
             }
@@ -1943,9 +1952,10 @@ void beginContact(Contact cp) {
 
 void close_bgMusic(){
      player.pause();
-     player.close();
-     minim1.stop();
-     super.stop();
+     player.rewind();
+     //player.close();
+     //minim1.stop();
+     //super.stop();
 }
 
 void play_shootSound(){
@@ -1960,9 +1970,24 @@ void coin_collectedSound(){
      //super.stop(); 
 }
 
-void play_ShootSound(){
-     shootSound.play();
-     
+void play_GameEnd(){
+     GameEnd.play(); 
+     GameEnd.rewind();
+}
+
+void play_heartCollected(){
+     heartCollected.play();
+     heartCollected.rewind();
+}
+
+void play_enemyKilled(){
+     enemyKilled.play();
+     enemyKilled.rewind();
+}
+
+void shieldCollected(){
+    shieldCollected.play();
+    shieldCollected.rewind();
 }
 
 
