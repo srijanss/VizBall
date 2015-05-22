@@ -56,7 +56,7 @@ class Weapon {
     } else if(weapon == "laser") {
       noFill(); 
       noStroke();
-      //image(lasermedium, -17, -18);
+      image(lasermedium, -17, -18);
     } else if(weapon == "ammo") {
       noFill();
       noStroke();
