@@ -1,7 +1,7 @@
 //VVizball Game Playarea
 
 //imports from box2d library
-import shiffman.box2d.*;
+import shiffman.box2d.*; 
 import org.jbox2d.dynamics.joints.*;
 import org.jbox2d.collision.shapes.*;
 import org.jbox2d.collision.shapes.Shape;
@@ -281,7 +281,7 @@ void setup() {
     ball = new Ball(width*0.1, height*0.4, 10);
 
     // endbox object
-    endbox = new Box(3000, -10, 200, 600); 
+    create_endbox(0);
 
     // Function that creates Floors, Ceilings and Platforms
     create_boxes(0);
@@ -319,6 +319,10 @@ void setup() {
     // set lifeCollected equals to life
     _lifeCollected = life;
 }
+
+void create_endbox(float shift){
+  endbox = new Box(shift+2800, -10, 200, 600);
+} 
 
 // created separate function to create floors, ceilings and platforms
 void create_boxes(float shift){
@@ -624,6 +628,7 @@ void draw() {
                                       got_shield = false;
                                       // reset got_gun flag
                                       got_gun = false;
+                                      got_laser = false;
                                       got_ammo = false;
 
                                      
@@ -631,6 +636,7 @@ void draw() {
                                       destroy_floors();
                                       destroy_platforms();
                                       destroy_ceilings();
+                                      destroy_endbox();
                                       destroy_enemy(enemy, true);
                                       destroy_enemy2(enemy2, true);
                                       destroy_shield(shield1, true);
@@ -885,6 +891,7 @@ void draw() {
                     got_shield = false;
                     // reset got_gun flag
                     got_gun = false;
+                    got_laser = false;
                     got_ammo = false;
 
                     
@@ -909,6 +916,7 @@ void draw() {
                         destroy_floors();
                         destroy_platforms();
                         destroy_ceilings();
+                        destroy_endbox();
                         destroy_enemy(enemy, true);
                         destroy_enemy2(enemy2, true);
                         destroy_shield(shield1, true);
@@ -923,6 +931,7 @@ void draw() {
                       destroy_floors();
                       destroy_platforms();
                       destroy_ceilings();
+                      destroy_endbox();
                       destroy_enemy(enemy, false);
                       destroy_enemy2(enemy2, false);
                       destroy_shield(shield1, false);
@@ -1051,11 +1060,17 @@ void draw() {
                                 }
                                 //Check for end of level : Srijan 11th March 2015
                                 //print(x_bg);
-                                if (x_bg <=-610) {
+                                if (x_bg <=-320) {
                                     
                                     if(_totalScore > 500){
                                       // Level up and Increase scroll speed
                                       level++;
+                                      if(level == 3){
+                                        gameScreen = 4;
+                                        level = 0;
+                                        life = 1;
+                                        _lifeCollected = life;
+                                      }
                                       gl.increaseLevel(level);
                                       t.resetTimer();
                                       //fast_scroll +=1;
@@ -1073,6 +1088,7 @@ void draw() {
                                       got_shield = false;
                                       // reset got_gun flag
                                       got_gun = false;
+                                      got_laser = false;
                                       got_ammo = false;
 
                                     // TODO: Currently resetting when level up
@@ -1114,6 +1130,7 @@ void draw() {
                                       destroy_floors();
                                       destroy_platforms();
                                       destroy_ceilings();
+                                      destroy_endbox();
                                       destroy_enemy(enemy, true);
                                       destroy_enemy2(enemy2, true);
                                       destroy_shield(shield1, true);
@@ -1128,6 +1145,7 @@ TODO: Show Level up screen , Currently game over screen is used
                                      */
 
                                     //gameScreen = 4;
+                                    
                                     }
                                 }
                             }
@@ -1181,6 +1199,7 @@ void destroy_floors() {
             }
         }
     }
+    println("floors killed");
    // return true;
    create_floors(0);
 }
@@ -1195,8 +1214,16 @@ void destroy_ceilings() {
             }
         }
     }
+    println("ceilings killed");
    // return true;
    create_ceilings(0);
+}
+
+void destroy_endbox() {
+   endbox.kill();
+   //endbox = new Box(shift+3000, -10, 200, 600);
+   println("endbox killed");
+   create_endbox(0);
 }
 
 void destroy_platforms() {
@@ -1209,6 +1236,7 @@ void destroy_platforms() {
             }
         }
     }
+    println("platforms killed");
    // return true;
    create_platforms(0);
 }
@@ -1374,8 +1402,14 @@ void scroll(float value) {
     shift += value;
 
     // shifting the box and the end of the each level
-    endbox.kill();
-    endbox = new Box(shift+3000, -10, 200, 600);
+    //endbox.kill();
+    //endbox = new Box(shift+3000, -10, 200, 600);
+    if(left_scroll_state == true){ 
+            endbox.shiftBody("l");
+        }
+    else if(right_scroll_state == true) {
+            endbox.shiftBody("r");
+    } 
 
     // TODO: make scroll_object functions which can be used by all the scrolling objects in playarea
     // Currently for loop used for individual object
@@ -1731,6 +1765,9 @@ void keyReleased() {
         if (keyCode == CONTROL) {
             keyCtrl = false;
             //moveLeft = 0;
+        }
+        if(keyCode != UP || keyCode != DOWN || keyCode != RIGHT || keyCode != LEFT || keyCode != CONTROL) {
+           println(keyCode); 
         }
     }
 }
